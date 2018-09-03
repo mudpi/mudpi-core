@@ -222,37 +222,37 @@ Here is a more complex example configuration file with an Arduino connected to U
 There are a number of sensors supported by default with MudPi for both the raspberry pi and arduino. Here are the options for adding the sensor to your system. You can read about the formatting in the configuration file above for adding the sensor.
 
 ### Pi Sensors
-* Liquid Float Level Switch
+* **Liquid Float Level Switch**
 	* 0 or 1 digital read of liquid level.
 	* **type:** Float
 	* _Returns:_ [Boolean] 0 or 1
-* Humidity Temperature Sensor (DHT)
+* **Humidity Temperature Sensor (DHT)**
 	* Take a digital read of humidity and temperature.
 	* **type:** Humidity
 	* _Returns:_ [Object] {humidity: float, temperature: float}
 
 ### Arduino Sensors
-* Soil Moisture
+* **Soil Moisture**
 	* Takes an analog reading of water content in soil.
 	* **type:** Soil
 	* _Returns:_ [Integer] Resistance
-* Liquid Float Level Switch
+* **Liquid Float Level Switch**
 	* 0 or 1 digital read of liquid level.
 	* **type:** Float
 	* _Returns:_ [Boolean] 0 or 1
-* Humidity Temperature Sensor (DHT)
+* **Humidity Temperature Sensor (DHT)**
 	* Take a digital read of humidity and temperature.
 	* **type:** Humidity
 	* _Returns:_ [Object] {humidity: float, temperature: float}
-* Rain Sensor
+* **Rain Sensor**
 	* Takes an analog reading of moisture/rain.
 	* **type:** Rain
 	* _Returns:_ [Integer] Resistance
-* Temperature Sensor (Onewire)
+* **Temperature Sensor (Onewire)**
 	* Takes a digital reading of temperature using onewire bus.
 	* **type:** Temperature
 	* _Returns:_ [Object] {temp_0: float, temp_1: float, ...}
-* Light Intesity Sensor (Not Fully Complete)
+* **Light Intesity Sensor (Not Fully Complete)**
 	* **type:** Light
 
 ## Redis
