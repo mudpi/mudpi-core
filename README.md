@@ -90,71 +90,71 @@ MudPi loads everything it needs from a JSON formatted file in the root installat
 
 If you plan to edit the config file manually or want know more about it, below you can find details about each of the configuration options available.
 
-**name** [String]
-Name of the system. Not used in the core, mainly here in case you wanted to pull for a UI.
+* **name** [String]
+	* Name of the system. Not used in the core, mainly here in case you wanted to pull for a UI.
 
-**version** 
-Version of your system. Not used yet, might be useful for legacy.
+* **version** 
+	* Version of your system. Not used yet, might be useful for legacy.
 
-**debug** [Boolean]
-If enabled, MudPi will output more information while the system runs. More information about the startup and cycles will be output.
+* **debug** [Boolean]
+	* If enabled, MudPi will output more information while the system runs. More information about the startup and cycles will be output.
 
-**server** [Object]
-Configuration for the MudPi socketio server. _Currently not used_
-	**host** [String]
-		IP address of server
-	**port** [Integer]
-		Port to run server on
+* **server** [Object]
+	* Configuration for the MudPi socketio server. _Currently not used_
+		* **host** [String]
+			* IP address of server
+		* **port** [Integer]
+			* Port to run server on
 
-**redis** [Object]
-Configuration of redis server to store sensor reads and utilize Pub/Sub
-	**host** [String]
-	IP address of redis server
-	**port** [Integer]
-	Port of redis server
+* **redis** [Object]
+	* Configuration of redis server to store sensor reads and utilize Pub/Sub
+		* **host** [String]
+			* IP address of redis server
+		* **port** [Integer]
+			* Port of redis server
 
-**pump** [Object]
-Configuration for relay that runs pump.
-	**pin** [Integer]
-	GPIO pin number the relay is hooked up to on the raspberry pi
-	**max_duration** [Integer]
-	Maximum runtime that the relay should be switched on in seconds
+* **pump** [Object]
+	* Configuration for relay that runs pump.
+		* **pin** [Integer]
+			* GPIO pin number the relay is hooked up to on the raspberry pi
+		* **max_duration** [Integer]
+			* Maximum runtime that the relay should be switched on in seconds
 	
-**sensors** [Array]
-An array of objects containing configuration for sensors attached to the raspberry pi. 
-	**sensor** [Object]
-	Configuration for a sensor attached to raspberry pi
-		**type** [String]
-		Type of sensor. Options: `Float`, `Humidity`
-		**pin** [Integer]
-		GPIO pin number on raspberry pi the sensor is connected to
-		**name** [String]
-		Name of the sensor. The name will be used as key to store in redis if a key is not specified. 
-		**key** [String] (Optional)
-		Key to store value under in redis. Alphanumeric with underscores only. Must be valid redis key. _If a key is not provided it will use the name converted to lowercase and spaces replaced with underscores._
-		**percent** [Integer] (Float Type Only)
-		For float sensors this value specifies the percent filled the container is. Useful for UI, not critical to core. 
-		**critical** [Boolean] (Float Type Only)
-		For float sensors this value specifies if the liquid level is critical to pump function. **If critical is set to true and the float sensor reads false, the relay will not turn on.** 
+* **sensors** [Array]
+	* An array of objects containing configuration for sensors attached to the raspberry pi. 
+	* **sensor** [Object]
+		* Configuration for a sensor attached to raspberry pi
+			* **type** [String]
+				* Type of sensor. Options: `Float`, `Humidity`
+			* **pin** [Integer]
+				* GPIO pin number on raspberry pi the sensor is connected to
+			* **name** [String]
+				* Name of the sensor. The name will be used as key to store in redis if a key is not specified. 
+			* **key** [String] (Optional)
+				* Key to store value under in redis. Alphanumeric with underscores only. Must be valid redis key. _If a key is not provided it will use the name converted to lowercase and spaces replaced with underscores._
+			* **percent** [Integer] (Float Type Only)
+				* For float sensors this value specifies the percent filled the container is. Useful for UI, not critical to core. 
+			* **critical** [Boolean] (Float Type Only)
+				* For float sensors this value specifies if the liquid level is critical to pump function. **If critical is set to true and the float sensor reads false, the relay will not turn on.** 
 
-**nodes** [Array]
-An array of objects containing configuration for arduinos attached to the raspberry pi.
-	**name** [String]
-	Name of Arduino	 connected to pi. Not important, only useful for UI or sorting sensor reads in the future. 
-	**address** [String]
-	TTY Serial address of Arduino connected to the raspberry pi over USB.
-	**sensors** [Array]
-	An array of objects containing configuration options for sensors connected to the node (Arduino). Run `ls /dev` in your raspberry pi terminal to list devices connected. Typically this value is one of `/dev/AMA0`, `/dev/ttyUSB0`, or `/dev/ttyUSB1`.
-		**sensor** [Object]
-		Configuration for a sensor attached to an Arduino
-			**type** [String]
-			Type of sensor. Options: `Temperature`, `Humidity`, `Soil`, `Rain`, `Light`, `Float`
-			**pin** [Integer]
-			GPIO pin number on the Arduino the sensor is connected to
-			**name** [String]
-			Name of the sensor. The name will be used as key to store in redis if a key is not specified. 
-			**key** [String] (Optional)
-			Key to store value under in redis. Alphanumeric with underscores only. Must be valid redis key. _If a key is not provided it will use the name converted to lowercase and spaces replaced with underscores._
+* **nodes** [Array]
+	* An array of objects containing configuration for arduinos attached to the raspberry pi.
+	* **name** [String]
+		* Name of Arduino	 connected to pi. Not important, only useful for UI or sorting sensor reads in the future. 
+	* **address** [String]
+		* TTY Serial address of Arduino connected to the raspberry pi over USB.
+	* **sensors** [Array]
+		* An array of objects containing configuration options for sensors connected to the node (Arduino). Run `ls /dev` in your raspberry pi terminal to list devices connected. Typically this value is one of `/dev/AMA0`, `/dev/ttyUSB0`, or `/dev/ttyUSB1`.
+		* **sensor** [Object]
+			* Configuration for a sensor attached to an Arduino
+				* **type** [String]
+					* Type of sensor. Options: `Temperature`, `Humidity`, `Soil`, `Rain`, `Light`, `Float`
+				* **pin** [Integer]
+					* GPIO pin number on the Arduino the sensor is connected to
+				* **name** [String]
+					* Name of the sensor. The name will be used as key to store in redis if a key is not specified. 
+				* **key** [String] (Optional)
+					* Key to store value under in redis. Alphanumeric with underscores only. Must be valid redis key. _If a key is not provided it will use the name converted to lowercase and spaces replaced with underscores._
 
 Here is a more complex example configuration file with an Arduino connected to USB 0
 ```json
