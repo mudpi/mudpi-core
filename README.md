@@ -210,7 +210,7 @@ Here is a more complex example configuration file with an Arduino connected to U
 ## How It Works
 Here is a diagram of the core architecture for MudPi and how it works:
 
-![](Mudpi-architecture.png)
+![alt text](http://ericdavisson.com/img/Mudpi-architecture.png)
 
 MudPi consists of multiple workers that are each responsible for a certain set of actions. Currently there are 3 workers included in MudPi, they are as follows:
 
