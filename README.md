@@ -12,14 +12,14 @@ I have also create an IMG of my pi to make things faster but keep in mind its be
 There are a few libraries that need to be installed for a minimal setup. However, if you want to take advantage of all the features of MudPi you will need:
 
 **Minimal Requirements**
-	* Raspberry Pi 
-		* Raspbian GNU/Linux 9 [stretch] (or similar distribution) 
-	* Python 3.5 
-		* (3.4 Included with Raspbian)
-	* RPi.GPIO 0.6.3 
-		* (Comes with Raspbian)
-	* Redis 3.2* (Redis to store values and Pub/Sub)
-		* [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
+* Raspberry Pi 
+	* Raspbian GNU/Linux 9 [stretch] (or similar distribution) 
+* Python 3.5 
+	- (3.4 Included with Raspbian)
+* RPi.GPIO 0.6.3 
+	* (Comes with Raspbian)
+* Redis 3.2* (Redis to store values and Pub/Sub)
+	* [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
 		
 ```bash
 pip install RPi.GPIO
@@ -299,15 +299,15 @@ If you have a sensor MudPi is not working with or you want to add more configura
 There are still some items remaining for MudPi that I would like to complete. I am aiming for more sensor support and working on other methods of communication like wifi and I2C. There are tweaks to the configuration and existing modules that still need to be completed for better error handling and allowing better customization. Additionally there are a few more features left to complete like solenoids for zoned watering, or a flow meter for accurate water usage. 
 
 **Todos**
-	- [ ] Pi Onewire Temperature Sensor Script (Dallas Temperature)
-	- [ ] Solenoid and Zone Control Scripts
-	- [ ] Flowmeter Script
-	- [ ] More configuration control
-	- [ ] Retry and Restart System After Serial Timeout During Prolonged Use
-	- [ ] Camera Feature (Pi)
-	- [ ] Finish LCD Screen Support
+- [ ] Pi Onewire Temperature Sensor Script (Dallas Temperature)
+- [ ] Solenoid and Zone Control Scripts
+- [ ] Flowmeter Script
+- [ ] More configuration control
+- [ ] Retry and Restart System After Serial Timeout During Prolonged Use
+- [ ] Camera Feature (Pi)
+- [ ] Finish LCD Screen Support
 
 **Maybes**
-	- [ ] Light Sensors ?
-	- [ ] Hardware controls (i.e. buttons)
+- [ ] Light Sensors ?
+- [ ] Hardware controls (i.e. buttons)
 
