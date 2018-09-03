@@ -1,5 +1,4 @@
-
-![alt text](http://ericdavisson.com/img/mudpi/mudPI_LOGO_small_flat.png)
+<img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="http://ericdavisson.com/img/mudpi/mudPI_LOGO_small_flat.png" width="200px">
 
 # MudPi Smart Garden
 > Configurable smart garden system for your raspberry pi garden project.  
@@ -315,3 +314,5 @@ There are still some items remaining for MudPi that I would like to complete. I 
 - [ ] Light Sensors ?
 - [ ] Hardware controls (i.e. buttons)
 
+
+<img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="http://ericdavisson.com/img/mudpi/mudPI_LOGO_small_flat.png" width="50px">
