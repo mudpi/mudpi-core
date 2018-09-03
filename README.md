@@ -5,6 +5,8 @@
 
 MudPi is a configurable smart garden system that runs on a raspberry pi written in python with no coding required to get started. MudPi is compatible with a variety of sensors on both the raspberry pi and Arduino allowing you create both simple and complex setups. Connect your sensors, edit the configuration file, and your all set!
 
+
+
 ## Getting Started
 To get started, download the MudPi repository from GitHub, edit your configuration file and run the main MudPi script. Make sure to install the prerequisites below if you have not already.
 
@@ -65,10 +67,9 @@ Edit the **mudpi.config** file located in the root of the MudPi installation. It
     },
     "sensors": [
         {
-            "type":"Float",
-            "pin": 19,
-            "name":"Water Tank Low",
-            "percent":5
+            "type":"Humidity",
+            "pin": 25,
+            "name":"Weather Station"
         }
     ]
 }
@@ -95,6 +96,15 @@ autorestart=true
 stderr_logfile=/var/www/mudpi/logs/mudpi.err.log
 stdout_logfile=/var/www/mudpi/logs/mudpi.out.log
 ```
+
+
+### Basic Hardware Example
+MudPi is built so you can add sensors and configure the system to your specific setup. You can review more info below under [the sensors section](#sensors) about all the sensor types available to you. 
+
+Here is a basic hardware example to get started with a DHT11 Humidity sensor hooked up to our pi on GPIO pin 25. _This will work the the configuration file example listed above and included by default._
+
+<img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="http://ericdavisson.com/img/mudpi/mudpi-example-1.png" width="300px">
+
 
 
 ## Configuring MudPi
@@ -218,6 +228,8 @@ Here is a more complex example configuration file with an Arduino connected to U
 
 ```
 
+
+
 ## Sensors
 There are a number of sensors supported by default with MudPi for both the raspberry pi and arduino. Here are the options for adding the sensor to your system. You can read about the formatting in the configuration file above for adding the sensor.
 
@@ -254,6 +266,8 @@ There are a number of sensors supported by default with MudPi for both the raspb
 	* _Returns:_ [Object] {temp_0: float, temp_1: float, ...}
 * **Light Intesity Sensor (Not Fully Complete)**
 	* **type:** Light
+
+
 
 ## Redis
 We chose redis to store our values quickly and to utilize its Pub/Sub capabilities since it was able to work across multiple languages Python, PHP, and Javascript in our case). If you don't have redis installed here is a great guide I used: [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
@@ -358,6 +372,7 @@ Data will be an object of all your sensor readings.
 ```
 
 
+
 ## How It Works
 Here is a diagram of the core architecture for MudPi and how it works:
 
@@ -404,12 +419,15 @@ Here are a few things I ran into:
 * Reading False from redis in python can be cast as a string by default which is truthy and caused a long confusing bug. Instead of storing false we just removed the key from redis using a `del` command and check for it the keys existance in MudPi.
 
 
+
 ## Contributing
 This was a side project for me to scratch my own itch at home. Any contributions you can make will be greatly appreciated. This is one of the first projects I am able to share publicly and I hope if comes of great use to other looking to build something similar.
 
 
+
 ## Versioning
 Breaking.Major.Minor
+
 
 
 ## Authors
@@ -417,21 +435,25 @@ Breaking.Major.Minor
 * Twitter.com/theDavisson
 
 
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
 
 
 ## Acknowledgments
 * Nanpy
 	* This library made the Arduino side of this project possible allowing me to setup a master/slave system of raspberry pi and Arduinos. 
-* Shoutout to my buddy who helped me with some of the AC to DC electrical stuff.
+* Shoutout to my buddy Drake who helped me with some of the AC to DC electrical stuff.
+	
 	
 
 ## Why Did You Build This?
 Gardening at home was taking more time that I would like and buying a simple timer for the hose was not something I really wanted as a solution. I wanted to build my own automated garden with my raspberry pi I had lying around. I do a good deal of web development during the day so the software aspect wasn’t an issue but I hadn’t touched electronics for years since high school so this was a good refresher. **You can read how I built MudPi and the process of me setting it up at home on the MudPi blog**
 
 
-## Tested On
+
+## Hardware Tested On
 These are the devices and sensors I tested and used with MudPi successfully. Many sensors are similar so it will work with a range more than what is listed below. 
 
 * [Raspberry Pi 2 Model B+](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/)
@@ -446,6 +468,7 @@ These are the devices and sensors I tested and used with MudPi successfully. Man
 * [USB to TTL USB 2.0 Serial Module UART](https://www.amazon.com/gp/product/B07CWKHTLH/ref=oh_aui_detailpage_o04_s00?ie=UTF8&psc=1)
 
 If you have a sensor MudPi is not working with or you want to add more configuration options please submit a pull request and help a single developer out :)
+
 
 
 ## What’s Next?
