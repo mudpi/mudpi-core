@@ -1,0 +1,93 @@
+import time
+import datetime
+import json
+import redis
+import threading
+import sys
+sys.path.append('..')
+from pi_sensors.float_sensor import (FloatSensor)
+from pi_sensors.humidity_sensor import (HumiditySensor)
+
+import variables
+
+#r = redis.Redis(host='127.0.0.1', port=6379)
+
+class PiSensorWorker():
+	def __init__(self, config, main_thread_running, system_ready, pump_ready):
+		#self.config = {**config, **self.config}
+		self.config = config
+		self.main_thread_running = main_thread_running
+		self.system_ready = system_ready
+		#Store pump event so we can shutdown pump with float readings
+		self.pump_ready = pump_ready
+		self.sensors = []
+		self.init_sensors()
+		return
+
+	def dynamic_sensor_import(self, name):
+		#Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor
+		components = name.split('.')
+		#Dynamically import root of component path
+		module = __import__(components[0])
+		#Get component attributes
+		for component in components[1:]:
+			module = getattr(module, component)
+		return module
+
+	def init_sensors(self):
+		for sensor in self.config:
+			if sensor.get('type', None) is not None:
+				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
+				sensor_type = 'pi_sensors.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
+
+				imported_sensor = self.dynamic_sensor_import(sensor_type)
+
+				new_sensor = imported_sensor(sensor.get('pin'), name=sensor.get('name', sensor.get('type')), key=sensor.get('key', None))
+				new_sensor.init_sensor()
+				new_sensor.type = sensor.get('type').lower()
+				if sensor.get('critical', None) is not None:
+					new_sensor.critical = True
+				else:
+					new_sensor.critical = False
+
+				self.sensors.append(new_sensor)
+				print('{type} Sensor (Pi) {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+		return
+
+	def run(self): 
+		t = threading.Thread(target=self.work, args=())
+		t.start()
+		print('Pi Sensor Worker [' + str(len(self.config)) + ' Sensors]...\t\t\033[1;32m Running\033[0;0m')
+		return t
+
+	def work(self):
+
+		while self.main_thread_running.is_set():
+			if self.system_ready.is_set():
+				message = {'event':'PiSensorUpdate'}
+				readings = {}
+				for sensor in self.sensors:
+					result = sensor.read()
+					readings[sensor.key] = result
+					variables.r.set(sensor.key, result)
+					#print(sensor.name, result)
+
+					#Check for a critical water level from any float sensors
+					if sensor.type == 'float':
+						if sensor.critical:
+							if result:
+								self.pump_ready.set()
+							else:
+								self.pump_ready.clear()
+						
+							
+								
+						
+
+				#print(readings)
+				message['data'] = readings
+				variables.r.publish('pi-sensors', json.dumps(message))
+				
+			time.sleep(2)
+		#This is only ran after the main thread is shut down
+		print("Pi Sensor Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")

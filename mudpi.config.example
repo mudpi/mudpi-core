@@ -1,0 +1,69 @@
+{
+    "name": "MudPi",
+    "version": 0.1,
+    "debug": false,
+    "server": {
+        "host": "127.0.0.1",
+        "port": 6602
+    },
+    "redis": {
+        "host": "127.0.0.1",
+        "port": 6379
+    },
+    "pump": {
+        "pin": 13,
+        "max_duration":30
+    },
+    "nodes": [
+        {
+            "name": "Arduino Box 1",
+            "address": "/dev/ttyUSB0",
+            "sensors": [
+                {
+                    "pin": "0",
+                    "is_digital": false,
+                    "type": "Soil",
+                    "name": "Soil Left Sensor"
+                },
+                {
+                    "pin": "3",
+                    "is_digital": true,
+                    "type": "Humidity",
+                    "name": "Weather Station"
+                },
+                {
+                    "pin": "4",
+                    "is_digital": true,
+                    "type": "Rain",
+                    "name": "Rain Sensor"
+                }
+            ]
+        },
+        {
+            "name": "Arduino Box 2",
+            "address": "/dev/ttyUSB1",
+            "sensors": [
+                {
+                    "pin": "7",
+                    "is_digital": true,
+                    "type": "Humidity",
+                    "name": "Weather Station 2"
+                }
+            ]
+        }
+    ],
+    "sensors": [
+        {
+            "type":"Humidity",
+            "pin": 26,
+            "name":"Box Weather"
+        },
+        {
+            "type":"Float",
+            "pin": 9,
+            "name":"Tank Empty",
+            "critical":true,
+            "percent":15
+        }
+    ]
+}
