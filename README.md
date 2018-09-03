@@ -1,3 +1,6 @@
+
+![alt text](http://ericdavisson.com/img/mudpi/mudPI_LOGO_small_flat.png)
+
 # MudPi Smart Garden
 > Configurable smart garden system for your raspberry pi garden project.  
 
@@ -27,8 +30,8 @@ pip install redis
 ```
 
 **Additional Requirements**
-	* Arduino Nano / Arduino UNO
-	* Nanpy 0.9.6* (Allows control over Arduino from raspberry pi)
+* Arduino Nano / Arduino UNO
+* Nanpy 0.9.6* (Allows control over Arduino from raspberry pi)
 	
 ```bash
 pip install nanpy
@@ -243,12 +246,13 @@ python3 blink.py
 ```
 
 ### Caveats
-While I was creating MudPi there was a ton of debugging along the way. I experienced a bunch of odd behavior that ranged from bugs in code, weird things due to small electronics, and still unknowns. 
+While I was creating MudPi there was a ton of debugging along the way. I experienced a bunch of odd behavior that ranged from bugs in code, weird things due to small electronics, and still unknowns (aka leaving solder flux on connections...). 
 
 Here are a few things I ran into:
-	* When using DHT11 temperature sensor on an Arduino it would connect and read correctly on the first script run for as long as the script ran for. However on the second run the sensor/device would timeout and never work unless I rebooted. 
-	* Temperature one wire probes tested and read fine on their own but as soon as they were loaded with other sensors they would always return bad readings.
-	* Rain sensors are a bit difficult to get accurate time ranges of rain because moisture and corrosion on the sensor cause elongated moisture readings. I had to typically wipe them off once or twice a week. 
+* When using DHT11 temperature sensor on an Arduino it would connect and read correctly on the first script run for as long as the script ran for. However on the second run the sensor/device would timeout and never work unless I rebooted. 
+* Temperature one wire probes tested and read fine on their own but as soon as they were loaded with other sensors they would always return bad readings.
+* Rain sensors are a bit difficult to get accurate time ranges of rain because moisture and corrosion on the sensor cause elongated moisture readings. I had to typically wipe them off once or twice a week.
+* Flux and small electronics can have leak voltage quite easily if your not super clean with your hardware work which can interfere with readings. 
 
 
 ## Contributing
