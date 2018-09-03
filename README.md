@@ -6,9 +6,7 @@
 MudPi is a configurable smart garden system that runs on a raspberry pi written in python with no coding required to get started. MudPi is compatible with a variety of sensors on both the raspberry pi and Arduino allowing you create both simple and complex setups. Connect your sensors, edit the configuration file, and your all set!
 
 ## Getting Started
-To get started, download the MudPi repository from GitHub, edit your configuration file and run the main MudPi script. Make sure to install the prerequisites below if you have not already. 
-
-I have also create an IMG of my pi to make things faster but keep in mind its better to install these libraries for yourself if your not using raspberry pi 2 b+ which is what I created this off of. 
+To get started, download the MudPi repository from GitHub, edit your configuration file and run the main MudPi script. Make sure to install the prerequisites below if you have not already.
 
 ### Prerequisites
 There are a few libraries that need to be installed for a minimal setup. However, if you want to take advantage of all the features of MudPi you will need:
@@ -84,6 +82,18 @@ Run `mudpi.py` script from the root folder of your mudpi installation.
 ```bash
 cd your/path/to/mudpi
 python3 mudpi.py
+```
+
+#### Keep MudPi Running With Supervisord
+Using a task monitor like supervisord is excellent to keep MudPi running in the background and only is a `pip install supervisor` away. This is what I do personally. Here is a example config file for supervisord once you get that installed. Change the paths and log files names as you need.
+```
+[program:mudpi]
+directory=/var/www/mudpi
+command=python3 -u /var/www/mudpi/mudpi.py
+autostart=true
+autorestart=true
+stderr_logfile=/var/www/mudpi/logs/mudpi.err.log
+stdout_logfile=/var/www/mudpi/logs/mudpi.out.log
 ```
 
 
@@ -201,11 +211,150 @@ Here is a more complex example configuration file with an Arduino connected to U
             "pin": 19,
             "name":"Water Tank Low",
             "percent":5,
-			  "critical":true
+	    "critical":true
         }
     ]
 }
 
+```
+
+## Sensors
+There are a number of sensors supported by default with MudPi for both the raspberry pi and arduino. Here are the options for adding the sensor to your system. You can read about the formatting in the configuration file above for adding the sensor.
+
+### Pi Sensors
+* Liquid Float Level Switch
+	* 0 or 1 digital read of liquid level.
+	* **type:** Float
+	* _Returns:_ [Boolean] 0 or 1
+* Humidity Temperature Sensor (DHT)
+	* Take a digital read of humidity and temperature.
+	* **type:** Humidity
+	* _Returns:_ [Object] {humidity: float, temperature: float}
+
+### Arduino Sensors
+* Soil Moisture
+	* Takes an analog reading of water content in soil.
+	* **type:** Soil
+	* _Returns:_ [Integer] Resistance
+* Liquid Float Level Switch
+	* 0 or 1 digital read of liquid level.
+	* **type:** Float
+	* _Returns:_ [Boolean] 0 or 1
+* Humidity Temperature Sensor (DHT)
+	* Take a digital read of humidity and temperature.
+	* **type:** Humidity
+	* _Returns:_ [Object] {humidity: float, temperature: float}
+* Rain Sensor
+	* Takes an analog reading of moisture/rain.
+	* **type:** Rain
+	* _Returns:_ [Integer] Resistance
+* Temperature Sensor (Onewire)
+	* Takes a digital reading of temperature using onewire bus.
+	* **type:** Temperature
+	* _Returns:_ [Object] {temp_0: float, temp_1: float, ...}
+* Light Intesity Sensor (Not Fully Complete)
+	* **type:** Light
+
+## Redis
+We chose redis to store our values quickly and to utilize its Pub/Sub capabilities since it was able to work across multiple languages Python, PHP, and Javascript in our case). If you don't have redis installed here is a great guide I used: [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
+
+### Storing Values
+MudPi will store your values in redis for you using the name you specified for the sensor in the `mudpi.config` file. Note the name will be slugged (converted to lowercase and spaces replaced with underscores) and used as the key if you do not specifically provide one.
+
+So for example a sensor config of:
+```
+{
+	"pin": "3",
+	"type": "Humidity",
+	"name": "Weather Station"
+}
+```
+Would store the reading in redis with a key of `weather_station`.
+
+If you wanted to specify a key of your own, you can do so in the sensor config with the `key` option. Keep in mind this must be a [valid redis key](https://redis.io/topics/data-types-intro) which can be just about anything. However, try to keep this simple but descriptive for your own sake. 
+
+```
+{
+	"pin": "3",
+	"type": "Humidity",
+	"name": "Weather Station",
+	"key": "your_own_key"
+}
+```
+
+### Key Values Stored in Redis
+Other than the sensor readings, there are a few other important values MudPi stores into redis for you. These value are listed below with more information. 
+
+_**Note on keys**: storing False in redis can be cast as a string which will read truthy in python. Instead we del the key and only store the key if its True_
+
+#### Main Values
+* **started_at** [Timestamp]
+	* Timestamp of when MudPi started running. Useful to check uptime.
+	
+#### Pump Values
+* **last_watered_at** [Timestamp]
+	* Timestamp of when the last water cycle occured. Useful to check watering frequency. 
+* **pump_should_be_running** [Booloean]
+	* True or nil(key shouldn't exist) value to tell pump worker if it should start a watering cycle. 
+* **pump_shuttoff_override** [Booloean]
+	* True or nil(key shouldn't exist) value to tell pump worker to immediatly terminate any active water cycle.
+	* _Key gets automatically deleted once its read by MudPi_
+* **pump_running** [Booloean]
+	* True or nil value set by MudPi to inform you if the water cycle in the pump worker is active or not.
+	
+
+### Redis Events
+In addition to storing values in redis, MudPi also will publish events when the sensors are read or during pump cycle changes. Each event will return a JSON payload with an `event: ExampleEvent` and its `data:'Hello World'`. Below are the events MudPi sends out along with the channel they emit on.
+
+#### Pump Events
+**channel:** pump
+
+##### Pump Turned On
+```
+{
+	"event": "PumpTurnedOff",
+	"data": 1
+}
+```
+
+##### Pump Turned Off
+```
+{
+	"event": "PumpTurnedOn",
+	"data": 1
+}
+```
+
+##### Pump Override Off
+```
+{
+	"event": "PumpOverrideOff",
+	"data": 1
+}
+```
+
+#### Pi Sensor Events
+**channel:** pi-sensors
+
+##### Sensor Update
+Data will be an object of all your sensor readings. 
+```
+{
+	"event": "PiSensorUpdate",
+	"data": {...}
+}
+```
+
+#### Arduino Sensor Events
+**channel:** sensors
+
+##### Sensor Update
+Data will be an object of all your sensor readings. 
+```
+{
+	"event": "SensorUpdate",
+	"data": {...}
+}
 ```
 
 
@@ -251,7 +400,8 @@ Here are a few things I ran into:
 * When using DHT11 temperature sensor on an Arduino it would connect and read correctly on the first script run for as long as the script ran for. However on the second run the sensor/device would timeout and never work unless I rebooted. 
 * Temperature one wire probes tested and read fine on their own but as soon as they were loaded with other sensors they would always return bad readings.
 * Rain sensors are a bit difficult to get accurate time ranges of rain because moisture and corrosion on the sensor cause elongated moisture readings. I had to typically wipe them off once or twice a week.
-* Flux and small electronics can have leak voltage quite easily if your not super clean with your hardware work which can interfere with readings. 
+* Flux and small electronics can have leak voltage quite easily if your not super clean with your hardware work which can interfere with readings.
+* Reading False from redis in python can be cast as a string by default which is truthy and caused a long confusing bug. Instead of storing false we just removed the key from redis using a `del` command and check for it the keys existance in MudPi.
 
 
 ## Contributing
@@ -305,7 +455,7 @@ There are still some items remaining for MudPi that I would like to complete. I 
 - [ ] Pi Onewire Temperature Sensor Script (Dallas Temperature)
 - [ ] Solenoid and Zone Control Scripts
 - [ ] Flowmeter Script
-- [ ] More configuration control
+- [ ] More configuration control (i.e. custom redis keys for pump checks)
 - [ ] Retry and Restart System After Serial Timeout During Prolonged Use
 - [ ] Camera Feature (Pi)
 - [ ] Finish LCD Screen Support
