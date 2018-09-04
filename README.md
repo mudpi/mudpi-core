@@ -5,7 +5,7 @@
 
 MudPi is a configurable smart garden system that runs on a raspberry pi written in python with no coding required to get started. MudPi is compatible with a variety of sensors on both the raspberry pi and Arduino allowing you create both simple and complex setups. Connect your sensors, edit the configuration file, and your all set!
 
-
+<img alt="MudPi Smart Garden" title="MudPi Smart Garden Demo" src="http://ericdavisson.com/img/mudpi/mud2.gif">
 
 ## Getting Started
 To get started, download the MudPi repository from GitHub, edit your configuration file and run the main MudPi script. Make sure to install the prerequisites below if you have not already.
@@ -15,11 +15,9 @@ There are a few libraries that need to be installed for a minimal setup. However
 
 **Minimal Requirements**
 * Raspberry Pi 
-	* Raspbian GNU/Linux 9 [stretch] (or similar distribution) 
-* Python 3.5 
-	- (3.4 Included with Raspbian)
-* RPi.GPIO 0.6.3 
-	* (Comes with Raspbian)
+	* OS: [Raspbian GNU/Linux 9](https://www.raspberrypi.org/downloads/raspbian/) [stretch] (or similar distribution) 
+* Python 3.5 (3.4 Included with Raspbian)
+* RPi.GPIO 0.6.3 (Comes with Raspbian)
 * Redis 3.2* (Redis to store values and Pub/Sub)
 	* [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
 		
@@ -76,7 +74,7 @@ Edit the **mudpi.config** file located in the root of the MudPi installation. It
 
 ```
 
-Editing the configuration file can be a pain. So I made a tool to create a file for you that you can copy paste for ease. [Eric Davisson](http://ericdavisson.com/)
+Editing the configuration file can be a pain. So I made a [tool to create the config file for you](https://mudpi.app/config) that you can copy paste into your pi easier.
 
 ### Running MudPi
 Run `mudpi.py` script from the root folder of your mudpi installation. 
@@ -86,7 +84,7 @@ python3 mudpi.py
 ```
 
 #### Keep MudPi Running With Supervisord
-Using a task monitor like supervisord is excellent to keep MudPi running in the background and only is a `pip install supervisor` away. This is what I do personally. Here is a example config file for supervisord once you get that installed. Change the paths and log files names as you need.
+Using a task monitor like supervisord is excellent to keep MudPi running in the background and only is a `pip install supervisor` away. Using a tool like supervisor allows you to keep MudPi running in the event of errors or system restarts. This is what I do personally. Here is a example config file for supervisord once you get that installed. In my case this was located under `/etc/supervisor/conf.d/` on my raspberry pi. Change the paths and log files names as you need.
 ```
 [program:mudpi]
 directory=/var/www/mudpi
@@ -101,82 +99,90 @@ stdout_logfile=/var/www/mudpi/logs/mudpi.out.log
 ### Basic Hardware Example
 MudPi is built so you can add sensors and configure the system to your specific setup. You can review more info below under [the sensors section](#sensors) about all the sensor types available to you. 
 
-Here is a basic hardware example to get started with a DHT11 Humidity sensor hooked up to our pi on GPIO pin 25. _This will work the the configuration file example listed above and included by default._
+Here is a basic hardware example to get started with a DHT11 Humidity sensor hooked up to the pi on GPIO pin 25. _This will work the the configuration file example listed above and included by default._
 
 <img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="http://ericdavisson.com/img/mudpi/mudpi-example-1.png" width="300px">
 
 
 
 ## Configuring MudPi
-MudPi loads everything it needs from a JSON formatted file in the root installation folder named `mudpi.config`. You can use my free configuration tool to create your file as well because I like making your life better. [Eric Davisson](http://ericdavisson.com/)
+MudPi loads everything it needs from a JSON formatted file in the root installation folder named `mudpi.config`. You can use my free [configuration tool to create your file](https://mudpi.app/config) as well because I like making your life better.
 
 If you plan to edit the config file manually or want know more about it, below you can find details about each of the configuration options available.
 
-* **name** [String]
-	* Name of the system. Not used in the core, mainly here in case you wanted to pull for a UI.
+`name` _[String]_
 
-* **version** 
-	* Version of your system. Not used yet, might be useful for legacy.
+Name of the system. Not used in the core, mainly here in case you wanted to pull for a UI.
 
-* **debug** [Boolean]
-	* If enabled, MudPi will output more information while the system runs. More information about the startup and cycles will be output.
+`version` 
 
-* **server** [Object]
-	* Configuration for the MudPi socketio server. _Currently not used_
-		* **host** [String]
-			* IP address of server
-		* **port** [Integer]
-			* Port to run server on
+Version of your system. Not used yet, might be useful for legacy.
 
-* **redis** [Object]
-	* Configuration of redis server to store sensor reads and utilize Pub/Sub
-		* **host** [String]
-			* IP address of redis server
-		* **port** [Integer]
-			* Port of redis server
+`debug` _[Boolean]_
 
-* **pump** [Object]
-	* Configuration for relay that runs pump.
-		* **pin** [Integer]
-			* GPIO pin number the relay is hooked up to on the raspberry pi
-		* **max_duration** [Integer]
-			* Maximum runtime that the relay should be switched on in seconds
+If enabled, MudPi will output more information while the system runs. More information about the startup and cycles will be output.
+
+`server` _[Object]_
+
+Configuration for the MudPi socketio server. _Currently not used_
+* `host` _[String]_
+	* IP address of server
+* `port` _[Integer]_
+	* Port to run server on
+
+`redis` _[Object]_
+
+Configuration of redis server to store sensor reads and utilize Pub/Sub
+* `host` _[String]_
+	* IP address of redis server
+* `port` _[Integer]_
+	* Port of redis server
+
+`pump` _[Object]_
+
+Configuration for relay that runs pump.
+* `pin` _[Integer]_
+	* GPIO pin number the relay is hooked up to on the raspberry pi
+* `max_duration` _[Integer]_
+	* Maximum runtime that the relay should be switched on in seconds
 	
-* **sensors** [Array]
-	* An array of objects containing configuration for sensors attached to the raspberry pi. 
-	* **sensor** [Object]
-		* Configuration for a sensor attached to raspberry pi
-			* **type** [String]
-				* Type of sensor. Options: `Float`, `Humidity`
-			* **pin** [Integer]
-				* GPIO pin number on raspberry pi the sensor is connected to
-			* **name** [String]
-				* Name of the sensor. The name will be used as key to store in redis if a key is not specified. 
-			* **key** [String] (Optional)
-				* Key to store value under in redis. Alphanumeric with underscores only. Must be valid redis key. _If a key is not provided it will use the name converted to lowercase and spaces replaced with underscores._
-			* **percent** [Integer] (Float Type Only)
-				* For float sensors this value specifies the percent filled the container is. Useful for UI, not critical to core. 
-			* **critical** [Boolean] (Float Type Only)
-				* For float sensors this value specifies if the liquid level is critical to pump function. **If critical is set to true and the float sensor reads false, the relay will not turn on.** 
+`sensors` _[Array]_
 
-* **nodes** [Array]
-	* An array of objects containing configuration for arduinos attached to the raspberry pi.
-	* **name** [String]
-		* Name of Arduino	 connected to pi. Not important, only useful for UI or sorting sensor reads in the future. 
-	* **address** [String]
-		* TTY Serial address of Arduino connected to the raspberry pi over USB.
-	* **sensors** [Array]
-		* An array of objects containing configuration options for sensors connected to the node (Arduino). Run `ls /dev` in your raspberry pi terminal to list devices connected. Typically this value is one of `/dev/AMA0`, `/dev/ttyUSB0`, or `/dev/ttyUSB1`.
-		* **sensor** [Object]
-			* Configuration for a sensor attached to an Arduino
-				* **type** [String]
-					* Type of sensor. Options: `Temperature`, `Humidity`, `Soil`, `Rain`, `Light`, `Float`
-				* **pin** [Integer]
-					* GPIO pin number on the Arduino the sensor is connected to
-				* **name** [String]
-					* Name of the sensor. The name will be used as key to store in redis if a key is not specified. 
-				* **key** [String] (Optional)
-					* Key to store value under in redis. Alphanumeric with underscores only. Must be valid redis key. _If a key is not provided it will use the name converted to lowercase and spaces replaced with underscores._
+An array of objects containing configuration for sensors attached to the raspberry pi. 
+* `sensor` _[Object]_
+	* Configuration for a sensor attached to raspberry pi
+		* `type` _[String]_
+			* Type of sensor. Options: `Float`, `Humidity`
+		* `pin` _[Integer]_
+			* GPIO pin number on raspberry pi the sensor is connected to
+		* `name` _[String]_
+			* Name of the sensor. The name will be used as key to store in redis if a key is not specified. 
+		* `key` _[String]_ (Optional)
+			* Key to store value under in redis. Alphanumeric with underscores only. Must be valid redis key. _If a key is not provided it will use the name converted to lowercase and spaces replaced with underscores._
+		* `percent` _[Integer]_ (Float Type Only)
+			* For float sensors this value specifies the percent filled the container is. Useful for UI, not critical to core. 
+		* `critical` _[Boolean]_ (Float Type Only)
+			* For float sensors this value specifies if the liquid level is critical to pump function. **If critical is set to true and the float sensor reads false, the relay will not turn on.** 
+
+`nodes` _[Array]_
+
+An array of objects containing configuration for arduinos attached to the raspberry pi.
+* `name` _[String]_
+	* Name of Arduino connected to pi. Not important, only useful for UI or sorting sensor reads in the future. 
+* `address` _[String]_
+	* TTY Serial address of Arduino connected to the raspberry pi over USB.
+* `sensors` _[Array]_
+	* An array of objects containing configuration options for sensors connected to the node (Arduino). Run `ls /dev` in your raspberry pi terminal to list devices connected. Typically this value is one of `/dev/AMA0`, `/dev/ttyUSB0`, or `/dev/ttyUSB1`.
+	* `sensor` _[Object]_
+		* Configuration for a sensor attached to an Arduino
+			* `type` _[String]_
+				* Type of sensor. Options: `Temperature`, `Humidity`, `Soil`, `Rain`, `Light`, `Float`
+			* `pin` _[Integer]_
+				* GPIO pin number on the Arduino the sensor is connected to
+			* `name` _[String]_
+				* Name of the sensor. The name will be used as key to store in redis if a key is not specified. 
+			* `key` _[String]_ (Optional)
+				* Key to store value under in redis. Alphanumeric with underscores only. Must be valid redis key. _If a key is not provided it will use the name converted to lowercase and spaces replaced with underscores._
 
 Here is a more complex example configuration file with an Arduino connected to USB 0
 ```json
@@ -234,46 +240,57 @@ Here is a more complex example configuration file with an Arduino connected to U
 There are a number of sensors supported by default with MudPi for both the raspberry pi and arduino. Here are the options for adding the sensor to your system. You can read about the formatting in the configuration file above for adding the sensor.
 
 ### Pi Sensors
-* **Liquid Float Level Switch**
-	* 0 or 1 digital read of liquid level.
-	* **type:** Float
-	* _Returns:_ [Boolean] 0 or 1
-* **Humidity Temperature Sensor (DHT)**
-	* Take a digital read of humidity and temperature.
-	* **type:** Humidity
-	* _Returns:_ [Object] {humidity: float, temperature: float}
+#### Liquid Float Level Switch
+0 or 1 digital read of liquid level.
+* **type:** `Float`
+* _Returns:_ [Boolean] 0 or 1
+	
+#### Humidity Temperature Sensor (DHT)
+Take a digital read of humidity and temperature.
+* **type:** `Humidity`
+* _Returns:_ [Object] {humidity: float, temperature: float}
 
 ### Arduino Sensors
-* **Soil Moisture**
-	* Takes an analog reading of water content in soil.
-	* **type:** Soil
-	* _Returns:_ [Integer] Resistance
-* **Liquid Float Level Switch**
-	* 0 or 1 digital read of liquid level.
-	* **type:** Float
-	* _Returns:_ [Boolean] 0 or 1
-* **Humidity Temperature Sensor (DHT)**
-	* Take a digital read of humidity and temperature.
-	* **type:** Humidity
-	* _Returns:_ [Object] {humidity: float, temperature: float}
-* **Rain Sensor**
-	* Takes an analog reading of moisture/rain.
-	* **type:** Rain
-	* _Returns:_ [Integer] Resistance
-* **Temperature Sensor (Onewire)**
-	* Takes a digital reading of temperature using onewire bus.
-	* **type:** Temperature
-	* _Returns:_ [Object] {temp_0: float, temp_1: float, ...}
-* **Light Intesity Sensor (Not Fully Complete)**
-	* **type:** Light
+#### Soil Moisture
+Takes an analog reading of water content in soil.
+* **type:** `Soil`
+* Pin Type: Analog
+* _Returns:_ [Integer] Resistance
+
+#### Liquid Float Level Switch
+0 or 1 digital read of liquid level.
+* **type:** `Float`
+* Pin Type: Digital
+* _Returns:_ [Boolean] 0 or 1
+
+#### Humidity Temperature Sensor (DHT)
+Take a digital read of humidity and temperature.
+* **type:** `Humidity`
+* Pin Type: Digital
+* _Returns:_ [Object] {humidity: float, temperature: float}
+
+#### Rain Sensor
+Takes an analog reading of moisture/rain.
+* **type:** `Rain`
+* Pin Type: Analog
+* _Returns:_ [Integer] Resistance
+
+#### Temperature Sensor (Onewire)
+Takes a digital reading of temperature using onewire bus.
+* **type:** `Temperature`
+* Pin Type: Digital
+* _Returns:_ [Object] {temp_0: float, temp_1: float, ...}
+
+#### Light Intesity Sensor (Not Fully Complete)
+* **type:** `Light`
 
 
 
 ## Redis
-We chose redis to store our values quickly and to utilize its Pub/Sub capabilities since it was able to work across multiple languages Python, PHP, and Javascript in our case). If you don't have redis installed here is a great guide I used: [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
+We chose redis to store our values quickly and to utilize its Pub/Sub capabilities since it was able to work across multiple languages (Python, PHP, and Javascript in our case). If you don't have redis installed here is a great guide I used to [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
 
 ### Storing Values
-MudPi will store your values in redis for you using the name you specified for the sensor in the `mudpi.config` file. Note the name will be slugged (converted to lowercase and spaces replaced with underscores) and used as the key if you do not specifically provide one.
+MudPi will store your values in redis for you using the `"name"` you specified for the sensor in the `mudpi.config` file. Note the `"name"` will be slugged (converted to lowercase and spaces replaced with underscores) and used in place of `"key"` if you do not specifically provide one.
 
 So for example a sensor config of:
 ```
@@ -285,7 +302,7 @@ So for example a sensor config of:
 ```
 Would store the reading in redis with a key of `weather_station`.
 
-If you wanted to specify a key of your own, you can do so in the sensor config with the `key` option. Keep in mind this must be a [valid redis key](https://redis.io/topics/data-types-intro) which can be just about anything. However, try to keep this simple but descriptive for your own sake. 
+If you wanted to specify a key of your own, you can do so in the sensor config with the `"key"` option. Keep in mind this must be a [valid redis key](https://redis.io/topics/data-types-intro) which can be just about anything. However, try to keep this simple but descriptive for your own sake. 
 
 ```
 {
@@ -295,6 +312,7 @@ If you wanted to specify a key of your own, you can do so in the sensor config w
 	"key": "your_own_key"
 }
 ```
+This config above would save in redis under the key `your_own_key` and the `"name"` would be ignored since a `"key"` option is present in the config. 
 
 ### Key Values Stored in Redis
 Other than the sensor readings, there are a few other important values MudPi stores into redis for you. These value are listed below with more information. 
@@ -302,19 +320,22 @@ Other than the sensor readings, there are a few other important values MudPi sto
 _**Note on keys**: storing False in redis can be cast as a string which will read truthy in python. Instead we del the key and only store the key if its True_
 
 #### Main Values
-* **started_at** [Timestamp]
-	* Timestamp of when MudPi started running. Useful to check uptime.
+`started_at` _[Timestamp]_
+* Timestamp of when MudPi started running. Useful to check uptime.
 	
 #### Pump Values
-* **last_watered_at** [Timestamp]
-	* Timestamp of when the last water cycle occured. Useful to check watering frequency. 
-* **pump_should_be_running** [Booloean]
-	* True or nil(key shouldn't exist) value to tell pump worker if it should start a watering cycle. 
-* **pump_shuttoff_override** [Booloean]
-	* True or nil(key shouldn't exist) value to tell pump worker to immediatly terminate any active water cycle.
-	* _Key gets automatically deleted once its read by MudPi_
-* **pump_running** [Booloean]
-	* True or nil value set by MudPi to inform you if the water cycle in the pump worker is active or not.
+`last_watered_at` _[Timestamp]_
+* Timestamp of when the last water cycle occured. Useful to check watering frequency. 
+
+`pump_should_be_running` _[Booloean]_
+* True or nil(key shouldn't exist) value to tell pump worker if it should start a watering cycle. 
+	
+`pump_shuttoff_override` _[Booloean]_
+* True or nil(key shouldn't exist) value to tell pump worker if set to true to immediatly terminate any active water cycle.
+* _Key gets automatically deleted once its read by MudPi_
+	
+`pump_running` _[Booloean]_
+* True or nil value set by MudPi to inform you if the water cycle in the pump worker is active or not.
 	
 
 ### Redis Events
@@ -370,7 +391,6 @@ Data will be an object of all your sensor readings.
 	"data": {...}
 }
 ```
-
 
 
 ## How It Works
