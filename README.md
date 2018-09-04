@@ -8,7 +8,7 @@ MudPi is a configurable smart garden system that runs on a raspberry pi written 
 <img alt="MudPi Smart Garden" title="MudPi Smart Garden Demo" src="http://ericdavisson.com/img/mudpi/mud2.gif">
 
 ## Getting Started
-To get started, download the MudPi repository from GitHub, edit your configuration file and run the main MudPi script. Make sure to install the prerequisites below if you have not already.
+To get started, [download](https://github.com/olixr/MudPi/archive/master.zip) the MudPi repository from GitHub, edit your `mudpi.config` configuration file and run the main MudPi script by executing `python3 mudpi.py`. Make sure to install the prerequisites below if you have not already.
 
 ### Prerequisites
 There are a few libraries that need to be installed for a minimal setup. However, if you want to take advantage of all the features of MudPi you will need:
@@ -28,6 +28,7 @@ pip install redis
 
 **Additional Requirements**
 * Arduino Nano / Arduino UNO
+	* Flashed with [Nanpy Firmware](https://github.com/nanpy/nanpy-firmware)
 * Nanpy 0.9.6* (Allows control over Arduino from raspberry pi)
 	
 ```bash
@@ -149,7 +150,7 @@ Configuration for relay that runs pump.
 `sensors` _[Array]_
 
 An array of objects containing configuration for sensors attached to the raspberry pi. 
-* `sensor` _[Object]_
+*  _[Object]_ (Object of options for sensor)
 	* Configuration for a sensor attached to raspberry pi
 		* `type` _[String]_
 			* Type of sensor. Options: `Float`, `Humidity`
@@ -173,7 +174,7 @@ An array of objects containing configuration for arduinos attached to the raspbe
 	* TTY Serial address of Arduino connected to the raspberry pi over USB.
 * `sensors` _[Array]_
 	* An array of objects containing configuration options for sensors connected to the node (Arduino). Run `ls /dev` in your raspberry pi terminal to list devices connected. Typically this value is one of `/dev/AMA0`, `/dev/ttyUSB0`, or `/dev/ttyUSB1`.
-	* `sensor` _[Object]_
+	* _[Object]_ (Object of options for sensor)
 		* Configuration for a sensor attached to an Arduino
 			* `type` _[String]_
 				* Type of sensor. Options: `Temperature`, `Humidity`, `Soil`, `Rain`, `Light`, `Float`
@@ -211,6 +212,12 @@ Here is a more complex example configuration file with an Arduino connected to U
                     "pin": "3",
                     "type": "Humidity",
                     "name": "Weather Station"
+                },
+                {
+                    "pin": "5",
+                    "type": "Soil",
+                    "name": "Soil Moisture",
+		    "key": "garden_soil_moisture"
                 }
             ]
         }
@@ -347,7 +354,7 @@ In addition to storing values in redis, MudPi also will publish events when the 
 ##### Pump Turned On
 ```
 {
-	"event": "PumpTurnedOff",
+	"event": "PumpTurnedOn",
 	"data": 1
 }
 ```
@@ -355,7 +362,7 @@ In addition to storing values in redis, MudPi also will publish events when the 
 ##### Pump Turned Off
 ```
 {
-	"event": "PumpTurnedOn",
+	"event": "PumpTurnedOff",
 	"data": 1
 }
 ```
@@ -391,6 +398,42 @@ Data will be an object of all your sensor readings.
 	"data": {...}
 }
 ```
+
+
+
+## Connecting an Arduino to MudPi
+Often the raspberry pi will meet all of our hardware needs, but there are times we need to extend our system with items such as analog sensors. Unfortunantly the raspberry pi does not have analog GPIO so hooking up an Arduino is a cheap easy way to resolve this. 
+
+Connecting to arduinos is easy with MudPi along with the help of Nanpy. Nanpy allows us to issue commands over serial to our Arduino from our raspberry pi running MudPi. Using a [USB to TTL USB serial module](https://www.amazon.com/gp/product/B07CWKHTLH/ref=oh_aui_detailpage_o04_s00?ie=UTF8&psc=1) you can connect your ardiuno using a USB slot from your raspberry pi. 
+
+
+Once you have an arduino connected, all that you need to do is update your `mudpi.config` file to include your node configuration and restart MudPi. An example of the node configuration is listed below:
+```
+    "nodes": [
+        {
+            "name": "Name of Your Node",
+            "address": "/dev/ttyUSB0",
+            "sensors": [
+                {
+                    "pin": "3",
+                    "type": "Humidity",
+                    "name": "Weather Station"
+                },
+                {
+                    "pin": "5",
+                    "type": "Soil",
+                    "name": "Soil Moisture",
+		    "key": "garden_soil_moisture"
+                }
+            ]
+        }
+    ],
+```
+
+The most important option to connect to your arduino is the `address`, which is the USB device path of your arduino. You can run `ls /dev` in your terminal to get a listing of devices. Typically the value your looking for is one of `/dev/AMA0`, `/dev/ttyUSB0`, or `/dev/ttyUSB1`.
+
+You can read more in the [configuration section](#Configuring MudPi) for details on each of the options available. Additionally the [sensors section](#sensors) can be reviewed for all the available sensors MudPi supports out of the box.
+
 
 
 ## How It Works
