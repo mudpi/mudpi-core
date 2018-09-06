@@ -8,15 +8,15 @@ MudPi is a configurable smart garden system that runs on a raspberry pi written 
 <img alt="MudPi Smart Garden" title="MudPi Smart Garden Demo" src="http://ericdavisson.com/img/mudpi/mud2.gif">
 
 ## Getting Started
-To get started, [download](https://github.com/olixr/MudPi/archive/master.zip) the MudPi repository from GitHub, edit your `mudpi.config` configuration file and run the main MudPi script by executing `python3 mudpi.py`. Make sure to install the prerequisites below if you have not already.
+To get started, [download](https://github.com/olixr/MudPi/archive/master.zip) the MudPi repository from GitHub, edit your `mudpi.config` configuration file and run the main MudPi script by executing `python3 mudpi.py` from the root of your MudPi installation. Make sure to install the prerequisites below if you have not already.
 
 ### Prerequisites
-There are a few libraries that need to be installed for a minimal setup. However, if you want to take advantage of all the features of MudPi you will need:
+There are a few libraries that need to be installed for a minimal setup. However, if you want to take advantage of all the features of MudPi you will need to also install the additonal requirements. 
 
 **Minimal Requirements**
 * Raspberry Pi 
 	* OS: [Raspbian GNU/Linux 9](https://www.raspberrypi.org/downloads/raspbian/) [stretch] (or similar distribution) 
-* Python 3.5 (3.4 Included with Raspbian)
+* Python 3.4+ (Comes with Raspbian)
 * RPi.GPIO 0.6.3 (Comes with Raspbian)
 * Redis 3.2* (Redis to store values and Pub/Sub)
 	* [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
@@ -248,8 +248,10 @@ There are a number of sensors supported by default with MudPi for both the raspb
 
 ### Pi Sensors
 #### Liquid Float Level Switch
-0 or 1 digital read of liquid level.
+0 or 1 digital read of liquid level. If marked critical it will prevent pump from running until it returns 1 (true)
 * **type:** `Float`
+* **percent:** 0 - 100
+* **critical:** true / false
 * _Returns:_ [Boolean] 0 or 1
 	
 #### Humidity Temperature Sensor (DHT)
@@ -293,11 +295,32 @@ Takes a digital reading of temperature using onewire bus.
 
 
 
+## Pump (Relay)
+Hooking up a pump to MudPi is done using a relay to protect the raspberry pi from high voltages. Once you have you relay attached you can add the pump options to you configuration.
+
+The pump has two options to configure, a `pin` and `max_duration`. The `pin` is the GPIO on the raspberry pi you hooked the relay up to. `max_duration` is the max runtime of the pump in seconds and determines how long the relay will be powered on for.
+```
+"pump": {
+	"pin": "3",
+	"max_duration": "60"
+}
+```
+The example pump configruation above would turn the relay on hooked up through GPIO pin 3 for a maxium of 60 seconds. 
+
+### Toggling the Pump
+The pump worker will check redis periodically to see if it should begin a pump cycle. It does this by looking for the `pump_should_be_running` key and checking that it exists. The value can be anything, even false and the pump will still trigger as long as they key is present. Once the key is read and the pump begins a cycle, it will delete the key from redis. Removing this key on your own will not shutoff the current pump cycle, it will only prevent it from starting if it has not already and the key is still set.
+
+In order to shutoff the pump before it has run for the specified `max_duration`, you must set the redis key `pump_shuttoff_override`. Again this key can hold any value, Mudpi only cares that the key exists. Once it detects the existance of this key it will immediatly shutdown the current pump cycle powering off the relay controlling the pump.
+
+MudPi will inform you if the pump is currently running by setting the `pump_running` key. Altering this value will not change the pump state, this value is only set for your convience of checking the pumps current status. 
+
+
+
 ## Redis
 We chose redis to store our values quickly and to utilize its Pub/Sub capabilities since it was able to work across multiple languages (Python, PHP, and Javascript in our case). If you don't have redis installed here is a great guide I used to [Install Redis on your Raspberry Pi](https://habilisbest.com/install-redis-on-your-raspberrypi)
 
 ### Storing Values
-MudPi will store your values in redis for you using the `"name"` you specified for the sensor in the `mudpi.config` file. Note the `"name"` will be slugged (converted to lowercase and spaces replaced with underscores) and used in place of `"key"` if you do not specifically provide one.
+MudPi will store sensor values in redis for you using the `"name"` you specified for the sensor in the `mudpi.config` file. Note the `"name"` will be slugged (converted to lowercase and spaces replaced with underscores) and used in place of `"key"` if you do not specifically provide one.
 
 So for example a sensor config of:
 ```
@@ -346,7 +369,7 @@ _**Note on keys**: storing False in redis can be cast as a string which will rea
 	
 
 ### Redis Events
-In addition to storing values in redis, MudPi also will publish events when the sensors are read or during pump cycle changes. Each event will return a JSON payload with an `event: ExampleEvent` and its `data:'Hello World'`. Below are the events MudPi sends out along with the channel they emit on.
+In addition to storing values in redis, MudPi also will publish events when the sensors return readings or during pump cycle changes. Each event will return a JSON payload with an `event: ExampleEvent` and its `data:'Hello World'`. Below are the events MudPi sends out along with the channel they emit on.
 
 #### Pump Events
 **channel:** pump
@@ -432,7 +455,7 @@ Once you have an arduino connected, all that you need to do is update your `mudp
 
 The most important option to connect to your arduino is the `address`, which is the USB device path of your arduino. You can run `ls /dev` in your terminal to get a listing of devices. Typically the value your looking for is one of `/dev/AMA0`, `/dev/ttyUSB0`, or `/dev/ttyUSB1`.
 
-You can read more in the [configuration section](#Configuring MudPi) for details on each of the options available. Additionally the [sensors section](#sensors) can be reviewed for all the available sensors MudPi supports out of the box.
+You can read more in the [configuration section](#configuring-mudpi) for details on each of the options available. Additionally the [sensors section](#sensors) can be reviewed for all the available sensors MudPi supports out of the box.
 
 
 
@@ -545,6 +568,7 @@ There are still some items remaining for MudPi that I would like to complete. I 
 - [ ] Retry and Restart System After Serial Timeout During Prolonged Use
 - [ ] Camera Feature (Pi)
 - [ ] Finish LCD Screen Support
+- [ ] Multi Pump (Relay) Support
 
 **Maybes**
 - [ ] Light Sensors ?
