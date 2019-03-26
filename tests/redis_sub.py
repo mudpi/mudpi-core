@@ -7,7 +7,7 @@ class Listener(threading.Thread):
 		threading.Thread.__init__(self)
 		self.redis = r
 		self.pubsub = self.redis.pubsub()
-		self.pubsub.subscribe(channels)
+		self.pubsub.psubscribe(channels)
 		
 	def check_type(self, item):
 		if isinstance(item, dict):

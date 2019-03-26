@@ -3,6 +3,7 @@ from workers.lcd_worker import LCDWorker
 from workers.sensor_worker import SensorWorker
 from workers.pi_sensor_worker import PiSensorWorker
 from workers.pump_worker import PumpWorker
+from workers.relay_worker import RelayWorker
 import RPi.GPIO as GPIO
 import time
 import datetime
@@ -66,6 +67,9 @@ try:
 	print('Preparing Threads for Workers\r', end="", flush=True)
 
 	threads = []
+	relays = []
+	relayEvents = {}
+	relay_index = 0
 	variables.lcd_message = {'line_1': 'Mudpi Control', 'line_2': 'Is Now Running'}
 
 	new_messages_waiting = threading.Event() #Event to signal LCD to pull new messages
@@ -83,17 +87,41 @@ try:
 	l = l.run()
 	threads.append(l)
 
-	p = PumpWorker(CONFIGS['pump'], main_thread_running, system_ready, pump_ready, pump_should_be_running)
-	print('Loading Pump Worker')
-	p = p.run()
-	threads.append(p)
+	# p = PumpWorker(CONFIGS['pump'], main_thread_running, system_ready, pump_ready, pump_should_be_running)
+	# print('Loading Pump Worker')
+	# p = p.run()
+	# threads.append(p)
 
-	ps = PiSensorWorker(CONFIGS['sensors'], main_thread_running, system_ready, pump_ready)
-	print('Loading Pi Sensor Worker')
-	ps = ps.run()
-	threads.append(ps)
+	try:
+		ps = PiSensorWorker(CONFIGS['sensors'], main_thread_running, system_ready, pump_ready)
+		print('Loading Pi Sensor Worker')
+		ps = ps.run()
+		threads.append(ps)
+	except KeyError:
+		print('No Sensors Found to Load')
 
-	#t = threading.Thread(target=temp_worker, args=(new_messages_waiting,main_thread_running,system_ready))
+
+	try:
+		for relay in CONFIGS['relays']:
+			#Create a threading event for each relay to check status
+			relayState = {
+				"available": threading.Event(), #Event to allow relay to activate
+				"active": threading.Event() #Event to signal relay to open/close
+			}
+			#Store the relays under the tag or index if no tag is found, this way we can reference the right relays
+			relayEvents[relay.get("tag", relay_index)] = relayState
+			#Create sensor worker for a relay
+			r = RelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'])
+			r = r.run()
+			#Make the relays available, this event is toggled off elsewhere if we need to disable relays
+			relayState['available'].set()
+			relay_index +=1
+			if r is not None:
+				threads.append(r)
+	except KeyError:
+		print('No Relays Found to Load')
+
+
 	try:
 		for node in CONFIGS['nodes']:
 			#Create sensor worker for node
@@ -122,12 +150,9 @@ try:
 	print('MudPi Garden Control...\t\t\t\033[1;32m Online\033[0;0m')
 	print('_________________________________________________')
 	system_ready.set() #Workers will not process until system is ready
-	variables.r.set('started_at', datetime.datetime.now()) #Store current time to track uptime
+	variables.r.set('started_at', str(datetime.datetime.now())) #Store current time to track uptime
 
-	#time.sleep(10)
-	#new_messages_waiting.set()
-	#pump_ready.set()
-	#time.sleep(desired_runtime)
+	
 
 	#Hold the program here until its time to graceful shutdown
 	#This is our pump cycle check, Using redis to determine if pump should activate
@@ -157,15 +182,13 @@ finally:
 	# time.sleep(1)
 	# sock.close()
 
-	try:
-		if t is not None:
-			t.join()
-	except NameError:
-		pass
-	l.join()
-	s.join()
-	p.join()
-	ps.join()
+	#Join all our thread for shutdown
+	for thread in threads:
+		thread.join()
+	# l.join()
+	# s.join()
+	# p.join()
+	# ps.join()
 	print("MudPi Shutting Down...\t\t\t\033[1;32m Complete\033[0;0m")
 	print("Mudpi is Now...\t\t\t\t\033[1;31m Offline\033[0;0m")
 	
