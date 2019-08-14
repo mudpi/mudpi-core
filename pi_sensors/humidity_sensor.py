@@ -33,8 +33,8 @@ class HumiditySensor(Sensor):
 		if value.is_valid():
 			variables.r.set(self.key + '_temperature', round(value.temperature * 1.8 + 32, 2))
 			variables.r.set(self.key + '_humidity', value.humidity)
-			readings = {'temperature': value.temperature, 'humidity': value.humidity}
-			variables.r.set(self.key, readings)
+			readings = {'temperature': round(value.temperature * 1.8 + 32, 2), 'humidity': value.humidity}
+			variables.r.set(self.key, json.dumps(readings))
 			print('Pi Temp:', readings)
 			return readings
 

@@ -69,7 +69,7 @@ class PiSensorWorker():
 				for sensor in self.sensors:
 					result = sensor.read()
 					readings[sensor.key] = result
-					variables.r.set(sensor.key, result)
+					variables.r.set(sensor.key, json.dumps(result))
 					#print(sensor.name, result)
 
 					#Check for a critical water level from any float sensors
@@ -87,6 +87,7 @@ class PiSensorWorker():
 				#print(readings)
 				message['data'] = readings
 				variables.r.publish('pi-sensors', json.dumps(message))
+				time.sleep(30)
 				
 			time.sleep(2)
 		#This is only ran after the main thread is shut down

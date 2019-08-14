@@ -5,13 +5,14 @@ import redis
 import threading
 import sys
 import RPi.GPIO as GPIO
-from picamera import PiCamera
 sys.path.append('..')
 
 import variables
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
 GPIO.setmode(GPIO.BCM)
+
+# ToDO Update relay to make a tag is one is not set in config
 
 class RelayWorker():
 	def __init__(self, config, main_thread_running, system_ready, relay_available, relay_active):
@@ -26,7 +27,7 @@ class RelayWorker():
 
 		#Dynamic Properties based on config
 		self.active = False
-		self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'garden/relay/'
+		self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/relay/'
 		self.pin_state_off = GPIO.HIGH if self.config['normally_open'] is not None and self.config['normally_open'] else GPIO.LOW
 		self.pin_state_on = GPIO.LOW if self.config['normally_open'] is not None and self.config['normally_open'] else GPIO.HIGH
 
@@ -41,6 +42,15 @@ class RelayWorker():
 		GPIO.setup(self.config['pin'], GPIO.OUT)
 		#Close the relay by default, we use the pin state we determined based on the config at init
 		GPIO.output(self.config['pin'], self.pin_state_off)
+		time.sleep(0.1)
+
+		#Feature to restore relay state in case of crash  or unexpected shutdown. This will check for last state stored in redis and set relay accordingly
+		if(self.config.get('restore_last_known_state', None) is not None and self.config.get('restore_last_known_state', False) is True):
+			if(variables.r.get(self.config['tag']+'_state')):
+				GPIO.output(self.config['pin'], self.pin_state_on)
+				print('Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.config['tag']))
+
+
 		print('Relay Worker {tag}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**self.config))
 		return
 
@@ -72,20 +82,20 @@ class RelayWorker():
 			decoded_message = self.decodeMessageData(data)
 			try:
 				if decoded_message['event'] == 'Switch':
-					if decoded_message.get('data', None) == 1:
+					if decoded_message.get('data', None):
 						self.relay_active.set()
-					elif decoded_message.get('data', None) == 0:
+					elif decoded_message.get('data', None):
 						self.relay_active.clear()
-					print('Switch Relay {0} state to {1}'.format(self.config['tag'], decoded_message['data']))
+					print('Switch Relay \033[1;36m{0}\033[0;0m state to \033[1;36m{1}\033[0;0m'.format(self.config['tag'], decoded_message['data']))
 				elif decoded_message['event'] == 'Toggle':
 					state = 'Off' if self.active else 'On'
 					if self.relay_active.is_set():
 						self.relay_active.clear()
 					else:
 						self.relay_active.set()
-					print('Toggle Relay {0} {1}'.format(self.config['tag'], state))
+					print('Toggle Relay \033[1;36m{0} {1} \033[0;0m'.format(self.config['tag'], state))
 			except:
-				print('Error Decoding Message for Relay {}'.format(self.config['tag']))
+				print('Error Decoding Message for Relay {0}'.format(self.config['tag']))
 
 	def elapsedTime(self):
 		self.time_elapsed = time.perf_counter() - self.time_start
@@ -135,7 +145,7 @@ class RelayWorker():
 						self.turnOff()
 						time.sleep(1)
 				except:
-					print("Relay Worker {tag} \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
+					print("Relay Worker \033[1;36m{tag}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
 
 			else:
 				#System not ready relay should be off

@@ -1,16 +1,20 @@
 import threading
+import RPi.GPIO as GPIO
+import time
+import datetime
+import socket
+import sys
+import json
+sys.path.append('..')
 from workers.lcd_worker import LCDWorker
 from workers.sensor_worker import SensorWorker
 from workers.pi_sensor_worker import PiSensorWorker
 from workers.pump_worker import PumpWorker
 from workers.relay_worker import RelayWorker
-import RPi.GPIO as GPIO
-import time
-import datetime
+from workers.camera_worker import CameraWorker
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
 import variables
-import socket
 # __  __           _ _____ _ 
 #|  \/  |         | |  __ (_)
 #| \  / |_   _  __| | |__) | 
@@ -20,14 +24,18 @@ import socket
 
 CONFIGS = {}
 PROGRAM_RUNNING = True
+print(chr(27) + "[2J")
 print('Loading MudPi Configs...\r', end="", flush=True)
 #load the configuration
 CONFIGS = loadConfigJson(CONFIGS)
+#Waiting for redis and services to be running
+time.sleep(5) 
 print('Loading MudPi Configs...\t\033[1;32m Complete\033[0;0m')
-time.sleep(5) #Waiting for redis and services to be running
+time.sleep(1)
 
-#Clear the console if its open for debuggin                             
+#Clear the console if its open for debugging                           
 print(chr(27) + "[2J")
+#Print a display logo for startup
 print("\033[1;32m")
 print(' __  __           _ _____ _ ')
 print('|  \/  |         | |  __ (_)')
@@ -40,20 +48,14 @@ print('')
 print('Eric Davisson @theDavisson')
 print('Version: ', CONFIGS['version'])
 print('\033[0;0m')
+
 if CONFIGS['debug'] is True:
 	print('\033[1;33mDEBUG MODE ENABLED\033[0;0m')
-time.sleep(1)
-
-
-if CONFIGS['debug'] is True:
 	print("Loaded Config\n--------------------")
 	for index, config in CONFIGS.items():
 		if config != '':
 			print('%s: %s' % (index, config))
-	#for debugging
-	desired_runtime = int(input('\033[1;32m|DEBUG MODE|\033[0;0m Server Runtime (seconds): '))
-else:
-	desired_runtime = 60
+	time.sleep(10)
 
 try:
 	print('Initializing Garden Control \r', end="", flush=True)
@@ -77,15 +79,25 @@ try:
 	system_ready = threading.Event() #Event to tell workers to begin working
 	pump_ready = threading.Event() #Event to determine if pump can be turned on
 	pump_should_be_running = threading.Event() #Event to tell pump to water cycle
+	camera_available = threading.Event() #Event to signal if camera can be used
 	main_thread_running.set() #Main event to tell workers to run/shutdown
 
 	time.sleep(0.1)
 	print('Preparing Threads for Workers...\t\033[1;32m Complete\033[0;0m')
 
-	l = LCDWorker(new_messages_waiting,main_thread_running,system_ready)
-	print('Loading LCD Worker')
-	l = l.run()
-	threads.append(l)
+	#l = LCDWorker(new_messages_waiting,main_thread_running,system_ready)
+	#print('Loading LCD Worker')
+	#l = l.run()
+	#threads.append(l)
+
+	try:
+		c = CameraWorker(CONFIGS['camera'], main_thread_running, system_ready, camera_available)
+		print('Loading Pi Camera Worker')
+		c = c.run()
+		threads.append(c)
+		camera_available.set()
+	except KeyError:
+		print('No Camera Found to Load')
 
 	# p = PumpWorker(CONFIGS['pump'], main_thread_running, system_ready, pump_ready, pump_should_be_running)
 	# print('Loading Pump Worker')
@@ -133,7 +145,7 @@ try:
 		print('No Nodes Found to Load')
 
 
-	#Didnt build server worker (this is replaced with nodejs)
+	#Decided not to build server worker (this is replaced with nodejs, expressjs)
 	#Maybe use this for internal communication across devices if using wireless
 	def server_worker():
 		server.listen()
@@ -151,24 +163,25 @@ try:
 	print('_________________________________________________')
 	system_ready.set() #Workers will not process until system is ready
 	variables.r.set('started_at', str(datetime.datetime.now())) #Store current time to track uptime
-
+	system_message = {'event':'SystemStarted', 'data':1}
+	variables.r.publish('mudpi', json.dumps(system_message))
 	
 
 	#Hold the program here until its time to graceful shutdown
 	#This is our pump cycle check, Using redis to determine if pump should activate
 	while PROGRAM_RUNNING:
-		pump_status = variables.r.get('pump_should_be_running')
-		if pump_status and not pump_should_be_running.is_set():
-			pump_should_be_running.set()
-			variables.r.delete('pump_should_be_running')
-		if pump_should_be_running.is_set():
-			pump_override = variables.r.get('pump_shuttoff_override')
-			if pump_override:
-				pump_should_be_running.clear()
-				variables.r.delete('pump_shuttoff_override')
-				message = {'event':'PumpOverrideOff', 'data':1}
-				variables.r.publish('pump', json.dumps(message))
-		time.sleep(5)
+		# pump_status = variables.r.get('pump_should_be_running')
+		# if pump_status and not pump_should_be_running.is_set():
+		# 	pump_should_be_running.set()
+		# 	variables.r.delete('pump_should_be_running')
+		# if pump_should_be_running.is_set():
+		# 	pump_override = variables.r.get('pump_shuttoff_override')
+		# 	if pump_override:
+		# 		pump_should_be_running.clear()
+		# 		variables.r.delete('pump_shuttoff_override')
+		# 		message = {'event':'PumpOverrideOff', 'data':1}
+		# 		variables.r.publish('pump', json.dumps(message))
+		time.sleep(0.1)
 
 except KeyboardInterrupt:
 	PROGRAM_RUNNING = False
@@ -178,6 +191,8 @@ finally:
 	# sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	#sock.connect((CONFIGS['SERVER_HOST'], int(CONFIGS['SERVER_PORT'])))
 	main_thread_running.clear()
+	#Shutdown the camera loop
+	camera_available.clear()
 	server.sock.shutdown(socket.SHUT_RDWR)
 	# time.sleep(1)
 	# sock.close()
@@ -185,10 +200,6 @@ finally:
 	#Join all our thread for shutdown
 	for thread in threads:
 		thread.join()
-	# l.join()
-	# s.join()
-	# p.join()
-	# ps.join()
 	print("MudPi Shutting Down...\t\t\t\033[1;32m Complete\033[0;0m")
 	print("Mudpi is Now...\t\t\t\t\033[1;31m Offline\033[0;0m")
 	

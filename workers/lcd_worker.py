@@ -1,4 +1,4 @@
-#!/usr/bin/python
+
  
 # The wiring for the LCD is as follows:
 # 1 : GND
@@ -18,7 +18,6 @@
 # 15: LCD Backlight +5V**
 # 16: LCD Backlight GND
  
-#import
 import RPi.GPIO as GPIO
 import time
 import redis
@@ -52,7 +51,8 @@ E_DELAY = 0.0005
 
 MESSAGE_QUEUE = []
 
-r = redis.Redis(host='127.0.0.1', port=6379)
+#r = redis.Redis(host='127.0.0.1', port=6379)
+r = variables.r
 
 class LCDWorker():
 

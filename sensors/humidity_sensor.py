@@ -30,7 +30,7 @@ class HumiditySensor(Sensor):
 		data = {'temperature': temperature, 'humidity': humidity}
 		variables.r.set(self.key + '_temperature', temperature)
 		variables.r.set(self.key + '_humidity', humidity)
-		variables.r.set(self.key, data)
+		variables.r.set(self.key, json.dumps(data))
 		return data
 
 	def readRaw(self):
