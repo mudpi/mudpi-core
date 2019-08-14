@@ -3,10 +3,10 @@
 # MudPi Smart Garden
 > A python library to gather sensor readings, trigger components, control solenoids and more in an event based system that can be run on a raspberry pi.
 
----
 
 ## Documentation
 For full documentation visit [mudpi.app](https://mudpi.app/docs)
+
 
 ## Guides
 For examples and guides on how to setup and use MudPi check out the [free guides we prepared.](https://mudpi.app/guides)
@@ -25,10 +25,6 @@ Breaking.Major.Minor
 * Twitter.com/theDavisson
 
 
-## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-
 ## Hardware Tested On
 These are the devices and sensors I tested and used with MudPi successfully. Many sensors are similar so it will work with a range more than what is listed below. 
 
@@ -43,4 +39,9 @@ These are the devices and sensors I tested and used with MudPi successfully. Man
 * [DFROBOT Analog Capacitive Soil Moisture Sensor](https://www.amazon.com/gp/product/B01GHY0N4K/ref=oh_aui_detailpage_o01_s00?ie=UTF8&psc=1)
 * [USB to TTL USB 2.0 Serial Module UART](https://www.amazon.com/gp/product/B07CWKHTLH/ref=oh_aui_detailpage_o04_s00?ie=UTF8&psc=1)
 
+## License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+
 <img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="http://ericdavisson.com/img/mudpi/mudPI_LOGO_small_flat.png" width="50px">
+
