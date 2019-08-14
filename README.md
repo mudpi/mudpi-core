@@ -29,7 +29,7 @@ Breaking.Major.Minor
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 
-## Tested On
+## Hardware Tested On
 These are the devices and sensors I tested and used with MudPi successfully. Many sensors are similar so it will work with a range more than what is listed below. 
 
 * [Raspberry Pi 2 Model B+](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/)
@@ -42,8 +42,5 @@ These are the devices and sensors I tested and used with MudPi successfully. Man
 * [Rain Sensor](https://www.amazon.com/gp/product/B01D9JK2F6/ref=oh_aui_detailpage_o03_s00?ie=UTF8&psc=1)
 * [DFROBOT Analog Capacitive Soil Moisture Sensor](https://www.amazon.com/gp/product/B01GHY0N4K/ref=oh_aui_detailpage_o01_s00?ie=UTF8&psc=1)
 * [USB to TTL USB 2.0 Serial Module UART](https://www.amazon.com/gp/product/B07CWKHTLH/ref=oh_aui_detailpage_o04_s00?ie=UTF8&psc=1)
-
-If you have a sensor MudPi is not working with or you want to add more configuration options please submit a pull request and help a single developer out :)
-
 
 <img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="http://ericdavisson.com/img/mudpi/mudPI_LOGO_small_flat.png" width="50px">

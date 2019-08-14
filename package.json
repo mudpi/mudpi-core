@@ -1,0 +1,14 @@
+{
+  "name": "MudpiCore",
+  "version": "0.7.0",
+  "description": "Mudpi Core System",
+  "main": "mudpi_event_listener.js",
+  "scripts": {
+    "start": "node server/mudpi_event_listener.js"
+  },
+  "repository": {},
+  "dependencies": {
+    "axios": "^0.18.0",
+    "ioredis": "^4.9.0"
+  }
+}
