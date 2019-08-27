@@ -42,7 +42,7 @@ class PiSensorWorker():
 
 				imported_sensor = self.dynamic_sensor_import(sensor_type)
 
-				new_sensor = imported_sensor(sensor.get('pin'), name=sensor.get('name', sensor.get('type')), key=sensor.get('key', None))
+				new_sensor = imported_sensor(sensor.get('pin'), name=sensor.get('name', sensor.get('type')), key=sensor.get('key', None), model=sensor.get('model', None))
 				new_sensor.init_sensor()
 				new_sensor.type = sensor.get('type').lower()
 				if sensor.get('critical', None) is not None:

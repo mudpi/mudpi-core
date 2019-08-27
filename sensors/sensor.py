@@ -5,6 +5,7 @@ from nanpy import (ArduinoApi, SerialManager)
 
 default_connection = SerialManager()
 
+# Base sensor class to extend all other arduino sensors from.
 class Sensor():
 
 	def __init__(self, pin, name='Sensor', connection=default_connection, analog_pin_mode=False, key=None):
