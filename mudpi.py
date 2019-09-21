@@ -8,6 +8,7 @@ import json
 sys.path.append('..')
 from workers.lcd_worker import LCDWorker
 from workers.sensor_worker import SensorWorker
+from workers.adc_worker import ADCMCP3008Worker
 from workers.pi_sensor_worker import PiSensorWorker
 from workers.pump_worker import PumpWorker
 from workers.relay_worker import RelayWorker
@@ -136,13 +137,18 @@ try:
 
 	try:
 		for node in CONFIGS['nodes']:
-			#Create sensor worker for node
-			t = SensorWorker(node, main_thread_running, system_ready)
+			# Create sensor worker for node
+			if node['type'] == "arduino":
+				t = SensorWorker(node, main_thread_running, system_ready)
+			elif node['type'] == "ADC-MCP3008":
+				t = ADCMCP3008Worker(node, main_thread_running, system_ready)
+			else:
+				raise Exception("Unknown Node Type: " + node['type'])
 			t = t.run()
 			if t is not None:
 				threads.append(t)
 	except KeyError:
-		print('No Nodes Found to Load')
+		print('Invalid or no Nodes found to Load')
 
 
 	#Decided not to build server worker (this is replaced with nodejs, expressjs)
