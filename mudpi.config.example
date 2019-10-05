@@ -17,6 +17,7 @@
     "nodes": [
         {
             "name": "Arduino Box 1",
+            "type": "arduino",
             "address": "/dev/ttyUSB0",
             "sensors": [
                 {
@@ -41,6 +42,7 @@
         },
         {
             "name": "Arduino Box 2",
+            "type": "arduino",
             "address": "/dev/ttyUSB1",
             "sensors": [
                 {
@@ -48,6 +50,23 @@
                     "is_digital": true,
                     "type": "Humidity",
                     "name": "Weather Station 2"
+                }
+            ]
+        },
+         {
+            "name": "MCP3008 #1",
+            "type": "ADC-MCP3008",
+            "pin": "22",
+            "sensors": [
+                {
+                    "pin": "0",
+                    "type": "Soil",
+                    "name": "Soil Sensor #1"
+                },
+                {
+                    "pin": "1",
+                    "type": "Soil",
+                    "name": "Soil Sensor #1"
                 }
             ]
         }

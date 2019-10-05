@@ -1,20 +1,13 @@
 import time
-import datetime
 import json
-import redis
 import threading
-from nanpy import (ArduinoApi, SerialManager, DHT)
+from nanpy import (SerialManager)
 from nanpy.serialmanager import SerialManagerError
 import sys
 sys.path.append('..')
-from sensors.float_sensor import (FloatSensor)
-from sensors.rain_sensor import (RainSensor)
-from sensors.light_sensor import (LightSensor)
-from sensors.humidity_sensor import (HumiditySensor)
-from sensors.soil_sensor import (SoilSensor)
-from sensors.temperature_sensor import (TemperatureSensor)
 
 import variables
+import importlib
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
 
@@ -42,21 +35,23 @@ class SensorWorker():
 				break
 		return
 
-	def dynamic_sensor_import(self, name):
-		#Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor
-		components = name.split('.')
-		#Dynamically import root of component path
-		module = __import__(components[0])
-		#Get component attributes
-		for component in components[1:]:
-			module = getattr(module, component)
-		return module
+	def dynamic_sensor_import(self, path):
+		components = path.split('.')
+
+		s = ''
+		for component in components[:-1]:
+			s += component + '.'
+
+		parent = importlib.import_module(s[:-1])
+		sensor = getattr(parent, components[-1])
+
+		return sensor
 
 	def init_sensors(self):
 		for sensor in self.config['sensors']:
 			if sensor.get('type', None) is not None:
 				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
-				sensor_type = 'sensors.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
+				sensor_type = 'sensors.arduino.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
 				#analog_pin_mode = False if sensor.get('is_digital', False) else True
 				imported_sensor = self.dynamic_sensor_import(sensor_type)
 				new_sensor = imported_sensor(sensor.get('pin'), name=sensor.get('name', sensor.get('type')), connection=self.connection, key=sensor.get('key', None))
