@@ -84,7 +84,7 @@ class RelayWorker():
 				if decoded_message['event'] == 'Switch':
 					if decoded_message.get('data', None):
 						self.relay_active.set()
-					elif decoded_message.get('data', None):
+					elif decoded_message.get('data', None) == 0:
 						self.relay_active.clear()
 					print('Switch Relay \033[1;36m{0}\033[0;0m state to \033[1;36m{1}\033[0;0m'.format(self.config['tag'], decoded_message['data']))
 				elif decoded_message['event'] == 'Toggle':
