@@ -16,12 +16,14 @@ from workers.camera_worker import CameraWorker
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
 import variables
+
 # __  __           _ _____ _ 
 #|  \/  |         | |  __ (_)
 #| \  / |_   _  __| | |__) | 
 #| |\/| | | | |/ _` |  ___/ |
 #| |  | | |_| | (_| | |   | |
 #|_|  |_|\__,_|\__,_|_|   |_|
+# https://mudpi.app
 
 CONFIGS = {}
 PROGRAM_RUNNING = True
@@ -63,7 +65,7 @@ try:
 	GPIO.setwarnings(False)
 	GPIO.setmode(GPIO.BCM)
 	GPIO.cleanup()
-
+	#Pause for GPIO to finish
 	time.sleep(0.1)
 	print('Initializing Garden Control...\t\t\033[1;32m Complete\033[0;0m')
 
@@ -78,8 +80,8 @@ try:
 	new_messages_waiting = threading.Event() #Event to signal LCD to pull new messages
 	main_thread_running = threading.Event() #Event to signal workers to close
 	system_ready = threading.Event() #Event to tell workers to begin working
-	pump_ready = threading.Event() #Event to determine if pump can be turned on
-	pump_should_be_running = threading.Event() #Event to tell pump to water cycle
+	pump_ready = threading.Event() #Event to determine if pump can be turned on DEPREICATED
+	pump_should_be_running = threading.Event() #Event to tell pump to water cycle DEPRICATED
 	camera_available = threading.Event() #Event to signal if camera can be used
 	main_thread_running.set() #Main event to tell workers to run/shutdown
 
@@ -100,6 +102,7 @@ try:
 	except KeyError:
 		print('No Camera Found to Load')
 
+	# Replaced by Relays in v0.7.0
 	# p = PumpWorker(CONFIGS['pump'], main_thread_running, system_ready, pump_ready, pump_should_be_running)
 	# print('Loading Pump Worker')
 	# p = p.run()

@@ -3,6 +3,7 @@ import json
 import threading
 from nanpy import (SerialManager)
 from nanpy.serialmanager import SerialManagerError
+from nanpy.sockconnection import (SocketManager, SocketManagerError)
 import sys
 sys.path.append('..')
 
@@ -18,21 +19,39 @@ class SensorWorker():
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		self.node_ready = False
+
 		attempts = 3
-		while attempts > 0:
-			try:
-				attempts-= 1
-				self.connection = SerialManager(device=str(self.config.get('address', '/dev/ttyUSB1')))
-				self.sensors = []
-				self.init_sensors()
-			except SerialManagerError:
-				print('[{name}] \033[1;33m Node Timeout\033[0;0m ['.format(**self.config), attempts, ' tries left]...')
-				time.sleep(15)
-				print('Retrying Connection...')
-			else:
-				print('[{name}] Serial Connected \t\033[1;32m Success\033[0;0m'.format(**self.config))
-				self.node_ready = True
-				break
+		if self.config.get('use_wifi', False):
+			while attempts > 0:
+				try:
+					attempts-= 1
+					self.connection = SocketManager(host=str(self.config.get('address', 'mudpi.local')))
+					self.sensors = []
+					self.init_sensors()
+				except SocketManagerError:
+					print('[{name}] \033[1;33m Node Timeout\033[0;0m ['.format(**self.config), attempts, ' tries left]...')
+					time.sleep(15)
+					print('Retrying Connection...')
+				else:
+					print('[{name}] Wifi Connection \t\033[1;32m Success\033[0;0m'.format(**self.config))
+					self.node_ready = True
+					break
+		else:
+			while attempts > 0:
+				try:
+					attempts-= 1
+					self.connection = SerialManager(device=str(self.config.get('address', '/dev/ttyUSB1')))
+					self.sensors = []
+					self.init_sensors()
+				except SerialManagerError:
+					print('[{name}] \033[1;33m Node Timeout\033[0;0m ['.format(**self.config), attempts, ' tries left]...')
+					time.sleep(15)
+					print('Retrying Connection...')
+				else:
+					print('[{name}] Serial Connection \t\033[1;32m Success\033[0;0m'.format(**self.config))
+					self.node_ready = True
+					break
+		
 		return
 
 	def dynamic_sensor_import(self, path):

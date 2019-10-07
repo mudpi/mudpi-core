@@ -25,13 +25,13 @@ class HumiditySensor(Sensor):
 		# prepare sensor on specified pin
 		sensor_types = { '11': DHT.DHT11,
 						'22': DHT.DHT22,
-						'2302': DHT.AM2302 }
+						'2301': DHT.AM2301 }
 		if len(self.type) == 3 and self.type in sensor_types:
 			self.sensor = sensor_types[self.type]
 		else:
 			print('Sensor Type Error: Defaulting to DHT11')
 			self.sensor = DHT.DHT11
-		self.dht = DHT(self.pin, DHT[self.sensor], connection=self.connection)
+		self.dht = DHT(self.pin, self.sensor, connection=self.connection)
 
 	def read(self):
 		#Pass true to read in american degrees :)
