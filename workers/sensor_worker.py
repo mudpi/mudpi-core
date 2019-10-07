@@ -71,9 +71,27 @@ class SensorWorker():
 			if sensor.get('type', None) is not None:
 				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
 				sensor_type = 'sensors.arduino.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
+				
 				#analog_pin_mode = False if sensor.get('is_digital', False) else True
+
 				imported_sensor = self.dynamic_sensor_import(sensor_type)
-				new_sensor = imported_sensor(sensor.get('pin'), name=sensor.get('name', sensor.get('type')), connection=self.connection, key=sensor.get('key', None))
+				#new_sensor = imported_sensor(sensor.get('pin'), name=sensor.get('name', sensor.get('type')), connection=self.connection, key=sensor.get('key', None))
+				
+				# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
+				sensor_kwargs = { 
+					'name' : sensor.get('name', sensor.get('type')),
+					'pin' : sensor.get('pin'),
+					'connection': self.connection,
+					'key'  : sensor.get('key', None)
+				}
+
+				# optional sensor variables 
+				# Model is specific to DHT modules to specify DHT11(11) DHT22(22) or DHT2301(21)
+				if sensor.get('model'):
+					sensor_kwargs['model'] = sensor.get('model')
+
+				new_sensor = imported_sensor(**sensor_kwargs)
+
 				new_sensor.init_sensor()
 				self.sensors.append(new_sensor)
 				print('{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))

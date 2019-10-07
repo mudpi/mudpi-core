@@ -49,7 +49,7 @@ print('|_|  |_|\__,_|\__,_|_|   |_| ')
 print('_________________________________________________')
 print('')
 print('Eric Davisson @theDavisson')
-print('Version: ', CONFIGS['version'])
+print('Version: ', CONFIGS.get('version', '0.7.5'))
 print('\033[0;0m')
 
 if CONFIGS['debug'] is True:
@@ -68,7 +68,6 @@ try:
 	#Pause for GPIO to finish
 	time.sleep(0.1)
 	print('Initializing Garden Control...\t\t\033[1;32m Complete\033[0;0m')
-
 	print('Preparing Threads for Workers\r', end="", flush=True)
 
 	threads = []
@@ -80,8 +79,6 @@ try:
 	new_messages_waiting = threading.Event() #Event to signal LCD to pull new messages
 	main_thread_running = threading.Event() #Event to signal workers to close
 	system_ready = threading.Event() #Event to tell workers to begin working
-	pump_ready = threading.Event() #Event to determine if pump can be turned on DEPREICATED
-	pump_should_be_running = threading.Event() #Event to tell pump to water cycle DEPRICATED
 	camera_available = threading.Event() #Event to signal if camera can be used
 	main_thread_running.set() #Main event to tell workers to run/shutdown
 
@@ -93,6 +90,7 @@ try:
 	#l = l.run()
 	#threads.append(l)
 
+	# Worker for Camera
 	try:
 		c = CameraWorker(CONFIGS['camera'], main_thread_running, system_ready, camera_available)
 		print('Loading Pi Camera Worker')
@@ -102,21 +100,16 @@ try:
 	except KeyError:
 		print('No Camera Found to Load')
 
-	# Replaced by Relays in v0.7.0
-	# p = PumpWorker(CONFIGS['pump'], main_thread_running, system_ready, pump_ready, pump_should_be_running)
-	# print('Loading Pump Worker')
-	# p = p.run()
-	# threads.append(p)
-
+	# Worker for sensors attached to pi
 	try:
-		ps = PiSensorWorker(CONFIGS['sensors'], main_thread_running, system_ready, pump_ready)
+		ps = PiSensorWorker(CONFIGS['sensors'], main_thread_running, system_ready)
 		print('Loading Pi Sensor Worker')
 		ps = ps.run()
 		threads.append(ps)
 	except KeyError:
 		print('No Sensors Found to Load')
 
-
+	# Worker for relays attached to pi
 	try:
 		for relay in CONFIGS['relays']:
 			#Create a threading event for each relay to check status
@@ -137,7 +130,7 @@ try:
 	except KeyError:
 		print('No Relays Found to Load')
 
-
+	# Worker for nodes attached to pi via serial or wifi[esp8266]
 	try:
 		for node in CONFIGS['nodes']:
 			# Create sensor worker for node
@@ -158,10 +151,8 @@ try:
 	#Maybe use this for internal communication across devices if using wireless
 	def server_worker():
 		server.listen()
-
 	print('Initializing Server')
 	server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
-
 	s = threading.Thread(target=server_worker)
 	threads.append(s)
 	s.start()
@@ -179,36 +170,33 @@ try:
 	#Hold the program here until its time to graceful shutdown
 	#This is our pump cycle check, Using redis to determine if pump should activate
 	while PROGRAM_RUNNING:
-		# pump_status = variables.r.get('pump_should_be_running')
-		# if pump_status and not pump_should_be_running.is_set():
-		# 	pump_should_be_running.set()
-		# 	variables.r.delete('pump_should_be_running')
-		# if pump_should_be_running.is_set():
-		# 	pump_override = variables.r.get('pump_shuttoff_override')
-		# 	if pump_override:
-		# 		pump_should_be_running.clear()
-		# 		variables.r.delete('pump_shuttoff_override')
-		# 		message = {'event':'PumpOverrideOff', 'data':1}
-		# 		variables.r.publish('pump', json.dumps(message))
+		# Main program loop
+		# add logging or other system operations here...
 		time.sleep(0.1)
 
 except KeyboardInterrupt:
 	PROGRAM_RUNNING = False
 finally:
 	print('MudPi Shutting Down...')
+	#Perform any cleanup tasks here...
+
 	#load a client on the server to clear it from waiting
 	# sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	#sock.connect((CONFIGS['SERVER_HOST'], int(CONFIGS['SERVER_PORT'])))
-	main_thread_running.clear()
-	#Shutdown the camera loop
-	camera_available.clear()
 	server.sock.shutdown(socket.SHUT_RDWR)
 	# time.sleep(1)
 	# sock.close()
+	
+	#Clear main running event to signal threads to close
+	main_thread_running.clear()
 
-	#Join all our thread for shutdown
+	#Shutdown the camera loop
+	camera_available.clear()
+
+	#Join all our threads for shutdown
 	for thread in threads:
 		thread.join()
+
 	print("MudPi Shutting Down...\t\t\t\033[1;32m Complete\033[0;0m")
 	print("Mudpi is Now...\t\t\t\t\033[1;31m Offline\033[0;0m")
 	

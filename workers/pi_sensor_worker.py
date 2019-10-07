@@ -13,13 +13,12 @@ import variables
 #r = redis.Redis(host='127.0.0.1', port=6379)
 
 class PiSensorWorker():
-	def __init__(self, config, main_thread_running, system_ready, pump_ready):
+	def __init__(self, config, main_thread_running, system_ready):
 		#self.config = {**config, **self.config}
 		self.config = config
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		#Store pump event so we can shutdown pump with float readings
-		self.pump_ready = pump_ready
 		self.sensors = []
 		self.init_sensors()
 		return
@@ -42,8 +41,22 @@ class PiSensorWorker():
 
 				imported_sensor = self.dynamic_sensor_import(sensor_type)
 
-				new_sensor = imported_sensor(sensor.get('pin'), name=sensor.get('name', sensor.get('type')), key=sensor.get('key', None), model=sensor.get('model', None))
+				# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
+				sensor_kwargs = { 
+					'name' : sensor.get('name', sensor.get('type')),
+					'pin' : sensor.get('pin'),
+					'key'  : sensor.get('key', None)
+				}
+
+				# optional sensor variables 
+				# Model is specific to DHT modules to specify DHT11 DHT22 or DHT2302
+				if sensor.get('model'):
+					sensor_kwargs['model'] = sensor.get('model')
+
+				new_sensor = imported_sensor(**sensor_kwargs)
 				new_sensor.init_sensor()
+
+				#Set the sensor type and determine if the readings are critical to operations
 				new_sensor.type = sensor.get('type').lower()
 				if sensor.get('critical', None) is not None:
 					new_sensor.critical = True
@@ -76,9 +89,11 @@ class PiSensorWorker():
 					if sensor.type == 'float':
 						if sensor.critical:
 							if result:
-								self.pump_ready.set()
+								pass
+								#self.pump_ready.set()
 							else:
-								self.pump_ready.clear()
+								pass
+								#self.pump_ready.clear()
 						
 							
 								

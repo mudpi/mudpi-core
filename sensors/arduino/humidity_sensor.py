@@ -17,7 +17,6 @@ class HumiditySensor(Sensor):
 
 	def __init__(self, pin, name='HumiditySensor', key=None, connection=default_connection, model='11'):
 		super().__init__(pin, name=name, key=key, connection=connection)
-		print(model)
 		self.type = model #DHT11 or DHT22 maybe AM2302
 		return
 
@@ -37,7 +36,7 @@ class HumiditySensor(Sensor):
 		#Pass true to read in american degrees :)
 		temperature = self.dht.readTemperature(True)
 		humidity = self.dht.readHumidity()
-		data = {'temperature': temperature, 'humidity': humidity}
+		data = {'temperature': round(temperature, 2), 'humidity': round(humidity, 2)}
 		variables.r.set(self.key + '_temperature', temperature)
 		variables.r.set(self.key + '_humidity', humidity)
 		variables.r.set(self.key, json.dumps(data))
