@@ -49,7 +49,7 @@ print('|_|  |_|\__,_|\__,_|_|   |_| ')
 print('_________________________________________________')
 print('')
 print('Eric Davisson @theDavisson')
-print('Version: ', CONFIGS.get('version', '0.8.1'))
+print('Version: ', CONFIGS.get('version', '0.8.2'))
 print('\033[0;0m')
 
 if CONFIGS['debug'] is True:
@@ -100,14 +100,24 @@ try:
 	except KeyError:
 		print('No Camera Found to Load')
 
-	# Worker for sensors attached to pi
+	# Workers for pi (Sensors, Controls, Relays)
 	try:
-		ps = PiSensorWorker(CONFIGS['sensors'], main_thread_running, system_ready)
-		print('Loading Pi Sensor Worker')
-		ps = ps.run()
-		threads.append(ps)
+		for worker in CONFIGS['workers']:
+			# Create worker for worker
+			if worker['type'] == "sensor":
+				pw = PiSensorWorker(worker, main_thread_running, system_ready)
+				print('Loading Pi Sensor Worker')
+			elif worker['type'] == "relay":
+				# Add Relay Worker Here for Better Config Control
+				print('Loading Pi Relay Worker')
+			else:
+				raise Exception("Unknown Worker Type: " + worker['type'])
+			pw = pw.run()
+			if pw is not None:
+				threads.append(pw)
 	except KeyError:
-		print('No Sensors Found to Load')
+		print('No Pi Workers Found to Load or Invalid Type')
+
 
 	# Worker for relays attached to pi
 	try:
@@ -137,11 +147,11 @@ try:
 			# Create worker for node
 			if node['type'] == "arduino":
 				t = ArduinoWorker(node, main_thread_running, system_ready)
-				# if node['controls'] is not None:
-				# 	acw = ArduinoControlWorker(node, main_thread_running, system_ready, t.connection)
-				# 	acw = acw.run()
-				# 	if acw is not None:
-				# 		threads.append(acw)
+				if node['controls'] is not None:
+					acw = ArduinoControlWorker(node, main_thread_running, system_ready, t.connection)
+					acw = acw.run()
+					if acw is not None:
+						threads.append(acw)
 			elif node['type'] == "ADC-MCP3008":
 				t = ADCMCP3008Worker(node, main_thread_running, system_ready)
 			else:

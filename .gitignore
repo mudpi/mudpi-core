@@ -3,3 +3,4 @@ package-lock.json
 scripts/
 img/
 .DS_Store
+mudpi.config

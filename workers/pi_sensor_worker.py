@@ -11,11 +11,14 @@ from sensors.pi.humidity_sensor import (HumiditySensor)
 import variables
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
+# def clamp(n, smallest, largest): return max(smallest, min(n, largest))
 
 class PiSensorWorker():
 	def __init__(self, config, main_thread_running, system_ready):
 		#self.config = {**config, **self.config}
 		self.config = config
+		self.channel = config.get('channel', 'pi-sensors').replace(" ", "_").lower()
+		self.sleep_duration = config.get('sleep_duration', 30)
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		#Store pump event so we can shutdown pump with float readings
@@ -34,7 +37,7 @@ class PiSensorWorker():
 		return module
 
 	def init_sensors(self):
-		for sensor in self.config:
+		for sensor in self.config['sensors']:
 			if sensor.get('type', None) is not None:
 				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
 				sensor_type = 'sensors.pi.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
@@ -64,7 +67,7 @@ class PiSensorWorker():
 					new_sensor.critical = False
 
 				self.sensors.append(new_sensor)
-				print('{type} Sensor (Pi) {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+				print('{type} Sensor (Pi) {pin}...\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
 		return
 
 	def run(self): 
@@ -95,14 +98,11 @@ class PiSensorWorker():
 								pass
 								#self.pump_ready.clear()
 						
-							
-								
-						
 
 				#print(readings)
 				message['data'] = readings
-				variables.r.publish('pi-sensors', json.dumps(message))
-				time.sleep(30)
+				variables.r.publish(self.channel, json.dumps(message))
+				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)
 		#This is only ran after the main thread is shut down
