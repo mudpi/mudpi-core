@@ -7,10 +7,10 @@ import sys
 import json
 sys.path.append('..')
 from workers.lcd_worker import LCDWorker
-from workers.sensor_worker import SensorWorker
+from workers.arduino_worker import ArduinoWorker
+from workers.arduino_control_worker import ArduinoControlWorker
 from workers.adc_worker import ADCMCP3008Worker
 from workers.pi_sensor_worker import PiSensorWorker
-from workers.pump_worker import PumpWorker
 from workers.relay_worker import RelayWorker
 from workers.camera_worker import CameraWorker
 from config_load import loadConfigJson
@@ -49,7 +49,7 @@ print('|_|  |_|\__,_|\__,_|_|   |_| ')
 print('_________________________________________________')
 print('')
 print('Eric Davisson @theDavisson')
-print('Version: ', CONFIGS.get('version', '0.7.5'))
+print('Version: ', CONFIGS.get('version', '0.7.6'))
 print('\033[0;0m')
 
 if CONFIGS['debug'] is True:
@@ -117,8 +117,8 @@ try:
 				"available": threading.Event(), #Event to allow relay to activate
 				"active": threading.Event() #Event to signal relay to open/close
 			}
-			#Store the relays under the tag or index if no tag is found, this way we can reference the right relays
-			relayEvents[relay.get("tag", relay_index)] = relayState
+			#Store the relays under the key or index if no key is found, this way we can reference the right relays
+			relayEvents[relay.get("key", relay_index)] = relayState
 			#Create sensor worker for a relay
 			r = RelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'])
 			r = r.run()
@@ -131,11 +131,17 @@ try:
 		print('No Relays Found to Load')
 
 	# Worker for nodes attached to pi via serial or wifi[esp8266]
+	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others
 	try:
 		for node in CONFIGS['nodes']:
-			# Create sensor worker for node
+			# Create worker for node
 			if node['type'] == "arduino":
-				t = SensorWorker(node, main_thread_running, system_ready)
+				t = ArduinoWorker(node, main_thread_running, system_ready)
+				# if node['controls'] is not None:
+				# 	acw = ArduinoControlWorker(node, main_thread_running, system_ready, t.connection)
+				# 	acw = acw.run()
+				# 	if acw is not None:
+				# 		threads.append(acw)
 			elif node['type'] == "ADC-MCP3008":
 				t = ADCMCP3008Worker(node, main_thread_running, system_ready)
 			else:
