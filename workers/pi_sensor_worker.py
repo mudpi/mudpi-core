@@ -23,7 +23,7 @@ class PiSensorWorker():
 		self.init_sensors()
 		return
 
-	def dynamic_sensor_import(self, name):
+	def dynamic_import(self, name):
 		#Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor
 		components = name.split('.')
 		#Dynamically import root of component path
@@ -39,7 +39,7 @@ class PiSensorWorker():
 				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
 				sensor_type = 'pi_sensors.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
 
-				imported_sensor = self.dynamic_sensor_import(sensor_type)
+				imported_sensor = self.dynamic_import(sensor_type)
 
 				# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
 				sensor_kwargs = { 
