@@ -5,8 +5,8 @@ import redis
 import threading
 import sys
 sys.path.append('..')
-from pi_sensors.float_sensor import (FloatSensor)
-from pi_sensors.humidity_sensor import (HumiditySensor)
+from sensors.pi.float_sensor import (FloatSensor)
+from sensors.pi.humidity_sensor import (HumiditySensor)
 
 import variables
 
@@ -37,7 +37,7 @@ class PiSensorWorker():
 		for sensor in self.config:
 			if sensor.get('type', None) is not None:
 				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
-				sensor_type = 'pi_sensors.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
+				sensor_type = 'sensors.pi.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
 
 				imported_sensor = self.dynamic_import(sensor_type)
 

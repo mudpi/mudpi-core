@@ -1,6 +1,6 @@
 import redis
 import threading
-import redis_sub
+import event_listener
 import json
 import time
 

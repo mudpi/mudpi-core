@@ -3,6 +3,10 @@ import sys
 import threading
 import pickle
 
+# A socket server prototype that was going to be used for devices to communicate.
+# Instead we are using nodejs to catch events in redis and emit them over a socket.
+# May update this in later version for device communications. Undetermined.
+
 class MudpiServer(object):
 
 	def __init__(self, system_running, host='127.0.0.1', port=6601):

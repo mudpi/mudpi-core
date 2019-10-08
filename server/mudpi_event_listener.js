@@ -3,6 +3,11 @@ var listener = new Redis({ showFriendlyErrorStack: true });
 var plistener = new Redis({ showFriendlyErrorStack: true }); //listener.createClient();
 const axios = require('axios')
 
+// Mudpi Event Relay Server v0.2
+// This is a nodejs script to catch redis events emitted by the mudpi core and
+// relay them to a webhook for further actions such as logging to a database.
+
+
 // CONFIGS -------------------------
 const address = 'test.php'
 const channel = '*';
