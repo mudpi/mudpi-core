@@ -66,18 +66,19 @@
             ]
         }
     ],
-    "sensors": [
+    "workers":[
         {
-            "type":"Humidity",
-            "pin": 26,
-            "name":"Box Weather"
-        },
-        {
-            "type":"Float",
-            "pin": 9,
-            "name":"Tank Empty",
-            "critical":true,
-            "percent":15
+            "type":"sensor",
+            "sleep_duration":30,
+            "channel":"pi-sensors",
+            "sensors": [
+                {
+                    "type":"Humidity",
+                    "pin": 24,
+                    "name":"Environment",
+                    "model":"11"
+                }
+            ]
         }
     ]
 }

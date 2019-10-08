@@ -54,7 +54,7 @@ class ArduinoControlWorker():
 						time.sleep(15)
 						print('Retrying Connection...')
 					else:
-						print('[{name}] Serial Connection \t\033[1;32m Success\033[0;0m'.format(**self.config))
+						print('[{name}] Serial Connection \t\t\033[1;32m Success\033[0;0m'.format(**self.config))
 						self.node_ready = True
 						break
 		
