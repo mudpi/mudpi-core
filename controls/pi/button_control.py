@@ -3,15 +3,14 @@ import datetime
 import json
 import redis
 from .control import Control
-from nanpy import (ArduinoApi, SerialManager)
+import RPi.GPIO as GPIO
 
-default_connection = SerialManager(device='/dev/ttyUSB0')
 r = redis.Redis(host='127.0.0.1', port=6379)
 
 class ButtonControl(Control):
 
-	def __init__(self, pin, name='ButtonControl', key=None, connection=default_connection, analog_pin_mode=False, topic=None):
-		super().__init__(pin, name=name, key=key, connection=connection, analog_pin_mode=analog_pin_mode)
+	def __init__(self, pin, name='ButtonControl', key=None, resistor=None, edge_detection=None, debounce=None, topic=None):
+		super().__init__(pin, name=name, key=key, resistor=resistor, edge_detection=edge_detection, debounce=debounce)
 		self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/relay/'
 		return
 

@@ -31,5 +31,5 @@ class Sensor():
 
 	def readPin(self):
 		#Read the pin from the ardiuno. Can be analog or digital based on "analog_pin_mode"
-		data = self.api.analogRead(self.pin) if analog_pin_mode else self.api.digitalRead(self.pin)
+		data = self.gpio.input(self.pin)
 		return data

@@ -1,20 +1,21 @@
-import threading
 import RPi.GPIO as GPIO
-import time
+import threading
 import datetime
 import socket
-import sys
+import time
 import json
+import sys
 sys.path.append('..')
-from workers.lcd_worker import LCDWorker
-from workers.arduino_worker import ArduinoWorker
-from workers.arduino_control_worker import ArduinoControlWorker
-from workers.adc_worker import ADCMCP3008Worker
-from workers.pi_sensor_worker import PiSensorWorker
-from workers.relay_worker import RelayWorker
-from workers.camera_worker import CameraWorker
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
+from workers.lcd_worker import LCDWorker
+from workers.relay_worker import RelayWorker
+from workers.camera_worker import CameraWorker
+from workers.adc_worker import ADCMCP3008Worker
+from workers.arduino_worker import ArduinoWorker
+from workers.pi_sensor_worker import PiSensorWorker
+from workers.pi_control_worker import PiControlWorker
+from workers.arduino_control_worker import ArduinoControlWorker
 import variables
 
 # __  __           _ _____ _ 
@@ -49,7 +50,7 @@ print('|_|  |_|\__,_|\__,_|_|   |_| ')
 print('_________________________________________________')
 print('')
 print('Eric Davisson @theDavisson')
-print('Version: ', CONFIGS.get('version', '0.8.2'))
+print('Version: ', CONFIGS.get('version', '0.8.3'))
 print('\033[0;0m')
 
 if CONFIGS['debug'] is True:
@@ -107,6 +108,9 @@ try:
 			if worker['type'] == "sensor":
 				pw = PiSensorWorker(worker, main_thread_running, system_ready)
 				print('Loading Pi Sensor Worker')
+			elif worker['type'] == "control":
+				pw = PiControlWorker(worker, main_thread_running, system_ready)
+				print('Loading Pi Control Worker')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
 				print('Loading Pi Relay Worker')
