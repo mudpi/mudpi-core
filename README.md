@@ -1,4 +1,4 @@
-<img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="http://ericdavisson.com/img/mudpi/mudPI_LOGO_small_flat.png" width="200px">
+<img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="https://mudpi.app/img/mudPI_LOGO_small_flat.png" width="200px">
 
 # MudPi Smart Garden
 > A python library to gather sensor readings, trigger components, control solenoids and more in an event based system that can be run on a raspberry pi.
@@ -29,8 +29,11 @@ Breaking.Major.Minor
 These are the devices and sensors I tested and used with MudPi successfully. Many sensors are similar so it will work with a range more than what is listed below. 
 
 * [Raspberry Pi 2 Model B+](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/)
+* [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
+* [Raspberry Pi Zero](https://www.raspberrypi.org/products/raspberry-pi-zero/)
 * [Arduino Nano (ELEGOO offbrand)](https://www.amazon.com/ELEGOO-Arduino-ATmega328P-without-compatible/dp/B0713XK923)
 * [Arduino Uno](https://store.arduino.cc/usa/arduino-uno-rev3)
+* [ESP8266](https://www.espressif.com/en/products/hardware/esp8266ex/overview)
 * [Horizontal Liquid Float Switch](https://www.amazon.com/gp/product/B01HLPGJUQ/ref=oh_aui_detailpage_o07_s00?ie=UTF8&psc=1)
 * [4 Channel DC 5V Relay](https://www.amazon.com/gp/product/B00KTEN3TM/ref=oh_aui_detailpage_o08_s00?ie=UTF8&psc=1)
 * [DS18B20 Temperature Sensors](https://www.amazon.com/gp/product/B018KFX5X0/ref=oh_aui_detailpage_o08_s00?ie=UTF8&psc=1)
@@ -39,9 +42,11 @@ These are the devices and sensors I tested and used with MudPi successfully. Man
 * [DFROBOT Analog Capacitive Soil Moisture Sensor](https://www.amazon.com/gp/product/B01GHY0N4K/ref=oh_aui_detailpage_o01_s00?ie=UTF8&psc=1)
 * [USB to TTL USB 2.0 Serial Module UART](https://www.amazon.com/gp/product/B07CWKHTLH/ref=oh_aui_detailpage_o04_s00?ie=UTF8&psc=1)
 
+Let me know if you are able to confirm tests on any other devices
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 
-<img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="http://ericdavisson.com/img/mudpi/mudPI_LOGO_small_flat.png" width="50px">
+<img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="https://mudpi.app/img/mudPI_LOGO_small_flat.png" width="50px">
 
