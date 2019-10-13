@@ -19,3 +19,6 @@ venv.bak/
 
 # IDE configs
 .idea/
+
+
+*.log
