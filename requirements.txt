@@ -1,0 +1,4 @@
+https://github.com/olixr/nanpy/archive/master.zip
+Adafruit_DHT
+adafruit-circuitpython-mcp3xxx
+adafruit-blinka
