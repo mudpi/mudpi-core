@@ -11,11 +11,22 @@ from server.mudpi_server import MudpiServer
 from workers.lcd_worker import LCDWorker
 from workers.relay_worker import RelayWorker
 from workers.camera_worker import CameraWorker
-from workers.adc_worker import ADCMCP3008Worker
-from workers.arduino_worker import ArduinoWorker
 from workers.pi_sensor_worker import PiSensorWorker
 from workers.pi_control_worker import PiControlWorker
-from workers.arduino_control_worker import ArduinoControlWorker
+try:
+	# Does this prevent the need to install the module if you dont use it?
+	from workers.arduino_worker import ArduinoWorker
+	from workers.arduino_control_worker import ArduinoControlWorker
+	NANPY_ENABLED = True
+except ImportError:
+	NANPY_ENABLED = False
+try:
+	# Does this prevent the need to install the module if you dont use it?
+	from workers.adc_worker import ADCMCP3008Worker
+	MCP_ENABLED = True
+except ImportError:
+	MCP_ENABLED = False
+
 import variables
 
 # __  __           _ _____ _ 
@@ -150,14 +161,20 @@ try:
 		for node in CONFIGS['nodes']:
 			# Create worker for node
 			if node['type'] == "arduino":
-				t = ArduinoWorker(node, main_thread_running, system_ready)
-				if node['controls'] is not None:
-					acw = ArduinoControlWorker(node, main_thread_running, system_ready, t.connection)
-					acw = acw.run()
-					if acw is not None:
-						threads.append(acw)
+				if NANPY_ENABLED:
+					t = ArduinoWorker(node, main_thread_running, system_ready)
+					if node['controls'] is not None:
+						acw = ArduinoControlWorker(node, main_thread_running, system_ready, t.connection)
+						acw = acw.run()
+						if acw is not None:
+							threads.append(acw)
+				else:
+					print('Error Loading Nanpy library. Did you pip3 install -r requirements.txt?')
 			elif node['type'] == "ADC-MCP3008":
-				t = ADCMCP3008Worker(node, main_thread_running, system_ready)
+				if MCP_ENABLED:
+					t = ADCMCP3008Worker(node, main_thread_running, system_ready)
+				else:
+					print('Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt?')
 			else:
 				raise Exception("Unknown Node Type: " + node['type'])
 			t = t.run()
@@ -171,7 +188,8 @@ try:
 	#Maybe use this for internal communication across devices if using wireless
 	def server_worker():
 		server.listen()
-	print('Initializing Server')
+	print('MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
+	time.sleep(1)
 	server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
 	s = threading.Thread(target=server_worker)
 	threads.append(s)

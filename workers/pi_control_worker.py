@@ -68,7 +68,7 @@ class PiControlWorker():
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Pi Control Worker [' + str(len(self.config['controls'])) + ' Controls]...\t\t\033[1;32m Running\033[0;0m')
+		print('Pi Control Worker [' + str(len(self.config['controls'])) + ' Controls]...\t\033[1;32m Running\033[0;0m')
 		return t
 
 	def work(self):

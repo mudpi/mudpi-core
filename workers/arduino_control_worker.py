@@ -19,46 +19,63 @@ class ArduinoControlWorker():
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		self.node_ready = False
-
-		if connection is not None:
-			self.connection = connection
-			self.controls = []
+		self.connection = connection
+		self.controls = []
+		if connection is None:
+			self.connect()
+		else:
 			self.init_controls()
 			self.node_ready = True
-		else:
-			attempts = 3
-			if self.config.get('use_wifi', False):
-				while attempts > 0:
-					try:
-						attempts-= 1
-						self.connection = SocketManager(host=str(self.config.get('address', 'mudpi.local')))
-						self.controls = []
-						self.init_controls()
-					except SocketManagerError:
-						print('[{name}] \033[1;33m Node Timeout\033[0;0m ['.format(**self.config), attempts, ' tries left]...')
-						time.sleep(15)
-						print('Retrying Connection...')
-					else:
-						print('[{name}] Wifi Connection \t\033[1;32m Success\033[0;0m'.format(**self.config))
-						self.node_ready = True
-						break
-			else:
-				while attempts > 0:
-					try:
-						attempts-= 1
-						self.connection = SerialManager(device=str(self.config.get('address', '/dev/ttyUSB1')))
-						self.controls = []
-						self.init_controls()
-					except SerialManagerError:
-						print('[{name}] \033[1;33m Node Timeout\033[0;0m ['.format(**self.config), attempts, ' tries left]...')
-						time.sleep(15)
-						print('Retrying Connection...')
-					else:
-						print('[{name}] Serial Connection \t\t\033[1;32m Success\033[0;0m'.format(**self.config))
-						self.node_ready = True
-						break
-		
 		return
+
+	def connect(self):
+		attempts = 3
+		connection = None
+		connected = False
+		if self.config.get('use_wifi', False):
+			while attempts > 0:
+				try:
+					print('{name} -> Attempting Connection...'.format(**self.config), end='\r', flush=True)
+					attempts-= 1
+					connection = SocketManager(host=str(self.config.get('address', 'mudpi.local')))
+					connected = True
+					self.connection = connection
+					self.init_controls()
+				except (SocketManagerError, BrokenPipeError, ConnectionResetError) as e:
+					print('{name} -> Attempting Connection...\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
+					print('{name} -> Waiting 15s to Reconnect...\t'.format(**self.config), end='\r', flush=True)
+					connection = None
+					connected = False
+					self.sensors = []
+					time.sleep(15)
+				except (OSError, KeyError) as e:
+					print('[{name}] \033[1;33m Node Not Found. (Is it online?)\033[0;0m'.format(**self.config))
+					connection = None
+					connected = False
+					self.sensors = []
+					time.sleep(15)
+				else:
+					print('{name} Wifi Connection \t\t\033[1;32m Success\033[0;0m           '.format(**self.config))
+					self.node_ready = True
+					break
+		else:
+			while attempts > 0:
+				try:
+					attempts-= 1
+					connection = SerialManager(device=str(self.config.get('address', '/dev/ttyUSB1')))
+				except SerialManagerError:
+					print('{name} \033[1;33m Node Timeout\033[0;0m ['.format(**self.config), attempts, ' tries left]...')
+					time.sleep(15)
+					print('Retrying Connection...')
+					connection = None
+				else:
+					if connection is not None:
+						self.connection = connection
+						print('{name} Serial Connection \t\033[1;32m Success\033[0;0m'.format(**self.config))
+						self.init_controls()
+						self.node_ready = True
+					break
+			return connection
 
 	def dynamic_import(self, path):
 		components = path.split('.')
@@ -104,14 +121,13 @@ class ArduinoControlWorker():
 		return
 
 	def run(self):
+		t = threading.Thread(target=self.work, args=())
+		t.start()
 		if self.node_ready:
-			t = threading.Thread(target=self.work, args=())
-			t.start()
-			print(str(self.config['name']) +' Node Worker [' + str(len(self.config['controls'])) + ' Controls]...\t\033[1;32m Running\033[0;0m')
-			return t
+			print(str(self.config['name']) +' Node Worker [' + str(len(self.config['sensors'])) + ' Sensors]...\t\033[1;32m Running\033[0;0m')
 		else:
-			print("Node Connection...\t\t\t\033[1;31m Failed\033[0;0m")
-			return None
+			print(str(self.config['name']) +' Controls...\t\t\t\033[1;33m Pending Reconnect\033[0;0m')
+		return t
 
 	def work(self):
 
@@ -129,4 +145,4 @@ class ArduinoControlWorker():
 			#Will this nuke the connection?	
 			time.sleep(0.5)
 		#This is only ran after the main thread is shut down
-		print("{name} Node Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		print("{name} Controls Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
