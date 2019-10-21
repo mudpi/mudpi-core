@@ -118,6 +118,7 @@ class ArduinoWorker():
 		return t
 
 	def work(self):
+		delay_multiplier = 1
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set() and self.node_ready.is_set():
 				if not self.node_connected.is_set():
@@ -129,7 +130,7 @@ class ArduinoWorker():
 				# Node reconnection cycle
 				if not self.node_connected.is_set():
 					# Random delay before connections to offset multiple attempts (1-5 min delay)
-					random_delay = random.randrange(60,300)
+					random_delay = random.randrange(60,300) * delay_multiplier
 					time.sleep(10)
 					print('\033[1;36m'+str(self.config['name']) +'\033[0;0m -> Retrying in '+ '{0}s...'.format(random_delay)+'\t\033[1;33m Pending Reconnect\033[0;0m ')
 					# Two separate checks for main thread event to prevent re-connections during shutdown
@@ -137,6 +138,12 @@ class ArduinoWorker():
 						time.sleep(random_delay)
 					if self.main_thread_running.is_set():
 						self.connection = self.connect()
+					if self.connection is None:
+						delay_multiplier += 1
+						if delay_multiplier > 6:
+							delay_multiplier = 6
+					else:
+						delay_multiplier = 1
 			# Main loop delay between cycles			
 			time.sleep(self.sleep_duration)
 
