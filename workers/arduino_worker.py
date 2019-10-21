@@ -3,9 +3,11 @@ import json
 import threading
 import random
 import socket
-from nanpy import (SerialManager)
+from nanpy import (SerialManager, ArduinoApi)
 from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
+from workers.arduino_control_worker import ArduinoControlWorker
+from workers.arduino_sensor_worker import ArduinoSensorWorker
 import sys
 sys.path.append('..')
 
@@ -21,11 +23,27 @@ class ArduinoWorker():
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		self.sleep_duration = config.get('sleep_duration', 15)
-		self.node_ready = False
 		self.connection = connection
-		self.sensors = []
+		self.threads = []
+		self.node_ready = threading.Event()
+		self.node_connected = threading.Event() #Event to signal if camera can be used
+		self.workers = []
 		if connection is None:
 			self.connection = self.connect()
+
+		if self.config['controls'] is not None:
+			acw = ArduinoControlWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
+			self.workers.append(acw)
+			acw = acw.run()
+			if acw is not None:
+				self.threads.append(acw)
+
+		if self.config['sensors'] is not None:
+			asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
+			self.workers.append(asw)
+			asw = asw.run()
+			if asw is not None:
+				self.threads.append(asw)
 		return
 
 	def connect(self):
@@ -37,9 +55,9 @@ class ArduinoWorker():
 					print('\033[1;36m{0}\033[0;0m -> Connecting...         \t'.format(self.config["name"], (3-attempts)), end='\r', flush=True)
 					attempts-= 1
 					conn = SocketManager(host=str(self.config.get('address', 'mudpi.local')))
-					self.connection = conn
-					self.init_sensors()
-				except (SocketManagerError, BrokenPipeError, ConnectionResetError) as e:
+					# Test the connection with api
+					self.api = ArduinoApi(connection=conn)
+				except (SocketManagerError, BrokenPipeError, ConnectionResetError, socket.timeout) as e:
 					print('{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
 					if attempts > 0:
 						print('{name} -> Preparing Reconnect...  \t'.format(**self.config), end='\r', flush=True)
@@ -54,112 +72,66 @@ class ArduinoWorker():
 					self.resetConnection()
 					time.sleep(15)
 				else:
-					print('[{name}] Wifi Connection \t\t\033[1;32m Success\033[0;0m                 '.format(**self.config))
-					self.node_ready = True
+					print('{name} -> Wifi Connection \t\t\033[1;32m Success\033[0;0m                 '.format(**self.config))
+					for worker in self.workers:
+							worker.connection = conn
+					self.node_connected.set()
+					self.node_ready.set()
 					break
 		else:
 			while attempts > 0 and self.main_thread_running.is_set():
 				try:
 					attempts-= 1
-					connection = SerialManager(device=str(self.config.get('address', '/dev/ttyUSB1')))
+					conn = SerialManager(device=str(self.config.get('address', '/dev/ttyUSB1')))
 				except SerialManagerError:
-					print('[{name}] \033[1;33m Node Timeout\033[0;0m ['.format(**self.config), attempts, ' tries left]...')
+					print('{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
+					if attempts > 0:
+						print('{name} -> Preparing Reconnect...  \t'.format(**self.config), end='\r', flush=True)
+					else:
+						print('{name} -> Connection Attempts...\t\033[1;31m Failed\033[0;0m           '.format(**self.config))
 					self.resetConnection()
-					time.sleep(15)
-					print('Retrying Connection...')
 					conn = None
+					time.sleep(15)
 				else:
 					if conn is not None:
-						self.connection = conn
 						print('[{name}] Serial Connection \t\033[1;32m Success\033[0;0m         '.format(**self.config))
-						self.init_sensors()
-						self.node_ready = True
+						for worker in self.workers:
+							worker.connection = conn
+						self.node_connected.set()
+						self.node_ready.set()
 					break
 		return conn
 
 	def resetConnection(self):
 		self.connection = None
-		self.sensors = []
-		self.node_ready = False
+		self.node_connected.clear()
+		self.node_ready.clear()
 
-
-	def dynamic_import(self, path):
-		components = path.split('.')
-
-		s = ''
-		for component in components[:-1]:
-			s += component + '.'
-
-		parent = importlib.import_module(s[:-1])
-		sensor = getattr(parent, components[-1])
-
-		return sensor
-
-	def init_sensors(self, connection=None):
-		for sensor in self.config['sensors']:
-			if sensor.get('type', None) is not None:
-				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
-				sensor_type = 'sensors.arduino.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
-				
-				#analog_pin_mode = False if sensor.get('is_digital', False) else True
-
-				imported_sensor = self.dynamic_import(sensor_type)
-				#new_sensor = imported_sensor(sensor.get('pin'), name=sensor.get('name', sensor.get('type')), connection=self.connection, key=sensor.get('key', None))
-				
-				# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
-				sensor_kwargs = { 
-					'name' : sensor.get('name', sensor.get('type')),
-					'pin' : sensor.get('pin'),
-					'connection': self.connection,
-					'key'  : sensor.get('key', None)
-				}
-
-				# optional sensor variables 
-				# Model is specific to DHT modules to specify DHT11(11) DHT22(22) or DHT2301(21)
-				if sensor.get('model'):
-					sensor_kwargs['model'] = sensor.get('model')
-
-				new_sensor = imported_sensor(**sensor_kwargs)
-
-				new_sensor.init_sensor()
-				self.sensors.append(new_sensor)
-				print('{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
-		return
 
 	def run(self):
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		if self.node_ready:
-			print(str(self.config['name']) +' Node Worker [' + str(len(self.config['sensors'])) + ' Sensors]...\t\033[1;32m Running\033[0;0m')
+		if self.node_ready.is_set():
+			print(str(self.config['name']) +' Node Worker '+ '[S: ' + str(len(self.config['sensors'])) + ']' + '[C: ' + str(len(self.config['controls'])) + ']...\t\033[1;32m Running\033[0;0m')
 		else:
-			print(str(self.config['name']) +' Sensors...\t\t\t\033[1;33m Pending Reconnect\033[0;0m.')
+			print(str(self.config['name']) +'...\t\t\t\t\033[1;33m Pending Reconnect\033[0;0m ')
 		return t
 
 	def work(self):
 		while self.main_thread_running.is_set():
-			if self.system_ready.is_set() and self.node_ready:
-				try:
-					message = {'event':'SensorUpdate'}
-					readings = {}
-					for sensor in self.sensors:
-						result = sensor.read()
-						readings[sensor.key] = result
-						#r.set(sensor.get('key', sensor.get('type')), value)
-						
-					print(readings)
-					message['data'] = readings
-					variables.r.publish('sensors', json.dumps(message))
-				except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
-					print('[{name}] \033[1;33m Sensors Timeout!\033[0;0m \033[1;31m(Connection Failed)\033[0;0m'.format(**self.config))
+			if self.system_ready.is_set() and self.node_ready.is_set():
+				if not self.node_connected.is_set():
+					#Connection Broken - Reset Connection
 					self.resetConnection()
-					time.sleep(15)
+					print('\033[1;36m{name}\033[0;0m -> \033[1;33mTimeout!\033[0;0m \t\t\t\033[1;31m Connection Broken\033[0;0m'.format(**self.config))
+					time.sleep(30)
 			else:
-				# Node not ready yet should try reconnect
-				if self.connection is None:
-					# Random delay before connections to offset multiple attempts
-					random_delay = random.randrange(20,120)
+				# Node reconnection cycle
+				if not self.node_connected.is_set():
+					# Random delay before connections to offset multiple attempts (1-5 min delay)
+					random_delay = random.randrange(60,300)
 					time.sleep(10)
-					print("\033[1;36m{name}\033[0;0m -> Attempting Reconnect to \033[1;36mSensors\033[0;0m in".format(**self.config),'{0}s...'.format(random_delay))
+					print('\033[1;36m'+str(self.config['name']) +'\033[0;0m -> Retrying in '+ '{0}s...'.format(random_delay)+'\t\033[1;33m Pending Reconnect\033[0;0m ')
 					# Two separate checks for main thread event to prevent re-connections during shutdown
 					if self.main_thread_running.is_set():
 						time.sleep(random_delay)
@@ -169,4 +141,7 @@ class ArduinoWorker():
 			time.sleep(self.sleep_duration)
 
 		#This is only ran after the main thread is shut down
-		print("{name} Sensors Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		#Join all our sub threads for shutdown
+		for thread in self.threads:
+			thread.join()
+		print("{name} Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))

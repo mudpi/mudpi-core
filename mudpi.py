@@ -16,7 +16,6 @@ from workers.pi_control_worker import PiControlWorker
 try:
 	# Does this prevent the need to install the module if you dont use it?
 	from workers.arduino_worker import ArduinoWorker
-	from workers.arduino_control_worker import ArduinoControlWorker
 	NANPY_ENABLED = True
 except ImportError:
 	NANPY_ENABLED = False
@@ -163,18 +162,13 @@ try:
 			if node['type'] == "arduino":
 				if NANPY_ENABLED:
 					t = ArduinoWorker(node, main_thread_running, system_ready)
-					if node['controls'] is not None:
-						acw = ArduinoControlWorker(node, main_thread_running, system_ready, t.connection)
-						acw = acw.run()
-						if acw is not None:
-							threads.append(acw)
 				else:
 					print('Error Loading Nanpy library. Did you pip3 install -r requirements.txt?')
 			elif node['type'] == "ADC-MCP3008":
 				if MCP_ENABLED:
 					t = ADCMCP3008Worker(node, main_thread_running, system_ready)
 				else:
-					print('Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt?')
+					print('Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt;?')
 			else:
 				raise Exception("Unknown Node Type: " + node['type'])
 			t = t.run()
