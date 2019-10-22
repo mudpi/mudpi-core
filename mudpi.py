@@ -38,10 +38,11 @@ import variables
 
 CONFIGS = {}
 PROGRAM_RUNNING = True
+
 print(chr(27) + "[2J")
 print('Loading MudPi Configs...\r', end="", flush=True)
 #load the configuration
-CONFIGS = loadConfigJson(CONFIGS)
+CONFIGS = loadConfigJson()
 #Waiting for redis and services to be running
 time.sleep(5) 
 print('Loading MudPi Configs...\t\033[1;32m Complete\033[0;0m')
