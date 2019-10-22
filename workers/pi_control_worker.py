@@ -75,16 +75,10 @@ class PiControlWorker():
 
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
-				message = {'event':'ControlUpdate'}
 				readings = {}
 				for control in self.controls:
 					result = control.read()
 					readings[control.key] = result
-					#r.set(sensor.get('key', sensor.get('type')), value)
-					
-				message['data'] = readings
-				variables.r.publish(self.channel, json.dumps(message))
-			#Will this nuke the connection?	
 			time.sleep(self.sleep_duration)
 		#This is only ran after the main thread is shut down
 		print("Pi Control Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
