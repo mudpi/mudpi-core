@@ -116,6 +116,6 @@ class ArduinoControlWorker():
 					self.controls = []
 					time.sleep(10)
 			#Will this nuke the connection?	
-			time.sleep(0.5)
+			time.sleep(0.1)
 		#This is only ran after the main thread is shut down
 		print("{name} Controls Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))

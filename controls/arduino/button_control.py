@@ -13,6 +13,8 @@ class ButtonControl(Control):
 	def __init__(self, pin, name='ButtonControl', key=None, connection=default_connection, analog_pin_mode=False, topic=None):
 		super().__init__(pin, name=name, key=key, connection=connection, analog_pin_mode=analog_pin_mode)
 		self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/relay/'
+		self.state_counter = 1
+		self.previous_state = 0
 		return
 
 	def init_control(self):
@@ -20,11 +22,16 @@ class ButtonControl(Control):
 
 	def read(self):
 		state = super().read()
-		if state:
-			#Button Pressed
-			#eventually add multipress tracking
-			print('{0} Pressed'.format(self.name))
-			self.emitEvent()
+		if state == self.previous_state:
+			self.state_counter += 1
+			# Todo add long press
+			if state and self.state_counter % 2 == 0:
+				print('{0} Pressed'.format(self.name))
+		else:
+			#Button State Changed
+			self.state_counter = 1
+
+		self.previous_state = state
 		return state
 
 	def readRaw(self):
@@ -35,4 +42,4 @@ class ButtonControl(Control):
 			'event': 'Toggle',
 			'data': None
 		}
-		r.publish(self.topic, json.dumps(message))
+		# r.publish(self.topic, json.dumps(message))
