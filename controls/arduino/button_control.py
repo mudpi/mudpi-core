@@ -6,7 +6,7 @@ from .control import Control
 from nanpy import (ArduinoApi, SerialManager)
 
 default_connection = SerialManager(device='/dev/ttyUSB0')
-r = redis.Redis(host='127.0.0.1', port=6379)
+# r = redis.Redis(host='127.0.0.1', port=6379)
 
 class ButtonControl(Control):
 
@@ -26,7 +26,8 @@ class ButtonControl(Control):
 			self.state_counter += 1
 			# Todo add long press
 			if state and self.state_counter % 2 == 0:
-				print('{0} Pressed'.format(self.name))
+				# print('{0} Pressed'.format(self.name))
+				super().emitEvent(state)
 		else:
 			#Button State Changed
 			self.state_counter = 1
@@ -36,10 +37,3 @@ class ButtonControl(Control):
 
 	def readRaw(self):
 		return super().read()
-
-	def emitEvent(self):
-		message = {
-			'event': 'Toggle',
-			'data': None
-		}
-		# r.publish(self.topic, json.dumps(message))

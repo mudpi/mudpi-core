@@ -2,6 +2,9 @@ import time
 import json
 import redis
 import RPi.GPIO as GPIO
+import sys
+sys.path.append('..')
+import variables
 
 # Base sensor class to extend all other arduino sensors from.
 class Control():
@@ -55,3 +58,13 @@ class Control():
 		#Read the pin from the pi digital reads only
 		data = self.gpio.input(self.pin)
 		return data
+	
+	def emitEvent(self, data): 
+		message = {
+			'event':'ControlUpdate',
+			'data': {
+				self.key:data
+			}
+		}
+		print(message["data"])
+		variables.r.publish('controls', json.dumps(message))

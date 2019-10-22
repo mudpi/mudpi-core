@@ -6,7 +6,7 @@ from .control import Control
 from nanpy import (ArduinoApi, SerialManager)
 
 default_connection = SerialManager(device='/dev/ttyUSB0')
-r = redis.Redis(host='127.0.0.1', port=6379)
+# r = redis.Redis(host='127.0.0.1', port=6379)
 
 class PotentiometerControl(Control):
 
@@ -27,7 +27,8 @@ class PotentiometerControl(Control):
 
 		if (state < self.previous_state - self.reading_buffer) or (state > self.previous_state + self.reading_buffer):
 			# Value changed
-			print('{0}: {1}'.format(self.name, state))
+			# print('{0}: {1}'.format(self.name, state))
+			super().emitEvent(state)
 
 		self.previous_state = state
 		return state

@@ -2,6 +2,9 @@ import time
 import json
 import redis
 from nanpy import (ArduinoApi, SerialManager)
+import sys
+sys.path.append('..')
+import variables
 
 default_connection = SerialManager()
 
@@ -34,3 +37,13 @@ class Control():
 		#Read the pin from the ardiuno. Can be analog or digital based on "analog_pin_mode"
 		data = self.api.analogRead(self.pin) if self.analog_pin_mode else self.api.digitalRead(self.pin)
 		return data
+
+	def emitEvent(self, data): 
+		message = {
+			'event':'ControlUpdate',
+			'data': {
+				self.key:data
+			}
+		}
+		print(message["data"])
+		variables.r.publish('controls', json.dumps(message))
