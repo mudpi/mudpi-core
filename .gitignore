@@ -2,5 +2,19 @@ node_modules/
 package-lock.json
 scripts/
 img/
-.DS_Store
 mudpi.config
+# Python compiled
+__pycache__/
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE configs
+.idea/
+.DS_Store
