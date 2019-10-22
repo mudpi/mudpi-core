@@ -22,16 +22,9 @@ class ButtonControl(Control):
 		if state:
 			#Button Pressed
 			#eventually add multipress tracking
-			print('{0} Pressed'.format(self.name))
-			self.emitEvent()
+			super().emitEvent(state)
 		return state
 
 	def readRaw(self):
 		return super().read()
 
-	def emitEvent(self):
-		message = {
-			'event': 'Toggle',
-			'data': None
-		}
-		r.publish(self.topic, json.dumps(message))
