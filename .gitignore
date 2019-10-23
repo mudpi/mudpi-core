@@ -1,7 +1,6 @@
 node_modules/
 package-lock.json
 scripts/
-tests/
 img/
 mudpi.config
 # Python compiled
