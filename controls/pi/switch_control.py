@@ -28,7 +28,8 @@ class SwitchControl(Control):
 		if state == self.previous_state:
 			self.state_counter += 1
 			if self.state_counter == self.trigger_delay:
-				super().emitEvent(state)
+				clean_state = 1 if state else 0
+				super().emitEvent(clean_state)
 		else:
 			#Button State Changed
 			self.state_counter = 1

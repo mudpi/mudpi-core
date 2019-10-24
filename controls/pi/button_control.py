@@ -22,7 +22,7 @@ class ButtonControl(Control):
 		if state:
 			#Button Pressed
 			#eventually add multipress tracking
-			super().emitEvent(state)
+			super().emitEvent(1)
 		return state
 
 	def readRaw(self):

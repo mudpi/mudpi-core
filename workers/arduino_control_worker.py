@@ -91,12 +91,10 @@ class ArduinoControlWorker():
 				if self.node_connected.is_set():
 					if self.controls_ready:
 						try:
-							message = {'event':'ControlUpdate'}
 							readings = {}
 							for control in self.controls:
 								result = control.read()
 								readings[control.key] = result
-							message['data'] = readings
 						except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
 							print('\033[1;36m{name}\033[0;0m -> \033[1;33mControls Timeout!\033[0;0m'.format(**self.config))
 							self.controls_ready = False
