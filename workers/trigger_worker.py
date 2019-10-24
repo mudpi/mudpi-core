@@ -71,6 +71,9 @@ class TriggerWorker():
 				if trigger.get('source'):
 					trigger_kwargs['source'] = trigger.get('source')
 
+				if trigger.get('channel'):
+					trigger_kwargs['channel'] = trigger.get('channel')
+
 				if trigger.get('thresholds'):
 					trigger_kwargs['thresholds'] = trigger.get('thresholds')
 
