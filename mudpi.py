@@ -11,6 +11,7 @@ from server.mudpi_server import MudpiServer
 from workers.lcd_worker import LCDWorker
 from workers.relay_worker import RelayWorker
 from workers.camera_worker import CameraWorker
+from workers.trigger_worker import TriggerWorker
 from workers.pi_sensor_worker import PiSensorWorker
 from workers.pi_control_worker import PiControlWorker
 try:
@@ -118,13 +119,13 @@ try:
 			# Create worker for worker
 			if worker['type'] == "sensor":
 				pw = PiSensorWorker(worker, main_thread_running, system_ready)
-				print('Loading Pi Sensor Worker')
+				print('Loading Pi Sensor Worker...')
 			elif worker['type'] == "control":
 				pw = PiControlWorker(worker, main_thread_running, system_ready)
-				print('Loading Pi Control Worker')
+				print('Loading Pi Control Worker...')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
-				print('Loading Pi Relay Worker')
+				print('Loading Pi Relay Worker...')
 			else:
 				raise Exception("Unknown Worker Type: " + worker['type'])
 			pw = pw.run()
@@ -177,6 +178,16 @@ try:
 				threads.append(t)
 	except KeyError:
 		print('Invalid or no Nodes found to Load')
+
+
+	# Worker for Triggers
+	try:
+		t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready)
+		print('Loading Triggers...')
+		t = t.run()
+		threads.append(t)
+	except KeyError:
+		print('No Triggers Found to Load')
 
 
 	#Decided not to build server worker (this is replaced with nodejs, expressjs)
