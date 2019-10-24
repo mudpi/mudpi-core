@@ -17,7 +17,7 @@ class PiSensorWorker():
 	def __init__(self, config, main_thread_running, system_ready):
 		#self.config = {**config, **self.config}
 		self.config = config
-		self.channel = config.get('channel', 'pi-sensors').replace(" ", "_").lower()
+		self.channel = config.get('channel', 'sensors').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 30)
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
