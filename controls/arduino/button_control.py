@@ -24,9 +24,11 @@ class ButtonControl(Control):
 		state = super().read()
 		if state == self.previous_state:
 			self.state_counter += 1
-			if self.state_counter == 2:
-				clean_state = 1 if state else 0
-				super().emitEvent(clean_state)
+			if self.state_counter % 2 == 0:
+				if state:
+					super().emitEvent(1)
+				elif self.state_counter == 2:
+					super().emitEvent(0)
 		else:
 			self.state_counter = 1
 
