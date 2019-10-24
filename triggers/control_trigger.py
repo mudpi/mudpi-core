@@ -41,9 +41,8 @@ class ControlTrigger(Trigger):
 								super().trigger(decoded_message['event'])
 					else:
 						self.trigger_active.clear()
-			except e:
+			except:
 				print('Error During Trigger Actions {0}'.format(self.key))
-				print(e)
 		self.previous_state = self.trigger_active.is_set()
 
 	def parseControlData(self, data):
