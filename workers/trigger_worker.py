@@ -10,12 +10,12 @@ import variables
 import importlib
 
 class TriggerWorker():
-	def __init__(self, config, main_thread_running, system_ready):
+	def __init__(self, config, main_thread_running, system_ready, actions):
 		#self.config = {**config, **self.config}
 		self.config = config
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
-		self.channel = "triggers"
+		self.actions = actions
 		self.triggers = []
 		self.trigger_events = {}
 		self.init_triggers()
@@ -56,8 +56,14 @@ class TriggerWorker():
 				}
 
 				# optional trigger variables 
-				if trigger.get('options'):
-					trigger_kwargs['options'] = trigger.get('options')
+				if trigger.get('actions'):
+					trigger_actions = []
+					for action in trigger.get("actions"):
+						trigger_actions.append(self.actions[action])
+					trigger_kwargs['actions'] = trigger_actions
+
+				if trigger.get('frequency'):
+					trigger_kwargs['frequency'] = trigger.get('frequency')
 
 				if trigger.get('schedule'):
 					trigger_kwargs['schedule'] = trigger.get('schedule')
@@ -71,7 +77,6 @@ class TriggerWorker():
 				new_trigger = imported_trigger(**trigger_kwargs)
 				new_trigger.init_trigger()
 
-				#Set the trigger type and determine if the readings are critical to operations
 				new_trigger.type = trigger.get('type').lower()
 
 				self.triggers.append(new_trigger)

@@ -6,6 +6,7 @@ import time
 import json
 import sys
 sys.path.append('..')
+from action import Action
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
 from workers.lcd_worker import LCDWorker
@@ -84,6 +85,7 @@ try:
 	print('Preparing Threads for Workers\r', end="", flush=True)
 
 	threads = []
+	actions = {}
 	relays = []
 	relayEvents = {}
 	relay_index = 0
@@ -180,9 +182,18 @@ try:
 		print('Invalid or no Nodes found to Load')
 
 
+	# Load in Actions
+	try:
+		for action in CONFIGS["actions"]:
+			a = Action(action)
+			a.init_action()
+			actions[a.key] = a
+	except KeyError:
+		print('No Actions Found to Load')
+
 	# Worker for Triggers
 	try:
-		t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready)
+		t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
 		print('Loading Triggers...')
 		t = t.run()
 		threads.append(t)

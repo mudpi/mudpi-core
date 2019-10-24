@@ -8,8 +8,8 @@ import variables
 
 class ControlTrigger(Trigger):
 
-	def __init__(self, name='ControlTrigger',key=None, source=None, thresholds=None, channel="controls", trigger_active=None):
-		super().__init__(name=name, key=key, source=source, thresholds=thresholds, trigger_active=trigger_active)
+	def __init__(self, name='ControlTrigger',key=None, source=None, thresholds=None, channel="controls", trigger_active=None, frequency='once', actions=[]):
+		super().__init__(name=name, key=key, source=source, thresholds=thresholds, trigger_active=trigger_active, frequency=frequency, actions=actions)
 		self.channel = channel.replace(" ", "_").lower() if channel is not None else "controls"
 		return
 
@@ -35,15 +35,15 @@ class ControlTrigger(Trigger):
 					if super().evaluateThresholds(control_value):
 						self.trigger_active.set()
 						if self.previous_state != self.trigger_active.is_set():
-							print("Triggered Once!")
-							# Add actions to fire in here once
+							super().trigger(decoded_message['event'])
 						else:
-							print("Triggered Many!")
-							# Add actions to fire in here continually
+							if self.frequency == 'many':
+								super().trigger(decoded_message['event'])
 					else:
 						self.trigger_active.clear()
-			except:
-				print('Error Decoding Message for Trigger {0}'.format(self.config['key']))
+			except e:
+				print('Error During Trigger Actions {0}'.format(self.key))
+				print(e)
 		self.previous_state = self.trigger_active.is_set()
 
 	def parseControlData(self, data):
