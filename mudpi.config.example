@@ -9,76 +9,127 @@
         "host": "127.0.0.1",
         "port": 6379
     },
-    "nodes": [
+    "relays": [
         {
-            "name": "Arduino Box 1",
-            "type": "arduino",
-            "address": "/dev/ttyUSB0",
-            "sensors": [
-                {
-                    "pin": "0",
-                    "is_digital": false,
-                    "type": "Soil",
-                    "name": "Soil Left Sensor"
-                },
-                {
-                    "pin": "3",
-                    "is_digital": true,
-                    "type": "Humidity",
-                    "name": "Weather Station"
-                },
-                {
-                    "pin": "4",
-                    "is_digital": true,
-                    "type": "Rain",
-                    "name": "Rain Sensor"
-                }
-            ]
+            "pin": 13,
+            "normally_open": true,
+            "group": "1",
+            "name": "Relay Name",
+            "topic": "garden/pi/relays/1",
+            "key": "relay_1"
         },
         {
-            "name": "Arduino Box 2",
-            "type": "arduino",
-            "address": "/dev/ttyUSB1",
-            "sensors": [
-                {
-                    "pin": "7",
-                    "is_digital": true,
-                    "type": "Humidity",
-                    "name": "Weather Station 2"
-                }
-            ]
+            "pin": 12,
+            "normally_open": true,
+            "group": "2",
+            "name": "Relay Name 2",
+            "topic": "garden/pi/relays/2",
+            "key": "relay_2"
         },
-         {
-            "name": "MCP3008 #1",
-            "type": "ADC-MCP3008",
-            "pin": "22",
-            "sensors": [
-                {
-                    "pin": "0",
-                    "type": "Soil",
-                    "name": "Soil Sensor #1"
-                },
-                {
-                    "pin": "1",
-                    "type": "Soil",
-                    "name": "Soil Sensor #1"
-                }
-            ]
+        {
+            "pin": 20,
+            "normally_open": true,
+            "group": "2",
+            "name": "Relay Name 3",
+            "topic": "garden/pi/relays/3",
+            "key": "relay_3"
         }
     ],
     "workers":[
         {
-            "type":"sensor",
-            "sleep_duration":30,
-            "channel":"pi-sensors",
-            "sensors": [
+            "type":"control",
+            "sleep_duration":0.5,
+            "channel":"controls",
+            "controls": [
                 {
-                    "type":"Humidity",
-                    "pin": 24,
-                    "name":"Environment",
-                    "model":"11"
+                    "pin":18,
+                    "type":"button",
+                    "name":"Button 1",
+                    "key": "button_1",
+                    "topic": "garden/pi/relays/1",
+                    "action":"Toggle",
+                    "resistor":"up",
+                    "edge_detection":"falling",
+                    "debounce":200
                 }
             ]
+        }
+    ],
+    "nodes": [
+        {
+            "name": "Demo Box 1",
+            "address": "192.168.2.150",
+            "type":"arduino",
+            "use_wifi":true,
+            "sensors": [
+                {
+                    "pin": 2,
+                    "is_digital": false,
+                    "type": "Humidity",
+                    "name": "Weather"
+                }
+            ],
+            "controls": [
+                {
+                    "pin":16,
+                    "type":"button",
+                    "name":"Button 1",
+                    "key": "button_1",
+                    "topic": "garden/pi/relays/1"
+                },
+                {
+                    "pin":5,
+                    "type":"switch",
+                    "name":"Switch 1",
+                    "key": "switch_1",
+                    "topic": "garden/pi/relays/1"
+                },
+                {
+                    "pin":0,
+                    "type":"potentiometer",
+                    "name":"Pot 1",
+                    "key": "pot_1"
+                }
+            ]
+        }
+    ],
+    "triggers": [
+        {
+            "type": "control",
+            "source": "button_1",
+            "key": "button_1_trigger",
+            "name": "Override Button Pressed",
+            "actions": ["turn_on_lights_1", "save_to_file"],
+            "frequency":"once",
+            "thresholds": [
+                {
+                    "comparison":"eq",
+                    "value":true
+                }
+            ]
+        },
+        {
+            "type": "time",
+            "key": "daily_lights_on",
+            "name": "Daily Lights On",
+            "schedule": "*/5 * * * *",
+            "actions": ["turn_on_lights_1"]
+        }
+    ],
+    "actions": [
+        {
+            "type": "command",
+            "name": "Save to file",
+            "key": "save_to_file",
+            "action": "ls -a",
+            "shell": true
+        },
+        {
+            "type": "event",
+            "name": "Turn on Lights",
+            "key": "turn_on_lights_1",
+            "action": {"event":"Toggle"},
+            "topic": "garden/pi/relays/2"
         }
     ]
 }
