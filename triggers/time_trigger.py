@@ -14,7 +14,7 @@ import variables
 class TimeTrigger(Trigger):
 
 	def __init__(self, main_thread_running, system_ready, name='TimeTrigger',key=None, trigger_active=None, actions=[], schedule=None):
-		super().__init__(main_thread_running, system_ready, name=name, key=key, trigger_active=trigger_active, actions=actions)
+		super().__init__(main_thread_running, system_ready, name=name, key=key, trigger_active=trigger_active, actions=actions, trigger_interval=60)
 		self.schedule = schedule
 		return
 
