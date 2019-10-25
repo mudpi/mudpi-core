@@ -8,8 +8,8 @@ import variables
 
 class ControlTrigger(Trigger):
 
-	def __init__(self, name='ControlTrigger',key=None, source=None, thresholds=None, channel="controls", trigger_active=None, frequency='once', actions=[]):
-		super().__init__(name=name, key=key, source=source, thresholds=thresholds, trigger_active=trigger_active, frequency=frequency, actions=actions)
+	def __init__(self, main_thread_running, system_ready, name='ControlTrigger',key=None, source=None, thresholds=None, channel="controls", trigger_active=None, frequency='once', actions=[]):
+		super().__init__(main_thread_running, system_ready, name=name, key=key, source=source, thresholds=thresholds, trigger_active=trigger_active, frequency=frequency, actions=actions, trigger_interval=0.5)
 		self.channel = channel.replace(" ", "_").lower() if channel is not None else "controls"
 		return
 
@@ -21,8 +21,13 @@ class ControlTrigger(Trigger):
 		pass
 
 	def check(self):
-		self.pubsub.get_message()
-		self.trigger_active.clear()
+		while self.main_thread_running.is_set():
+			if self.system_ready.is_set():
+				self.pubsub.get_message()
+				self.trigger_active.clear()
+				time.sleep(self.trigger_interval)
+			else:
+				time.sleep(2)
 		return
 
 	def handleEvent(self, message):

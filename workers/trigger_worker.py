@@ -17,6 +17,7 @@ class TriggerWorker():
 		self.system_ready = system_ready
 		self.actions = actions
 		self.triggers = []
+		self.trigger_threads = []
 		self.trigger_events = {}
 		self.init_triggers()
 		return
@@ -52,7 +53,9 @@ class TriggerWorker():
 				trigger_kwargs = { 
 					'name' : trigger.get('name', trigger.get('type')),
 					'key'  : trigger.get('key', None),
-					'trigger_active' : trigger_state["active"]
+					'trigger_active' : trigger_state["active"],
+					'main_thread_running' : self.main_thread_running,
+					'system_ready' : self.system_ready
 				}
 
 				# optional trigger variables 
@@ -83,6 +86,12 @@ class TriggerWorker():
 				new_trigger.type = trigger.get('type').lower()
 
 				self.triggers.append(new_trigger)
+
+				#Start the trigger thread
+				trigger_thread = new_trigger.run()
+
+				self.trigger_threads.append(trigger_thread)
+
 				trigger_index += 1
 				# print('{type} - {name}...\t\t\033[1;32m Listening\033[0;0m'.format(**trigger))
 		return
@@ -97,12 +106,14 @@ class TriggerWorker():
 
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
-				for trigger in self.triggers:
-					trigger.check()
-				time.sleep(0.01)
+				#Main Loop
+				time.sleep(1)
 				
 			time.sleep(2)
 		#This is only ran after the main thread is shut down
 		for trigger in self.triggers:
 			trigger.shutdown()
+		#Join all our sub threads for shutdown
+		for thread in self.trigger_threads:
+			thread.join()
 		print("Trigger Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")
