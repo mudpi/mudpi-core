@@ -36,7 +36,7 @@ class Action():
 
 	def runCommand(self, value=None):
 		if value is None:
-			completed_process = subprocess.run([self.action], shell=self.shell, capture_output=True)
+			completed_process = subprocess.run([self.action], shell=self.shell)
 		else:
-			completed_process = subprocess.run([self.action, json.dumps(value)], shell=self.shell, capture_output=True)
+			completed_process = subprocess.run([self.action, json.dumps(value)], shell=self.shell)
 		return
