@@ -26,8 +26,11 @@ class TimeTrigger(Trigger):
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
 				try:
-					if pycron.is_now(self.schedule):
-						super().trigger()
+					if CRON_ENABLED:
+						if pycron.is_now(self.schedule):
+							super().trigger()
+					else:
+						print("Error pycron not found.")
 				except:
 					print("Error evaluating time trigger schedule.")
 				time.sleep(self.trigger_interval)
