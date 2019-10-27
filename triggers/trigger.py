@@ -12,7 +12,7 @@ class Trigger():
 		self.name = name
 		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
 		self.thresholds = thresholds
-		self.source = source
+		self.source = source.lower() if source is not None else source
 		self.frequency = frequency
 		self.trigger_interval = trigger_interval
 		self.actions = actions

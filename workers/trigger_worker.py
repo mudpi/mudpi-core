@@ -74,6 +74,9 @@ class TriggerWorker():
 				if trigger.get('source'):
 					trigger_kwargs['source'] = trigger.get('source')
 
+				if trigger.get('nested_source'):
+					trigger_kwargs['nested_source'] = trigger.get('nested_source')
+
 				if trigger.get('channel'):
 					trigger_kwargs['channel'] = trigger.get('channel')
 
