@@ -95,16 +95,35 @@
     ],
     "triggers": [
         {
-            "type": "control",
-            "source": "button_1",
-            "key": "button_1_trigger",
-            "name": "Override Button Pressed",
-            "actions": ["turn_on_lights_1", "save_to_file"],
-            "frequency":"once",
-            "thresholds": [
+            "group":"Trigger Group 1",
+            "actions": ["turn_on_lights_1"],
+            "triggers":[
                 {
-                    "comparison":"eq",
-                    "value":true
+                    "type": "control",
+                    "source": "button_1",
+                    "key": "button_1_trigger",
+                    "name": "Override Button Pressed",
+                    "frequency":"once",
+                    "thresholds": [
+                        {
+                            "comparison":"eq",
+                            "value":true
+                        }
+                    ]
+                },
+                {
+                    "type": "sensor",
+                    "source": "weather",
+                    "nested_source":"temperature",
+                    "key": "temp_trigger",
+                    "name": "Temp too hot",
+                    "frequency":"once",
+                    "thresholds": [
+                        {
+                            "comparison":"gte",
+                            "value":70
+                        }
+                    ]
                 }
             ]
         },

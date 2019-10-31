@@ -13,8 +13,8 @@ import variables
 
 class TimeTrigger(Trigger):
 
-	def __init__(self, main_thread_running, system_ready, name='TimeTrigger',key=None, trigger_active=None, actions=[], schedule=None):
-		super().__init__(main_thread_running, system_ready, name=name, key=key, trigger_active=trigger_active, actions=actions, trigger_interval=60)
+	def __init__(self, main_thread_running, system_ready, name='TimeTrigger',key=None, trigger_active=None, actions=[], schedule=None, group=None):
+		super().__init__(main_thread_running, system_ready, name=name, key=key, trigger_active=trigger_active, actions=actions, trigger_interval=60, group=group)
 		self.schedule = schedule
 		return
 
@@ -25,10 +25,14 @@ class TimeTrigger(Trigger):
 	def check(self):
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
+				super().check()
 				try:
 					if CRON_ENABLED:
 						if pycron.is_now(self.schedule):
+							self.trigger_active.set()
 							super().trigger()
+						else:
+							self.trigger_active.clear()
 					else:
 						print("Error pycron not found.")
 				except:
