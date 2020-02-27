@@ -8,6 +8,13 @@
 For full documentation visit [mudpi.app](https://mudpi.app/docs)
 
 
+## Installation
+Install MudPi from your RaspberryPi terminal using:
+```
+curl -sL https://install.mudpi.app | bash
+```
+
+
 ## Guides
 For examples and guides on how to setup and use MudPi check out the [free guides we prepared.](https://mudpi.app/guides)
 
