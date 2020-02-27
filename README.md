@@ -9,7 +9,7 @@ For full documentation visit [mudpi.app](https://mudpi.app/docs)
 
 
 ## Installation
-Install MudPi using the [Installer](https://github.com/mudpi/installer) that will guide you through the process. You can also view the [manual install instructions](https://github.com/mubpi/installer/docs/MANUAL_INSTALL.md)
+Install MudPi using the [Installer](https://github.com/mudpi/installer) that will guide you through the process. You can also view the [manual install instructions](https://github.com/mudpi/installer/docs/MANUAL_INSTALL.md)
 
 
 ## Guides
