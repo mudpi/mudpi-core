@@ -1,6 +1,6 @@
 {
   "name": "MudpiCore",
-  "version": "0.7.0",
+  "version": "0.8.6",
   "description": "Mudpi Core System",
   "main": "mudpi_event_listener.js",
   "scripts": {
