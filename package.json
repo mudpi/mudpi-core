@@ -1,6 +1,6 @@
 {
   "name": "mudpi-core",
-  "version": "0.8.6",
+  "version": "0.8.7",
   "description": "Configurable automated smart garden for raspberry pi",
   "bugs": "https://github.com/mudpi/mudpi-core/issues",
   "contributors": [

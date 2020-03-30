@@ -24,15 +24,15 @@ class CameraWorker():
 		self.camera_available = camera_available
 
 		#Dynamic Properties based on config
-		self.path = self.config['path'].replace(" ", "-") if self.config['path'] is not None else 'mudpi/img/'
+		self.path = self.config['path'].replace(" ", "-") if self.config['path'] is not None else '/etc/mudpi/img/'
 		self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/camera/'
 		if self.config['resolution'] is not None:
-			self.resolutionX = self.config['resolution'].get('x', 1920)
-			self.resolutionY = self.config['resolution'].get('y', 1080)
+			self.resolutionX = int(self.config['resolution'].get('x', 1920))
+			self.resolutionY = int(self.config['resolution'].get('y', 1080))
 		if self.config['delay'] is not None:
-			self.hours = self.config['delay'].get('hours', 0)
-			self.minutes = self.config['delay'].get('minutes', 0)
-			self.seconds = self.config['delay'].get('seconds', 0)
+			self.hours = int(self.config['delay'].get('hours', 0))
+			self.minutes = int(self.config['delay'].get('minutes', 0))
+			self.seconds = int(self.config['delay'].get('seconds', 0))
 
 		self.init()
 		return

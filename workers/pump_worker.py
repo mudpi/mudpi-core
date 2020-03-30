@@ -16,6 +16,7 @@ class PumpWorker():
 	def __init__(self, config, main_thread_running, system_ready, pump_ready, pump_should_be_running):
 		#self.config = {**config, **self.config}
 		self.config = config
+		self.config['pin'] = int(self.config['pin']) #parse possbile strings to avoid errors
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		self.pump_ready = pump_ready

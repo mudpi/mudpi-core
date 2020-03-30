@@ -18,6 +18,7 @@ class RelayWorker():
 	def __init__(self, config, main_thread_running, system_ready, relay_available, relay_active):
 		#self.config = {**config, **self.config}
 		self.config = config
+		self.config['pin'] = int(self.config['pin']) #parse possbile strings to avoid errors
 
 		#Events
 		self.main_thread_running = main_thread_running

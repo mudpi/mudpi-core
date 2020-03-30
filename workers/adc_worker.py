@@ -72,7 +72,7 @@ class ADCMCP3008Worker:
                     'type').capitalize() + 'Sensor'
                 # analog_pin_mode = False if sensor.get('is_digital', False) else True
                 imported_sensor = self.dynamic_sensor_import(sensor_type)
-                new_sensor = imported_sensor(sensor.get('pin'),
+                new_sensor = imported_sensor(int(sensor.get('pin')),
                                              name=sensor.get('name', sensor.get('type')),
                                              key=sensor.get('key', None),
                                              mcp=self.mcp)

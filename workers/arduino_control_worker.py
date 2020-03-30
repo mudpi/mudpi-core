@@ -57,7 +57,7 @@ class ArduinoControlWorker():
 					# Define default kwargs for all control types, conditionally include optional variables below if they exist
 					control_kwargs = { 
 						'name' : control.get('name', control.get('type')),
-						'pin' : control.get('pin'),
+						'pin' : int(control.get('pin')),
 						'connection': self.connection,
 						'key'  : control.get('key', None),
 						'analog_pin_mode': analog_pin_mode,

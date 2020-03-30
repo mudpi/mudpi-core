@@ -47,7 +47,7 @@ class PiControlWorker():
 				# Define default kwargs for all control types, conditionally include optional variables below if they exist
 				control_kwargs = { 
 					'name' : control.get('name', control.get('type')),
-					'pin' : control.get('pin'),
+					'pin' : int(control.get('pin')),
 					'key'  : control.get('key', None),
 					'topic': control.get('topic', None),
 					'resistor': control.get('resistor', None),

@@ -80,7 +80,7 @@ class SensorWorker():
 				# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
 				sensor_kwargs = { 
 					'name' : sensor.get('name', sensor.get('type')),
-					'pin' : sensor.get('pin'),
+					'pin' : int(sensor.get('pin')),
 					'connection': self.connection,
 					'key'  : sensor.get('key', None)
 				}
