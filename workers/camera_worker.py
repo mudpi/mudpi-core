@@ -100,7 +100,7 @@ class CameraWorker():
 					decoded_message = temp
 					if decoded_message['event'] == 'Timelapse':
 						print("Camera Signaled for Reset")
-						camera_available.clear()
+						self.camera_available.clear()
 						self.pending_reset = True
 			except:
 				print('Error Handling Event for Camera')
