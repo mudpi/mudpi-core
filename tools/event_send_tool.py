@@ -1,6 +1,5 @@
 import redis
 import threading
-import redis_sub
 import json
 import time
 

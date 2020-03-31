@@ -4,6 +4,7 @@ import json
 import redis
 import threading
 import sys
+import os
 import RPi.GPIO as GPIO
 from picamera import PiCamera
 sys.path.append('..')
@@ -17,6 +18,7 @@ class CameraWorker():
 	def __init__(self, config, main_thread_running, system_ready, camera_available):
 		#self.config = {**config, **self.config}
 		self.config = config
+		self.pending_reset = False
 
 		#Events
 		self.main_thread_running = main_thread_running
@@ -40,26 +42,42 @@ class CameraWorker():
 	def init(self):
 		try:
 			self.camera = PiCamera(resolution=(self.resolutionX, self.resolutionY))
+			# Below we calibrate the camera for consistent imaging
+			camera.framerate = 30
+			# Wait for the automatic gain control to settle
+			time.sleep(2)
+			# Now fix the values
+			camera.shutter_speed = camera.exposure_speed
+			camera.exposure_mode = 'off'
+			g = camera.awb_gains
+			camera.awb_mode = 'off'
+			camera.awb_gains = g
 		except:
 			self.camera = PiCamera()
-		#camera.start_preview()
+
+		#Pubsub Listeners
+		self.pubsub = variables.r.pubsub()
+		self.pubsub.subscribe(**{self.topic: self.handleEvent})
+
 		print('Camera Worker...\t\t\t\033[1;32m Ready\033[0;0m')
 		return
 
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
+		self.listener = threading.Thread(target=self.listen, args=())
+		self.listener.start()
 		print('Camera Worker...\t\t\t\033[1;32m Running\033[0;0m')
 		return t
 
 	def wait(self):
 		# Calculate the delay
 		try:
-			next_time = (datetime.datetime.now() + datetime.timedelta(hours=self.hours, minutes=self.minutes, seconds=self.seconds)).replace(microsecond=0)
+			self.next_time = (datetime.datetime.now() + datetime.timedelta(hours=self.hours, minutes=self.minutes, seconds=self.seconds)).replace(microsecond=0)
 		except:
 			#Default every hour
-			next_time = (datetime.datetime.now() + datetime.timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
-		delay = (next_time - datetime.datetime.now()).seconds
+			self.next_time = (datetime.datetime.now() + datetime.timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+		delay = (self.next_time - datetime.datetime.now()).seconds
 		time.sleep(delay)
 
 	def elapsedTime(self):
@@ -70,6 +88,37 @@ class CameraWorker():
 		self.time_start = time.perf_counter()
 		pass
 
+	def handleEvent(self, message):
+		data = message['data']
+		decoded_message = None
+		if data is not None:
+			try:
+				if isinstance(data, dict):
+					decoded_message = data
+				elif isinstance(data.decode('utf-8'), str):
+					temp = json.loads(data.decode('utf-8'))
+					decoded_message = temp
+					if decoded_message['event'] == 'Timelapse':
+						print("Camera Signaled for Reset")
+						camera_available.clear()
+						self.pending_reset = True
+			except:
+				print('Error Handling Event for Camera')
+
+	def listen(self):
+		while self.main_thread_running.is_set():
+			if self.system_ready.is_set():
+				if self.camera_available.is_set():
+					self.pubsub.get_message()
+					time.sleep(1)
+				else:
+					delay = (self.next_time - datetime.datetime.now()).seconds + 15
+					time.sleep(delay) #wait 15 seconds after next scheduled picture
+					self.camera_available.set()
+			else:
+				time.sleep(2)
+		return
+
 	def work(self):
 		self.resetElapsedTime()
 		while self.main_thread_running.is_set():
@@ -77,17 +126,25 @@ class CameraWorker():
 				if self.camera_available.is_set():
 					# try:
 					for i, filename in enumerate(self.camera.capture_continuous(self.path + 'mudpi-{counter:05d}.jpg')):
+						if not self.camera_available.is_set():
+							if self.pending_reset:
+								try:
+									os.remove(filename) #cleanup previous file
+									self.pending_reset = False
+								except:
+									print("Error During Camera Reset Cleanup")
+							break;
 						message = {'event':'StateChanged', 'data':filename}
 						variables.r.set('last_camera_image', filename)
 						variables.r.publish(self.topic, json.dumps(message))
 						print('Image Captured \033[1;36m%s\033[0;0m' % filename)
 						self.wait()
-						if not self.camera_available.is_set():
-							break;
 					# except:
 					# 	print("Camera Worker \t\033[1;31m Unexpected Error\033[0;0m")
 					# 	time.sleep(30)
-
+				else:
+					time.sleep(1)
+					self.resetElapsedTime()
 			else:
 				#System not ready camera should be off
 				time.sleep(1)
@@ -97,4 +154,6 @@ class CameraWorker():
 
 		#This is only ran after the main thread is shut down
 		self.camera.close()
+		self.listener.join()
+		self.pubsub.close()
 		print("Camera Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")
