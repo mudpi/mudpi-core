@@ -43,15 +43,15 @@ class CameraWorker():
 		try:
 			self.camera = PiCamera(resolution=(self.resolutionX, self.resolutionY))
 			# Below we calibrate the camera for consistent imaging
-			camera.framerate = 30
+			self.camera.framerate = 30
 			# Wait for the automatic gain control to settle
 			time.sleep(2)
 			# Now fix the values
-			camera.shutter_speed = camera.exposure_speed
-			camera.exposure_mode = 'off'
-			g = camera.awb_gains
-			camera.awb_mode = 'off'
-			camera.awb_gains = g
+			self.camera.shutter_speed = self.camera.exposure_speed
+			self.camera.exposure_mode = 'off'
+			g = self.camera.awb_gains
+			self.camera.awb_mode = 'off'
+			self.camera.awb_gains = g
 		except:
 			self.camera = PiCamera()
 
