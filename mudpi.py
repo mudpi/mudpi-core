@@ -64,7 +64,7 @@ print('|_|  |_|\__,_|\__,_|_|   |_| ')
 print('_________________________________________________')
 print('')
 print('Eric Davisson @theDavisson')
-print('Version: ', CONFIGS.get('version', '0.8.6'))
+print('Version: ', CONFIGS.get('version', '0.8.7'))
 print('\033[0;0m')
 
 if CONFIGS['debug'] is True:
