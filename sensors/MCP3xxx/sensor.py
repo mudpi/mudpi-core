@@ -5,14 +5,14 @@ import adafruit_mcp3xxx.mcp3008 as MCP
 class Sensor:
 
     PINS = {
-        '0': MCP.P0,
-        '1': MCP.P1,
-        '2': MCP.P2,
-        '3': MCP.P3,
-        '4': MCP.P4,
-        '5': MCP.P5,
-        '6': MCP.P6,
-        '7': MCP.P7,
+        0: MCP.P0,
+        1: MCP.P1,
+        2: MCP.P2,
+        3: MCP.P3,
+        4: MCP.P4,
+        5: MCP.P5,
+        6: MCP.P6,
+        7: MCP.P7,
     }
 
     def __init__(self, pin: int, mcp, name='Sensor', key=None):
