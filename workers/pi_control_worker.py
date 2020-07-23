@@ -6,6 +6,7 @@ import threading
 import sys
 sys.path.append('..')
 from controls.pi.button_control import (ButtonControl)
+from controls.pi.switch_control import (SwitchControl)
 
 import variables
 

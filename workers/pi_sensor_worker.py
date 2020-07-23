@@ -73,7 +73,7 @@ class PiSensorWorker():
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Pi Sensor Worker [' + str(len(self.config)) + ' Sensors]...\t\t\033[1;32m Running\033[0;0m')
+		print('Pi Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\t\033[1;32m Running\033[0;0m')
 		return t
 
 	def work(self):
