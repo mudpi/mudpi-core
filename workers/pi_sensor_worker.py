@@ -73,6 +73,7 @@ class PiSensorWorker():
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
+		#TODO: This is printing 2 sensors when only 1 attached.
 		print('Pi Sensor Worker [' + str(len(self.config)) + ' Sensors]...\t\t\033[1;32m Running\033[0;0m')
 		return t
 
@@ -83,6 +84,7 @@ class PiSensorWorker():
 				message = {'event':'PiSensorUpdate'}
 				readings = {}
 				for sensor in self.sensors:
+					#breakpoint()
 					result = sensor.read()
 					readings[sensor.key] = result
 					variables.r.set(sensor.key, json.dumps(result))
