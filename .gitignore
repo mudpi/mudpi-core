@@ -21,3 +21,4 @@ venv.bak/
 .DS_Store
 launch.json
 *.code-workspace
+.vscode/
