@@ -1,3 +1,5 @@
+# Is this class even used? I don't see inheritance for it in the other workers
+
 import time
 import json
 import threading

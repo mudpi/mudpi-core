@@ -19,3 +19,5 @@ venv.bak/
 # IDE configs
 .idea/
 .DS_Store
+launch.json
+*.code-workspace
