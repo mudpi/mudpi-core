@@ -36,7 +36,7 @@ class HumiditySensor(Sensor):
 
 		humidity, temperature = Adafruit_DHT.read_retry(self.sensor, self.pin)
 		
-		if humidity is not None and temperature is not None:
+		if humidity is not None or temperature is not None:
 			variables.r.set(self.key + '_temperature', round(temperature * 1.8 + 32, 2))
 			variables.r.set(self.key + '_humidity', humidity)
 			readings = {'temperature': round(temperature * 1.8 + 32, 2), 'humidity': humidity}
