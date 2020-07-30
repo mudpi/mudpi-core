@@ -1,9 +1,7 @@
-import debugpy
-
-debugpy.listen(('192.168.1.191', 5678))
-debugpy.wait_for_client()
-
-
+#(import debugpy
+#debugpy.listen(('192.168.1.191', 5678))
+#debugpy.wait_for_client()
+#
 import time
 import glob
 import json
