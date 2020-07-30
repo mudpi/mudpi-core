@@ -1,4 +1,4 @@
-#(import debugpy
+#import debugpy
 #debugpy.listen(('192.168.1.191', 5678))
 #debugpy.wait_for_client()
 #
@@ -16,12 +16,12 @@ device_file = device_folder + '/w1_slave'
 default_connection = SerialManager(device = device_file)
 
 class TemperatureSensor(Sensor):
-    def __init__(self, pin, name = 'TemperatureSensor'), key = None,\
+    def __init__(self, pin, name = 'TemperatureSensor', key = None,\
         connection = default_connection):
         super().__init__(pin, name = name, key = key, connection = connection)
         return
 
-    def init_sensor(self):
+#    def init_sensor(self):
 #        self.sensors = 
 
 def read_temp_raw():
