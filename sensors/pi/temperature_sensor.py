@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+#import debugpy
+#debugpy.listen(('192.168.1.191', 5678))
+#debugpy.wait_for_client()
+#
+>>>>>>> c2fb309f5c728abbc80b089de8ce5823e6d1bb55
 import time
 import glob
 import json
@@ -12,6 +19,7 @@ device_folder = glob.glob(base_dir + '28*')[0]
 device_file = device_folder + '/w1_slave'
 
 class TemperatureSensor(Sensor):
+
     def __init__(self, pin, name = 'TemperatureSensor', key = None):
         super().__init__(pin, name = name, key = key)
         return
