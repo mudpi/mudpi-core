@@ -7,6 +7,8 @@ import sys
 sys.path.append('..')
 from sensors.pi.float_sensor import (FloatSensor)
 from sensors.pi.humidity_sensor import (HumiditySensor)
+from sensors.pi.temperature_sensor import (TemperatureSensor)
+from sensors.pi.soil_sensor import (SoilSensor)
 
 import variables
 
@@ -39,8 +41,10 @@ class PiSensorWorker():
 	def init_sensors(self):
 		for sensor in self.config['sensors']:
 			if sensor.get('type', None) is not None:
-				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
-				sensor_type = 'sensors.pi.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
+				#Get the sensor from the sensors folder\
+				# {sensor name}_sensor.{SensorName}Sensor
+				sensor_type = 'sensors.pi.' + sensor.get('type').lower() +\
+					'_sensor.' + sensor.get('type').capitalize() + 'Sensor'
 
 				imported_sensor = self.dynamic_import(sensor_type)
 
