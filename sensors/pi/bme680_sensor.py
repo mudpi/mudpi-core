@@ -35,7 +35,7 @@ class Bme680Sensor(Sensor):
 		temperature = round((self.sensor.temperature - 5) * 1.8 + 32, 2)
 		gas = self.sensor.gas
 		humidity = round(self.sensor.humidity, 1)
-		pressure = self.sensor.pressure
+		pressure = round(self.sensor.pressure, 2)
 		altitude = round(self.sensor.altitude, 3)
 		
 		if humidity is not None and temperature is not None:
