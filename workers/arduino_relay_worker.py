@@ -17,7 +17,7 @@ import variables
 # ToDO Update relay to make a key if one is not set in config
 
 class ArduinoRelayWorker():
-	def __init__(self, config, main_thread_running, system_ready, relay_available, relay_active, node_connected, connection=None):
+	def __init__(self, config, main_thread_running, system_ready, relay_available, relay_active, node_connected, connection=None, api=None):
 		#self.config = {**config, **self.config}
 		self.config = config
 		self.config['pin'] = int(self.config['pin']) #parse possbile strings to avoid errors
@@ -37,7 +37,7 @@ class ArduinoRelayWorker():
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
 
 		if node_connected.is_set():
-			self.api = ArduinoApi(connection)
+			self.api = api if api is not None else ArduinoApi(connection)
 			self.pin_state_off = self.api.HIGH if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.LOW
 			self.pin_state_on = self.api.LOW if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.HIGH
 			self.init()
