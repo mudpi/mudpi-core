@@ -36,14 +36,15 @@ class ArduinoRelayWorker():
 		self.pubsub = variables.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
 
-		if node_connected.is_set():
-			self.api = api if api is not None else ArduinoApi(connection)
-			self.pin_state_off = self.api.HIGH if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.LOW
-			self.pin_state_on = self.api.LOW if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.HIGH
+		if self.node_connected.is_set():
+			print('Node Relay Worker {key}...\t\t\033[1;32m Preparing\033[0;0m'.format(**self.config))
 			self.init()
 		return
 
 	def init(self):
+		self.api = api if api is not None else ArduinoApi(connection)
+		self.pin_state_off = self.api.HIGH if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.LOW
+		self.pin_state_on = self.api.LOW if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.HIGH
 		self.api.pinMode(self.config['pin'], self.api.OUTPUT)
 		#Close the relay by default, we use the pin state we determined based on the config at init
 		self.api.digitalWrite(self.config['pin'], self.pin_state_off)
@@ -56,13 +57,13 @@ class ArduinoRelayWorker():
 				print('Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.config['key']))
 
 
-		print('Node Relay Worker {key}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**self.config))
+		print('Node Relay Worker {key}...\t\t\033[1;32m Ready\033[0;0m'.format(**self.config))
 		return
 
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Node Relay Worker {key}...\t\t\t\033[1;32m Running\033[0;0m'.format(**self.config))
+		print('Node Relay Worker {key}...\t\t\033[1;32m Running\033[0;0m'.format(**self.config))
 		return t
 
 	def decodeMessageData(self, message):

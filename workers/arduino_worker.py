@@ -32,6 +32,7 @@ class ArduinoWorker():
 		self.relays = []
 		self.relayEvents = {}
 		self.relay_index = 0
+		self.api = None
 		if connection is None:
 			self.connection = self.connect()
 

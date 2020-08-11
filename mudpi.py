@@ -174,6 +174,7 @@ try:
 				threads.append(t)
 	except KeyError as e:
 		print('Invalid or no Nodes found to Load')
+		print(e)
 
 
 	# Load in Actions
