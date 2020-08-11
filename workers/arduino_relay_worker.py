@@ -5,7 +5,7 @@ import redis
 import threading
 import sys
 import socket
-from nanpy import (SerialManager)
+from nanpy import (SerialManager, ArduinoApi)
 from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
 sys.path.append('..')

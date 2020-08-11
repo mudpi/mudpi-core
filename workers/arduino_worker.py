@@ -67,7 +67,7 @@ class ArduinoWorker():
 					self.relayEvents[relay.get("key", self.relay_index)] = relayState
 					#Create sensor worker for a relay
 					arw = ArduinoRelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'], self.node_connected, self.connection)
-					arw = r.run()
+					arw = arw.run()
 					#Make the relays available, this event is toggled off elsewhere if we need to disable relays
 					self.relayState['available'].set()
 					self.relay_index +=1
