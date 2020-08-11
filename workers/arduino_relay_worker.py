@@ -27,6 +27,7 @@ class ArduinoRelayWorker():
 		self.system_ready = system_ready
 		self.relay_available = relay_available
 		self.relay_active = relay_active
+		self.node_connected = node_connected
 
 		#Dynamic Properties based on config
 		self.active = False
