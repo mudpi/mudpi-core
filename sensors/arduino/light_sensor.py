@@ -4,9 +4,13 @@ import json
 import redis
 from .sensor import Sensor
 from nanpy import (ArduinoApi, SerialManager)
+import sys
+sys.path.append('..')
+
+import variables
 
 default_connection = SerialManager(device='/dev/ttyUSB0')
-r = redis.Redis(host='127.0.0.1', port=6379)
+#r = redis.Redis(host='127.0.0.1', port=6379)
 
 class LightSensor(Sensor):
 
@@ -19,19 +23,9 @@ class LightSensor(Sensor):
 		self.api.pinMode(self.pin, self.api.INPUT)
 
 	def read(self):
-		ldr_resistance = self.api.analogRead(self.pin)
-		resistor1 = 10 #1k Resistor in the divider
-		
-		Vout = ldr_resistance * 0.0048828125 #Some frequency clock thing related to amps
-		#lux = 500 / ( resistor1 * ( (5 - Vout) / Vout )) #calculate lux using voltage divider formula with LDR to lux conversion
-		lux = ( 2500 / Vout - 500 ) / resistor1
-		
-		#print("ldr_resistance: %d" % ldr_resistance)
-		r.set(self.key, lux)
-		return lux
+		light_intesity = self.api.analogRead(self.pin)
+		r.set(self.key, light_intesity)
+		return light_intesity
 
 	def readRaw(self):
-			resistance = self.api.analogRead(self.pin)
-			#print("Resistance: %d" % resistance)
-			r.set(self.key+'_raw', resistance)
-			return resistance
+		return self.read()
