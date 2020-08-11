@@ -212,13 +212,17 @@ try:
 	def server_worker():
 		server.listen()
 
-	if (CONFIGS['server'] is not None):
-		print('MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
-		time.sleep(1)
-		server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
-		s = threading.Thread(target=server_worker)
-		threads.append(s)
-		s.start()
+	try:
+		if (CONFIGS['server'] is not None):
+			print('MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
+			time.sleep(1)
+			server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
+			s = threading.Thread(target=server_worker)
+			threads.append(s)
+			s.start()
+	except KeyError:
+		print('No Server Config Found to Load')
+		traceback.print_exc()
 
 
 	time.sleep(.5)
