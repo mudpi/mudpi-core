@@ -40,6 +40,7 @@ class HumiditySensor(Sensor):
 		variables.r.set(self.key + '_temperature', temperature)
 		variables.r.set(self.key + '_humidity', humidity)
 		variables.r.set(self.key, json.dumps(data))
+		print('Node Temp:', data)
 		return data
 
 	def readRaw(self):
