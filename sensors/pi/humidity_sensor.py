@@ -39,7 +39,7 @@ class HumiditySensor(Sensor):
 		if humidity is not None and temperature is not None:
 			variables.r.set(self.key + '_temperature', round(temperature * 1.8 + 32, 2))
 			variables.r.set(self.key + '_humidity', humidity)
-			readings = {'temperature': round(temperature * 1.8 + 32, 2), 'humidity': humidity}
+			readings = {'temperature': round(temperature * 1.8 + 32, 2), 'humidity': round(humidity, 2)}
 			variables.r.set(self.key, json.dumps(readings))
 			print('Pi Temp:', readings)
 			return readings
