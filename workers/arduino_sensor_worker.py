@@ -73,6 +73,7 @@ class ArduinoSensorWorker():
 					new_sensor.init_sensor()
 					self.sensors.append(new_sensor)
 					print('{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+					self.sensors_ready = True
 		except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
 			# Connection error. Reset everything for reconnect
 			self.sensors_ready = False
@@ -98,7 +99,7 @@ class ArduinoSensorWorker():
 								readings[sensor.key] = result
 								#r.set(sensor.get('key', sensor.get('type')), value)
 								
-							print(readings)
+							print("Node Readings: ", readings)
 							message['data'] = readings
 							variables.r.publish(self.channel, json.dumps(message))
 						except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:

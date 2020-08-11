@@ -138,19 +138,23 @@ class ArduinoRelayWorker():
 		self.resetElapsedTime()
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
-
-				try:
-					self.pubsub.get_message()
-					if self.relay_available.is_set():
-						if self.relay_active.is_set():
-							self.turnOn()
+				if self.node_connected.is_set():
+					try:
+						self.pubsub.get_message()
+						if self.relay_available.is_set():
+							if self.relay_active.is_set():
+								self.turnOn()
+							else:
+								self.turnOff()
 						else:
 							self.turnOff()
-					else:
-						self.turnOff()
-						time.sleep(1)
-				except:
-					print("Node Relay Worker \033[1;36m{key}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
+							time.sleep(1)
+					except e:
+						print("Node Relay Worker \033[1;36m{key}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
+						print(e)
+				else: 
+					# Node offline
+					time.sleep(5)
 
 			else:
 				#System not ready relay should be off
