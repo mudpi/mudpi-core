@@ -103,7 +103,6 @@ class ArduinoSensorWorker():
 							variables.r.publish(self.channel, json.dumps(message))
 						except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
 							print('\033[1;36m{name}\033[0;0m -> \033[1;33mSensors Timeout!\033[0;0m'.format(**self.config))
-							self.sensors_ready = False
 							self.sensors = []
 							self.node_connected.clear()
 							time.sleep(15)
@@ -113,7 +112,6 @@ class ArduinoSensorWorker():
 						self.sensors_ready = True
 				else:
 					#Node not connected, sensors not ready. Wait for reconnect
-					self.sensors_ready = False
 					self.sensors = []
 
 			# Main loop delay between cycles			
