@@ -83,15 +83,16 @@ class ArduinoWorker():
 		if self.config.get('use_wifi', False):
 			while attempts > 0 and self.main_thread_running.is_set():
 				try:
-					print('\033[1;36m{0}\033[0;0m -> Connecting...         \t'.format(self.config["name"], (3-attempts)), end='\r', flush=True)
+					print('\033[1;36m{0}\033[0;0m -> Connecting...         \t'.format(self.config["name"], (3-attempts)))
 					attempts-= 1
 					conn = SocketManager(host=str(self.config.get('address', 'mudpi.local')))
 					# Test the connection with api
 					self.api = ArduinoApi(connection=conn)
 				except (SocketManagerError, BrokenPipeError, ConnectionResetError, socket.timeout) as e:
 					print('{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
+					print(e);
 					if attempts > 0:
-						print('{name} -> Preparing Reconnect...  \t'.format(**self.config), end='\r', flush=True)
+						print('{name} -> Preparing Reconnect...  \t'.format(**self.config))
 					else:
 						print('{name} -> Connection Attempts...\t\033[1;31m Failed\033[0;0m           '.format(**self.config))
 					conn = None
@@ -161,7 +162,7 @@ class ArduinoWorker():
 				# Node reconnection cycle
 				if not self.node_connected.is_set():
 					# Random delay before connections to offset multiple attempts (1-5 min delay)
-					random_delay = random.randrange(60,300) * delay_multiplier
+					random_delay = random.randrange(30, self.config.get("max_reconnect_delay", 300)) * delay_multiplier
 					time.sleep(10)
 					print('\033[1;36m'+str(self.config['name']) +'\033[0;0m -> Retrying in '+ '{0}s...'.format(random_delay)+'\t\033[1;33m Pending Reconnect\033[0;0m ')
 					# Two separate checks for main thread event to prevent re-connections during shutdown
