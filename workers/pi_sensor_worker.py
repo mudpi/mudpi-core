@@ -7,6 +7,7 @@ import sys
 sys.path.append('..')
 from sensors.pi.float_sensor import (FloatSensor)
 from sensors.pi.humidity_sensor import (HumiditySensor)
+from sensors.pi.bme680_sensor import (Bme680Sensor)
 
 import variables
 
