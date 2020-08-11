@@ -89,7 +89,6 @@ try:
 	relays = []
 	relayEvents = {}
 	relay_index = 0
-	variables.lcd_message = {'line_1': 'Mudpi Control', 'line_2': 'Is Now Running'}
 
 	new_messages_waiting = threading.Event() #Event to signal LCD to pull new messages
 	main_thread_running = threading.Event() #Event to signal workers to close
@@ -99,11 +98,6 @@ try:
 
 	time.sleep(0.1)
 	print('Preparing Threads for Workers...\t\033[1;32m Complete\033[0;0m')
-
-	#l = LCDWorker(new_messages_waiting,main_thread_running,system_ready)
-	#print('Loading LCD Worker')
-	#l = l.run()
-	#threads.append(l)
 
 	# Worker for Camera
 	try:

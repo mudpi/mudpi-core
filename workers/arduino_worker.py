@@ -8,6 +8,7 @@ from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
 from workers.arduino_control_worker import ArduinoControlWorker
 from workers.arduino_sensor_worker import ArduinoSensorWorker
+from workers.arduino_relay_worker import ArduinoRelayWorker
 import sys
 sys.path.append('..')
 
@@ -28,22 +29,52 @@ class ArduinoWorker():
 		self.node_ready = threading.Event()
 		self.node_connected = threading.Event() #Event to signal if camera can be used
 		self.workers = []
+		self.relays = []
+		self.relayEvents = {}
+		self.relay_index = 0
 		if connection is None:
 			self.connection = self.connect()
 
-		if self.config['controls'] is not None:
-			acw = ArduinoControlWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
-			self.workers.append(acw)
-			acw = acw.run()
-			if acw is not None:
-				self.threads.append(acw)
+		try:
+			if self.config['controls'] is not None:
+				acw = ArduinoControlWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
+				self.workers.append(acw)
+				acw = acw.run()
+				if acw is not None:
+					self.threads.append(acw)
+		except KeyError:
+			print('No Node Controls Found to Load')
 
-		if self.config['sensors'] is not None:
-			asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
-			self.workers.append(asw)
-			asw = asw.run()
-			if asw is not None:
-				self.threads.append(asw)
+		try:
+			if self.config['sensors'] is not None:
+				asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
+				self.workers.append(asw)
+				asw = asw.run()
+				if asw is not None:
+					self.threads.append(asw)
+		except KeyError:
+			print('No Node Sensors Found to Load')
+
+		try:
+			if self.config['relays'] is not None:
+				for relay in self.config['relays']:
+					#Create a threading event for each relay to check status
+					relayState = {
+						"available": threading.Event(), #Event to allow relay to activate
+						"active": threading.Event() #Event to signal relay to open/close
+					}
+					#Store the relays under the key or index if no key is found, this way we can reference the right relays
+					self.relayEvents[relay.get("key", relay_index)] = relayState
+					#Create sensor worker for a relay
+					arw = ArduinoRelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'], self.node_connected, self.connection)
+					arw = r.run()
+					#Make the relays available, this event is toggled off elsewhere if we need to disable relays
+					self.relayState['available'].set()
+					self.relay_index +=1
+					if arw is not None:
+						self.threads.append(r)
+		except KeyError:
+			print('No Node Relays Found to Load')
 		return
 
 	def connect(self):
