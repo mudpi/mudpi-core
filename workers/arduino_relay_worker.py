@@ -150,7 +150,7 @@ class ArduinoRelayWorker():
 						self.turnOff()
 						time.sleep(1)
 				except:
-					print("Relay Worker \033[1;36m{key}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
+					print("Node Relay Worker \033[1;36m{key}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
 
 			else:
 				#System not ready relay should be off
@@ -164,4 +164,4 @@ class ArduinoRelayWorker():
 		#This is only ran after the main thread is shut down
 		#Close the pubsub connection
 		self.pubsub.close()
-		print("Relay Worker {key} Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		print("Node Relay Worker {key} Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
