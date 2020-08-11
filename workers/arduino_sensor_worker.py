@@ -114,6 +114,7 @@ class ArduinoSensorWorker():
 				else:
 					#Node not connected, sensors not ready. Wait for reconnect
 					self.sensors = []
+					self.sensors_ready = False
 
 			# Main loop delay between cycles			
 			time.sleep(self.sleep_duration)

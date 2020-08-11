@@ -39,11 +39,11 @@ class ArduinoRelayWorker():
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
 
 		if self.node_connected.is_set():
-			print('Node Relay Worker {key}...\t\t\033[1;32m Preparing\033[0;0m'.format(**self.config))
 			self.init()
 		return
 
 	def init(self):
+		print('Node Relay Worker {key}...\t\t\033[1;32m Preparing\033[0;0m'.format(**self.config))
 		self.api = api if api is not None else ArduinoApi(connection)
 		self.pin_state_off = self.api.HIGH if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.LOW
 		self.pin_state_on = self.api.LOW if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.HIGH
@@ -160,6 +160,7 @@ class ArduinoRelayWorker():
 						self.init()
 				else: 
 					# Node offline
+					self.relay_ready = False
 					time.sleep(5)
 
 			else:
