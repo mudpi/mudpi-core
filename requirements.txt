@@ -5,3 +5,4 @@ adafruit-blinka
 pycron
 redis
 picamera
+adafruit-circuitpython-bme680

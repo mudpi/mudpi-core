@@ -53,7 +53,7 @@ These are the devices and sensors I tested and used with MudPi successfully. Man
 Let me know if you are able to confirm tests on any other devices
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the BSD-4-Clause License - see the [LICENSE.md](LICENSE.md) file for details
 
 
 <img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="https://mudpi.app/img/mudPI_LOGO_small_flat.png" width="50px">
