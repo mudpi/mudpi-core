@@ -72,7 +72,7 @@ class ArduinoWorker():
 					relayState['available'].set()
 					self.relay_index +=1
 					if arw is not None:
-						self.threads.append(r)
+						self.threads.append(arw)
 		except KeyError:
 			print('No Node Relays Found to Load')
 		return
