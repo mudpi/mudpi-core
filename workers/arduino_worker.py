@@ -69,7 +69,7 @@ class ArduinoWorker():
 					arw = ArduinoRelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'], self.node_connected, self.connection)
 					arw = arw.run()
 					#Make the relays available, this event is toggled off elsewhere if we need to disable relays
-					self.relayState['available'].set()
+					relayState['available'].set()
 					self.relay_index +=1
 					if arw is not None:
 						self.threads.append(r)
