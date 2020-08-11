@@ -33,10 +33,10 @@ class Bme680Sensor(Sensor):
 		#Read the sensor(s), parse the data and store it in redis if redis is configured
 
 		temperature = round((self.sensor.temperature - 5) * 1.8 + 32, 2)
-	    gas = self.sensor.gas
-	    humidity = round(self.sensor.humidity, 1)
-	    pressure = self.sensor.pressure
-	    altitude = round(self.sensor.altitude, 3)
+		gas = self.sensor.gas
+		humidity = round(self.sensor.humidity, 1)
+		pressure = self.sensor.pressure
+		altitude = round(self.sensor.altitude, 3)
 		
 		if humidity is not None and temperature is not None:
 			variables.r.set(self.key + '_temperature', temperature)
