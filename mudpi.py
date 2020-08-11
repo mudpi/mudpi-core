@@ -5,7 +5,6 @@ import socket
 import time
 import json
 import sys
-import traceback
 sys.path.append('..')
 from action import Action
 from config_load import loadConfigJson
@@ -136,7 +135,6 @@ try:
 				threads.append(pw)
 	except KeyError:
 		print('No Pi Workers Found to Load or Invalid Type')
-		traceback.print_exc()
 
 
 	# Worker for relays attached to pi
@@ -159,7 +157,6 @@ try:
 				threads.append(r)
 	except KeyError:
 		print('No Relays Found to Load')
-		traceback.print_exc()
 
 	# Worker for nodes attached to pi via serial or wifi[esp8266]
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others
@@ -183,7 +180,6 @@ try:
 				threads.append(t)
 	except KeyError as e:
 		print('Invalid or no Nodes found to Load')
-		traceback.print_exc()
 
 
 	# Load in Actions
@@ -194,7 +190,6 @@ try:
 			actions[a.key] = a
 	except KeyError:
 		print('No Actions Found to Load')
-		traceback.print_exc()
 
 	# Worker for Triggers
 	try:
@@ -204,7 +199,6 @@ try:
 		threads.append(t)
 	except KeyError:
 		print('No Triggers Found to Load')
-		traceback.print_exc()
 
 
 	#Decided not to build server worker (this is replaced with nodejs, expressjs)
@@ -222,7 +216,6 @@ try:
 			s.start()
 	except KeyError:
 		print('No Server Config Found to Load')
-		traceback.print_exc()
 
 
 	time.sleep(.5)
@@ -250,7 +243,11 @@ finally:
 	#load a client on the server to clear it from waiting
 	# sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	#sock.connect((CONFIGS['SERVER_HOST'], int(CONFIGS['SERVER_PORT'])))
-	server.sock.shutdown(socket.SHUT_RDWR)
+	#
+	try:
+		server.sock.shutdown(socket.SHUT_RDWR)
+	except:
+		pass
 	# time.sleep(1)
 	# sock.close()
 	
