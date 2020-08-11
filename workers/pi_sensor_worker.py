@@ -55,7 +55,7 @@ class PiSensorWorker():
 				# optional sensor variables 
 				# Model is specific to DHT modules to specify DHT11 DHT22 or DHT2302
 				if sensor.get('model'):
-					sensor_kwargs['model'] = sensor.get('model')
+					sensor_kwargs['model'] = str(sensor.get('model'))
 
 				new_sensor = imported_sensor(**sensor_kwargs)
 				new_sensor.init_sensor()
