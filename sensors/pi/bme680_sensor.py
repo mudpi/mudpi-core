@@ -17,7 +17,7 @@ import variables
 
 class Bme680Sensor(Sensor):
 
-	def __init__(self, pin, name='PressureSensor', key=None):
+	def __init__(self, pin = None, name='PressureSensor', key=None):
 		super().__init__(pin, name=name, key=key)
 		return
 
