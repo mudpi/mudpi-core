@@ -47,14 +47,6 @@ class ArduinoWorker():
 			print('No Node Controls Found to Load')
 
 		try:
-			if self.config['sensors'] is not None:
-				asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
-				self.workers.append(asw)
-				time.sleep(3)
-		except KeyError:
-			print('No Node Sensors Found to Load')
-
-		try:
 			if self.config['relays'] is not None:
 				for relay in self.config['relays']:
 					#Create a threading event for each relay to check status
@@ -73,6 +65,14 @@ class ArduinoWorker():
 					time.sleep(3)
 		except KeyError:
 			print('No Node Relays Found to Load')
+
+		try:
+			if self.config['sensors'] is not None:
+				asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
+				self.workers.append(asw)
+				time.sleep(3)
+		except KeyError:
+			print('No Node Sensors Found to Load')
 
 		return
 
