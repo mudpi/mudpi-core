@@ -15,7 +15,7 @@ default_connection = SerialManager(device='/dev/ttyUSB0')
 
 class HumiditySensor(Sensor):
 
-	def __init__(self, pin, name='HumiditySensor', key=None, connection=default_connection, model='11'):
+	def __init__(self, pin, name='HumiditySensor', key=None, connection=default_connection, model='11', api=None):
 		super().__init__(pin, name=name, key=key, connection=connection)
 		self.type = model #DHT11 or DHT22 maybe AM2302
 		return
