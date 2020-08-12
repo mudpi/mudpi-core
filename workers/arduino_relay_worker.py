@@ -60,13 +60,13 @@ class ArduinoRelayWorker():
 				print('Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.config['key']))
 
 		self.relay_ready = True
-		print('Node Relay Worker {key}...\t\t\033[1;32m Ready\033[0;0m'.format(**self.config))
+		print('Node Relay {key}...\t\t\033[1;32m Ready\033[0;0m'.format(**self.config))
 		return
 
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Node Relay Worker {key}...\t\t\033[1;32m Running\033[0;0m'.format(**self.config))
+		print('Node Relay {key}...\t\t\033[1;32m Running\033[0;0m'.format(**self.config))
 		return t
 
 	def decodeMessageData(self, message):
@@ -176,4 +176,4 @@ class ArduinoRelayWorker():
 		#This is only ran after the main thread is shut down
 		#Close the pubsub connection
 		self.pubsub.close()
-		print("Node Relay Worker {key} Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		print("Node Relay {key} Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
