@@ -67,7 +67,7 @@ class ArduinoSensorWorker():
 					# optional sensor variables 
 					# Model is specific to DHT modules to specify DHT11(11) DHT22(22) or DHT2301(21)
 					if sensor.get('model'):
-						sensor_kwargs['model'] = sensor.get('model')
+						sensor_kwargs['model'] = str(sensor.get('model'))
 
 					new_sensor = imported_sensor(**sensor_kwargs)
 

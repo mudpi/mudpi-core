@@ -25,7 +25,7 @@ class HumiditySensor(Sensor):
 		sensor_types = { '11': DHT.DHT11,
 						'22': DHT.DHT22,
 						'2301': DHT.AM2301 }
-		if len(self.type) == 3 and self.type in sensor_types:
+		if self.type in sensor_types:
 			self.sensor = sensor_types[self.type]
 		else:
 			# print('Sensor Type Error: Defaulting to DHT11')
