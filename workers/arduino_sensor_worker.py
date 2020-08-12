@@ -44,7 +44,7 @@ class ArduinoSensorWorker():
 		return sensor
 
 	def init_sensors(self, connection=None):
-		print('Node Sensor Worker {key}...\t\t\033[1;32m Preparing\033[0;0m'.format(**self.config))
+		print('{name} Sensor Worker...\t\t\033[1;32m Preparing\033[0;0m'.format(**self.config))
 		try:
 			for sensor in self.config['sensors']:
 				if sensor.get('type', None) is not None:
