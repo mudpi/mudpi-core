@@ -31,6 +31,7 @@ class HumiditySensor(Sensor):
 			# print('Sensor Type Error: Defaulting to DHT11')
 			self.sensor = DHT.DHT11
 		self.dht = DHT(self.pin, self.sensor, connection=self.connection)
+		print("DHT Init")
 
 	def read(self):
 		#Pass true to read in american degrees :)

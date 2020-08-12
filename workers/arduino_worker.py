@@ -68,7 +68,7 @@ class ArduinoWorker():
 
 		try:
 			if self.config['sensors'] is not None:
-				asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
+				asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection, self.api)
 				self.workers.append(asw)
 				time.sleep(3)
 		except KeyError:

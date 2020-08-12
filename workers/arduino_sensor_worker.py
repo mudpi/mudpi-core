@@ -15,7 +15,7 @@ import importlib
 #r = redis.Redis(host='127.0.0.1', port=6379)
 
 class ArduinoSensorWorker():
-	def __init__(self, config, main_thread_running, system_ready, node_connected, connection=None):
+	def __init__(self, config, main_thread_running, system_ready, node_connected, connection=None, api=None):
 		#self.config = {**config, **self.config}
 		self.config = config
 		self.main_thread_running = main_thread_running
@@ -25,6 +25,7 @@ class ArduinoSensorWorker():
 		self.sensors_ready = False
 		self.node_connected = node_connected
 		self.connection = connection
+		self.api = api
 		self.sensors = []
 		if node_connected.is_set():
 			self.init_sensors()
