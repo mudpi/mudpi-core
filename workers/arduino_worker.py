@@ -45,13 +45,9 @@ class ArduinoWorker():
 		except KeyError:
 			print('No Node Controls Found to Load')
 
-		try:
-			if self.config['sensors'] is not None:
-				asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
-				self.workers.append(asw)
-		except KeyError as e:
-			print('No Node Sensors Found to Load')
-			print(e)
+		if self.config['sensors'] is not None:
+			asw = ArduinoSensorWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
+			self.workers.append(asw)
 
 		try:
 			if self.config['relays'] is not None:

@@ -28,7 +28,7 @@ class ArduinoSensorWorker():
 		self.sensors = []
 		if node_connected.is_set():
 			self.init_sensors()
-		self.sensors_ready = True
+			self.sensors_ready = True
 		return
 
 	def dynamic_import(self, path):
