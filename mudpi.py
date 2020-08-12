@@ -173,8 +173,7 @@ try:
 			if t is not None:
 				threads.append(t)
 	except KeyError as e:
-		print('Invalid or no Nodes found to Load')
-		print(e)
+		print('Nodes found to Load or Invalid Config Format')
 
 
 	# Load in Actions
