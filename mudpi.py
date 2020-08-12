@@ -5,6 +5,7 @@ import socket
 import time
 import json
 import sys
+import traceback
 sys.path.append('..')
 from action import Action
 from config_load import loadConfigJson
@@ -174,6 +175,7 @@ try:
 				threads.append(t)
 	except KeyError as e:
 		print('Invalid or no Nodes found to Load')
+		traceback.print_exc()
 		print(e)
 
 
