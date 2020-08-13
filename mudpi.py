@@ -233,6 +233,10 @@ try:
 		t = worker.run()
 		threads.append(t)
 		time.sleep(.5)
+	for node in nodes:
+		t = node.run()
+		threads.append(t)
+		time.sleep(.5)
 
 	time.sleep(.5)
 	print('MudPi Garden Control...\t\t\t\033[1;32m Online\033[0;0m')
