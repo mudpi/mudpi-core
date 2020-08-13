@@ -126,7 +126,7 @@ class TriggerWorker():
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Trigger Worker [' + str(len(self.config)) + ' Triggers]...\t\t\033[1;32m Running\033[0;0m')
+		print('Trigger Worker [' + str(len(self.config)) + ' Triggers]...\t\t\033[1;32m Online\033[0;0m')
 		return t
 
 	def work(self):

@@ -106,12 +106,13 @@ try:
 	# Worker for Camera
 	try:
 		c = CameraWorker(CONFIGS['camera'], main_thread_running, system_ready, camera_available)
+		print('MudPi Camera...\t\t\t\033[1;32m Initializing\033[0;0m')
 		workers.append(c)
 		# c = c.run()
 		# threads.append(c)
 		camera_available.set()
 	except KeyError:
-		print('MudPi Pi Camera...\t\t\033[1;31m Disabled\033[0;0m')
+		print('MudPi Pi Camera...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Workers for pi (Sensors, Controls, Relays)
 	try:
@@ -119,16 +120,16 @@ try:
 			# Create worker for worker
 			if worker['type'] == "sensor":
 				pw = PiSensorWorker(worker, main_thread_running, system_ready)
-				print('Loading Pi Sensor Worker...')
+				print('MudPi Sensors...\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "control":
 				pw = PiControlWorker(worker, main_thread_running, system_ready)
-				print('Loading Pi Control Worker...')
+				print('MudPi Controls...\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "i2c":
 				pw = PiI2CWorker(worker, main_thread_running, system_ready)
-				print('Loading Pi I2C Worker...')
+				print('MudPi I2C...\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
-				print('Loading Pi Relay Worker...')
+				print('MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')
 			else:
 				raise Exception("Unknown Worker Type: " + worker['type'])
 			workers.append(pw)
@@ -160,6 +161,29 @@ try:
 	except KeyError:
 		print('MudPi Relays Workers...\t\t\033[1;31m Disabled\033[0;0m')
 
+
+
+	# Load in Actions
+	try:
+		for action in CONFIGS["actions"]:
+			print('MudPi Actions...\t\t\t\033[1;32m Initializing\033[0;0m')
+			a = Action(action)
+			a.init_action()
+			actions[a.key] = a
+	except KeyError:
+		print('MudPi Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
+
+	# Worker for Triggers
+	try:
+		t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
+		print('MudPi Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
+		workers.append(t)
+		# t = t.run()
+		# threads.append(t)
+	except KeyError:
+		print('MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
+
+		
 	# Worker for nodes attached to pi via serial or wifi[esp8266]
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others
 	try:
@@ -184,25 +208,6 @@ try:
 	except KeyError as e:
 		print('MudPi Node Workers...\t\t\033[1;31m Disabled\033[0;0m')
 
-
-	# Load in Actions
-	try:
-		for action in CONFIGS["actions"]:
-			a = Action(action)
-			a.init_action()
-			actions[a.key] = a
-	except KeyError:
-		print('MudPi Action...\t\t\t\033[1;31m Disabled\033[0;0m')
-
-	# Worker for Triggers
-	try:
-		t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
-		print('Loading Triggers...')
-		workers.append(t)
-		# t = t.run()
-		# threads.append(t)
-	except KeyError:
-		print('MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	#Decided not to build server worker (this is replaced with nodejs, expressjs)
 	#Maybe use this for internal communication across devices if using wireless

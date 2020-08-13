@@ -58,7 +58,7 @@ class RelayWorker():
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Relay Worker {key}...\t\t\t\033[1;32m Running\033[0;0m'.format(**self.config))
+		print('Relay Worker {key}...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
 		return t
 
 	def decodeMessageData(self, message):

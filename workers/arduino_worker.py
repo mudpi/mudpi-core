@@ -147,7 +147,7 @@ class ArduinoWorker():
 		t = threading.Thread(target=self.work, args=())
 		t.start()
 		if self.node_ready.is_set():
-			print(str(self.config['name']) +' Node Worker '+ '[S: ' + str(len(self.config['sensors'])) + ']' + '[C: ' + str(len(self.config['controls'])) + ']...\t\033[1;32m Running\033[0;0m')
+			print(str(self.config['name']) +' Node Worker '+ '[S: ' + str(len(self.config['sensors'])) + ']' + '[C: ' + str(len(self.config['controls'])) + ']...\t\033[1;32m Online\033[0;0m')
 		else:
 			print(str(self.config['name']) +'...\t\t\t\t\033[1;33m Pending Reconnect\033[0;0m ')
 		return t

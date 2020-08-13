@@ -101,7 +101,7 @@ class SensorWorker():
 		if self.node_ready:
 			t = threading.Thread(target=self.work, args=())
 			t.start()
-			print(str(self.config['name']) +' Node Worker [' + str(len(self.config['sensors'])) + ' Sensors]...\t\033[1;32m Running\033[0;0m')
+			print(str(self.config['name']) +' Node Worker [' + str(len(self.config['sensors'])) + ' Sensors]...\t\033[1;32m Online\033[0;0m')
 			return t
 		else:
 			print("Node Connection...\t\t\t\033[1;31m Failed\033[0;0m")

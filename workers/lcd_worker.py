@@ -65,7 +65,7 @@ class LCDWorker():
 	def run(self): 
 		t = threading.Thread(target=self.process_loop, args=())
 		t.start()
-		print('LCD Worker...\t\t\t\t\033[1;32m Running\033[0;0m')
+		print('LCD Worker...\t\t\t\t\033[1;32m Online\033[0;0m')
 		return t
 
 	def process_loop(self):

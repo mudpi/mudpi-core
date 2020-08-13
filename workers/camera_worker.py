@@ -67,7 +67,7 @@ class CameraWorker():
 		t.start()
 		self.listener = threading.Thread(target=self.listen, args=())
 		self.listener.start()
-		print('Camera Worker...\t\t\t\033[1;32m Running\033[0;0m')
+		print('Camera Worker...\t\t\t\033[1;32m Online\033[0;0m')
 		return t
 
 	def wait(self):

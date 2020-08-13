@@ -24,7 +24,7 @@ class MudpiServer(object):
 
 	def listen(self):
 		self.sock.listen(10) #number of clients to listen for
-		print('MudPi Server...\t\t\t\t\033[1;32m Running\033[0;0m ')
+		print('MudPi Server...\t\t\t\t\033[1;32m Online\033[0;0m ')
 		while self.system_running.is_set():
 			try:
 				client, address = self.sock.accept()

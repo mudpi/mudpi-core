@@ -67,13 +67,13 @@ class PiSensorWorker():
 					new_sensor.critical = False
 
 				self.sensors.append(new_sensor)
-				print('{type} Sensor (Pi) {pin}...\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+				# print('{type} Sensor (Pi) {pin}...\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
 		return
 
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Pi Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\t\033[1;32m Running\033[0;0m')
+		print('Pi Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\t\033[1;32m Online\033[0;0m')
 		return t
 
 	def work(self):
@@ -99,7 +99,7 @@ class PiSensorWorker():
 								#self.pump_ready.clear()
 						
 
-				#print(readings)
+				print(readings)
 				message['data'] = readings
 				variables.r.publish(self.channel, json.dumps(message))
 				time.sleep(self.sleep_duration)
