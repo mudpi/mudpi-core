@@ -61,7 +61,7 @@ class PiI2CWorker():
 				new_sensor.type = sensor.get('type').lower()
 
 				self.sensors.append(new_sensor)
-				print('{type} Sensor (Pi) {pin}...\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+				print('{type} Sensor (Pi) {address}...\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
 		return
 
 	def run(self): 
