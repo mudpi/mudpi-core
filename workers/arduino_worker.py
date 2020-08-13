@@ -44,7 +44,7 @@ class ArduinoWorker():
 					self.threads.append(acw)
 				time.sleep(3)
 		except KeyError:
-			print('No Node Controls Found to Load')
+			print('{name} Node Controls...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
 
 		try:
 			if self.config['relays'] is not None:
@@ -64,7 +64,7 @@ class ArduinoWorker():
 					self.workers.append(arw)
 					time.sleep(3)
 		except KeyError:
-			print('No Node Relays Found to Load')
+			print('{name} Node Relays...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
 
 		try:
 			if self.config['sensors'] is not None:
@@ -72,7 +72,7 @@ class ArduinoWorker():
 				self.workers.append(asw)
 				time.sleep(3)
 		except KeyError:
-			print('No Node Sensors Found to Load')
+			print('{name} Node Sensors...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
 
 		return
 

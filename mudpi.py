@@ -126,7 +126,7 @@ try:
 				print('MudPi Controls...\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "i2c":
 				pw = PiI2CWorker(worker, main_thread_running, system_ready)
-				print('MudPi I2C...\t\t\t\033[1;32m Initializing\033[0;0m')
+				print('MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
 				print('MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')
@@ -183,7 +183,7 @@ try:
 	except KeyError:
 		print('MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
-		
+
 	# Worker for nodes attached to pi via serial or wifi[esp8266]
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others
 	try:
@@ -191,11 +191,13 @@ try:
 			# Create worker for node
 			if node['type'] == "arduino":
 				if NANPY_ENABLED:
+					print('MudPi Arduino Workers...\t\t\033[1;32m Initializing\033[0;0m')
 					t = ArduinoWorker(node, main_thread_running, system_ready)
 				else:
 					print('Error Loading Nanpy library. Did you pip3 install -r requirements.txt?')
 			elif node['type'] == "ADC-MCP3008":
 				if MCP_ENABLED:
+					print('MudPi ADC Workers...\t\t\033[1;32m Initializing\033[0;0m')
 					t = ADCMCP3008Worker(node, main_thread_running, system_ready)
 				else:
 					print('Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt;?')
