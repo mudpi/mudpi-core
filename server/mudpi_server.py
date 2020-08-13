@@ -9,7 +9,7 @@ import pickle
 
 class MudpiServer(object):
 
-	def __init__(self, system_running, host='127.0.0.1', port=6601):
+	def __init__(self, system_running, host='127.0.0.1', port=7002):
 		self.port = int(port)
 		self.host = host
 		self.system_running = system_running
@@ -57,7 +57,7 @@ class MudpiServer(object):
 
 if __name__ == "__main__":
 	host = '127.0.0.1'
-	port = 6002
+	port = 7002
 	server = MudpiServer(host, port)
 	server.listen();
 	while True:
