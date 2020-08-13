@@ -17,13 +17,12 @@ import variables
 
 class Bme680Sensor(Sensor):
 
-	def __init__(self, pin = None, name='PressureSensor', key=None):
-		super().__init__(pin, name=name, key=key)
+	def __init__(self, address = None, name='PressureSensor', key=None):
+		super().__init__(address, name=name, key=key)
 		return
 
 	def init_sensor(self):
 		#Initialize the sensor here (i.e. set pin mode, get addresses, etc) this gets called by the worker
-		self.i2c = I2C(board.SCL, board.SDA)
 		self.sensor = adafruit_bme680.Adafruit_BME680_I2C(self.i2c, debug=False)
 		# change this to match the location's pressure (hPa) at sea level
 		self.sensor.sea_level_pressure = 1013.25

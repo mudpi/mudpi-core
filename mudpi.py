@@ -15,6 +15,8 @@ from workers.camera_worker import CameraWorker
 from workers.trigger_worker import TriggerWorker
 from workers.pi_sensor_worker import PiSensorWorker
 from workers.pi_control_worker import PiControlWorker
+from workers.pi_i2c_worker import PiI2CWorker
+
 try:
 	# Does this prevent the need to install the module if you dont use it?
 	from workers.arduino_worker import ArduinoWorker
@@ -119,6 +121,9 @@ try:
 			elif worker['type'] == "control":
 				pw = PiControlWorker(worker, main_thread_running, system_ready)
 				print('Loading Pi Control Worker...')
+			elif worker['type'] == "i2c":
+				pw = PiI2CWorker(worker, main_thread_running, system_ready)
+				print('Loading Pi I2C Worker...')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
 				print('Loading Pi Relay Worker...')
