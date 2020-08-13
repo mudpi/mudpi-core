@@ -1,6 +1,8 @@
 import time
 import json
 import redis
+import board
+from busio import I2C
 import RPi.GPIO as GPIO
 
 #PIN MODE : OUT | IN
