@@ -91,6 +91,8 @@ try:
 	relays = []
 	relayEvents = {}
 	relay_index = 0
+	workers = []
+	nodes = []
 
 	new_messages_waiting = threading.Event() #Event to signal LCD to pull new messages
 	main_thread_running = threading.Event() #Event to signal workers to close
@@ -104,12 +106,12 @@ try:
 	# Worker for Camera
 	try:
 		c = CameraWorker(CONFIGS['camera'], main_thread_running, system_ready, camera_available)
-		print('Loading Pi Camera Worker')
-		c = c.run()
-		threads.append(c)
+		workers.append(c)
+		# c = c.run()
+		# threads.append(c)
 		camera_available.set()
 	except KeyError:
-		print('No Camera Found to Load')
+		print('MudPi Pi Camera...\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Workers for pi (Sensors, Controls, Relays)
 	try:
@@ -129,12 +131,12 @@ try:
 				print('Loading Pi Relay Worker...')
 			else:
 				raise Exception("Unknown Worker Type: " + worker['type'])
-			pw = pw.run()
-			if pw is not None:
-				threads.append(pw)
+			workers.append(pw)
+			# pw = pw.run()
+			# if pw is not None:
+				# threads.append(pw)
 	except KeyError:
-		print('No Pi Workers Found to Load or Invalid Type')
-
+		print('MudPi Pi Workers...\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Worker for relays attached to pi
 	try:
@@ -148,14 +150,15 @@ try:
 			relayEvents[relay.get("key", relay_index)] = relayState
 			#Create sensor worker for a relay
 			r = RelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'])
-			r = r.run()
+			workers.append(r)
+			# r = r.run()
 			#Make the relays available, this event is toggled off elsewhere if we need to disable relays
 			relayState['available'].set()
 			relay_index +=1
-			if r is not None:
-				threads.append(r)
+			# if r is not None:
+				# threads.append(r)
 	except KeyError:
-		print('No Relays Found to Load')
+		print('MudPi Relays Workers...\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Worker for nodes attached to pi via serial or wifi[esp8266]
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others
@@ -174,11 +177,12 @@ try:
 					print('Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt;?')
 			else:
 				raise Exception("Unknown Node Type: " + node['type'])
-			t = t.run()
-			if t is not None:
-				threads.append(t)
+			nodes.append(t)
+			# t = t.run()
+			# if t is not None:
+				# threads.append(t)
 	except KeyError as e:
-		print('Nodes found to Load or Invalid Config Format')
+		print('MudPi Node Workers...\t\t\033[1;31m Disabled\033[0;0m')
 
 
 	# Load in Actions
@@ -188,17 +192,17 @@ try:
 			a.init_action()
 			actions[a.key] = a
 	except KeyError:
-		print('No Actions Found to Load')
+		print('MudPi Action...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Worker for Triggers
 	try:
 		t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
 		print('Loading Triggers...')
-		t = t.run()
-		threads.append(t)
+		workers.append(t)
+		# t = t.run()
+		# threads.append(t)
 	except KeyError:
-		print('No Triggers Found to Load')
-
+		print('MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	#Decided not to build server worker (this is replaced with nodejs, expressjs)
 	#Maybe use this for internal communication across devices if using wireless
@@ -216,6 +220,12 @@ try:
 	except KeyError:
 		print('No Server Config Found to Load')
 
+
+	print('MudPi Garden Control...\t\t\t\033[1;32m Initialized\033[0;0m')
+	for worker in workers:
+		t = worker.run()
+		threads.append(t)
+		time.sleep(.5)
 
 	time.sleep(.5)
 	print('MudPi Garden Control...\t\t\t\033[1;32m Online\033[0;0m')

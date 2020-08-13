@@ -73,14 +73,13 @@ class ArduinoSensorWorker():
 
 					new_sensor = imported_sensor(**sensor_kwargs)
 
-					print('{type} Sensor {pin}...\t\t\t\033[1;32m Preparing\033[0;0m'.format(**sensor))
+					# print('{type} Sensor {pin}...\t\t\t\033[1;32m Preparing\033[0;0m'.format(**sensor))
 					new_sensor.init_sensor()
 					self.sensors.append(new_sensor)
-					print('{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+					# print('{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
 					self.sensors_ready = True
 		except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
 			# Connection error. Reset everything for reconnect
-			print('\033[1;36m{name}\033[0;0m -> \033[1;33mSensors Init Timeout!\033[0;0m'.format(**self.config))
 			self.sensors_ready = False
 			self.node_connected.clear()
 			self.sensors = []

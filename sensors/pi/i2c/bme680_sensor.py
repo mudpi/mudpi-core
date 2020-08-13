@@ -45,7 +45,7 @@ class Bme680Sensor(Sensor):
 			variables.r.set(self.key + '_altitude', altitude)
 			readings = {'temperature': temperature, 'humidity': humidity, 'pressure': pressure, 'gas': gas, 'altitude': altitude}
 			variables.r.set(self.key, json.dumps(readings))
-			print('BME680:', readings)
+			# print('BME680:', readings)
 			return readings
 		else:
 			print('Failed to get reading [BME680]. Try again!')

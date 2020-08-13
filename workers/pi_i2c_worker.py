@@ -67,7 +67,7 @@ class PiI2CWorker():
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Pi I2C Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\t\033[1;32m Running\033[0;0m')
+		print('Pi I2C Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\033[1;32m Running\033[0;0m')
 		return t
 
 	def work(self):

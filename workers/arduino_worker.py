@@ -89,7 +89,7 @@ class ArduinoWorker():
 					self.api = ArduinoApi(connection=conn)
 				except (SocketManagerError, BrokenPipeError, ConnectionResetError, socket.timeout) as e:
 					print('{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
-					print(e);
+					# print(e);
 					if attempts > 0:
 						print('{name} -> Preparing Reconnect...  \t'.format(**self.config))
 					else:
@@ -165,7 +165,7 @@ class ArduinoWorker():
 				# Node reconnection cycle
 				if not self.node_connected.is_set():
 					# Random delay before connections to offset multiple attempts (1-5 min delay)
-					random_delay = random.randrange(30, self.config.get("max_reconnect_delay", 300)) * delay_multiplier
+					random_delay = (random.randrange(30, self.config.get("max_reconnect_delay", 300)) * delay_multiplier) / 2
 					time.sleep(10)
 					print('\033[1;36m'+str(self.config['name']) +'\033[0;0m -> Retrying in '+ '{0}s...'.format(random_delay)+'\t\033[1;33m Pending Reconnect\033[0;0m ')
 					# Two separate checks for main thread event to prevent re-connections during shutdown
