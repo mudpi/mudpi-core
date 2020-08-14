@@ -134,9 +134,9 @@ class ArduinoWorker(Worker):
 
 
 	def run(self):
-		if connection is None:
+		if self.connection is None:
 			self.connection = self.connect()
-			
+
 		for worker in self.workers:
 			t = worker.run()
 			self.threads.append(t)
