@@ -127,8 +127,9 @@ try:
 			else:
 				raise Exception("Unknown Worker Type: " + worker['type'])
 			workers.append(pw)
-	except KeyError:
-		print('MudPi Pi Workers...\t\t\033[1;31m Disabled\033[0;0m')
+	except KeyError as e:
+		print('MudPi Pi Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
+		print(e)
 
 	# Worker for relays attached to pi
 	try:
