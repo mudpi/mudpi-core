@@ -28,7 +28,6 @@ class Worker():
 		self.worker_available = threading.Event()
 
 		self.components = []
-		self.init()
 		return
 
 	def init(self):
