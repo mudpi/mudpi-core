@@ -6,8 +6,6 @@ import threading
 from .worker import Worker
 import sys
 sys.path.append('..')
-from sensors.pi.float_sensor import (FloatSensor)
-from sensors.pi.humidity_sensor import (HumiditySensor)
 
 import variables
 

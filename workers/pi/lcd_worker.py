@@ -115,7 +115,7 @@ class LcdWorker(Worker):
 			variables.r.publish(self.topic, json.dumps(msg))
 			return
 
-	def nextMessageFromQueue():
+	def nextMessageFromQueue(self):
 		if len(self.message_queue) > 0:
 			self.need_new_message = False
 			self.resetElapsedTime()
