@@ -1,9 +1,9 @@
-https://github.com/olixr/nanpy/archive/master.zip
-Adafruit_DHT
-adafruit-circuitpython-mcp3xxx
-adafruit-blinka
 pycron
 redis
 picamera
+Adafruit_DHT
+adafruit-circuitpython-mcp3xxx
+adafruit-blinka
 adafruit-circuitpython-bme680
-adafruit-circuitpython-charlcd
+https://github.com/Tim-Jackins/Adafruit_CircuitPython_CharLCD/archive/master.zip
+https://github.com/olixr/nanpy/archive/master.zip

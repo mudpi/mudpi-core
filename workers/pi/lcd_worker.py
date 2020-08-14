@@ -56,11 +56,13 @@ class LcdWorker(Worker):
 		if(self.model):
 			if (self.model.lower() == 'rgb'):
 				self.lcd = character_lcd.Character_LCD_RGB_I2C(self.i2c, self.columns, self.rows, self.address)
+			elif (self.model.lower() == 'pcf'):
+				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, address=self.address usingPCF=True)
 			else:
 				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 		else:
 			self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
-
+		self.lcd.clear()
 		self.lcd.message = "MudPi\nGarden Online"
 		print('LCD Display Worker...\t\t\t\033[1;32m Initialized\033[0;0m'.format(**self.config))
 		return
@@ -103,6 +105,7 @@ class LcdWorker(Worker):
 
 	def work(self):
 		self.resetElapsedTime()
+		self.lcd.clear()
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
 				try:
