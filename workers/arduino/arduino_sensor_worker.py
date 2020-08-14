@@ -3,10 +3,16 @@ import json
 import threading
 import random
 import socket
+from .worker import Worker
 from nanpy import (SerialManager)
 from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
-from .worker import Worker
+from sensors.arduino.rain_sensor import (RainSensor)
+from sensors.arduino.soil_sensor import (SoilSensor)
+from sensors.arduino.float_sensor import (FloatSensor)
+from sensors.arduino.light_sensor import (LightSensor)
+from sensors.arduino.humidity_sensor import (HumiditySensor)
+from sensors.arduino.temperature_sensor import (TemperatureSensor)
 import sys
 sys.path.append('..')
 
