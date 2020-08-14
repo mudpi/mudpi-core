@@ -52,8 +52,11 @@ class LcdWorker(Worker):
 
 	def init(self):
 		# prepare sensor on specified pin
-		if (self.model.lower() == 'rgb'):
-			self.lcd = character_lcd.Character_LCD_RGB_I2C(self.i2c, self.columns, self.rows, self.address)
+		if(self.model):
+			if (self.model.lower() == 'rgb'):
+				self.lcd = character_lcd.Character_LCD_RGB_I2C(self.i2c, self.columns, self.rows, self.address)
+			else:
+				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 		else:
 			self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 
