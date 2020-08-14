@@ -123,4 +123,4 @@ class LcdWorker(Worker):
 		#This is only ran after the main thread is shut down
 		#Close the pubsub connection
 		self.pubsub.close()
-		print("LCD Worker Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		print("LCD Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))

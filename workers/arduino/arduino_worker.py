@@ -6,9 +6,9 @@ import socket
 from nanpy import (SerialManager, ArduinoApi)
 from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
-from workers.arduino_control_worker import ArduinoControlWorker
-from workers.arduino_sensor_worker import ArduinoSensorWorker
-from workers.arduino_relay_worker import ArduinoRelayWorker
+from workers.arduino.arduino_control_worker import ArduinoControlWorker
+from workers.arduino.arduino_sensor_worker import ArduinoSensorWorker
+from workers.arduino.arduino_relay_worker import ArduinoRelayWorker
 import sys
 sys.path.append('..')
 
