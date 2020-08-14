@@ -23,7 +23,7 @@ class LcdWorker(Worker):
 		try:
 			self.model = str(self.config['model']) if self.config['model'] is not None else None
 		except KeyError:
-			self.model = None
+			self.model = ''
 		try:
 			self.columns = int(self.config['columns']) if self.config['columns'] is not None else 16
 		except KeyError:
