@@ -5,34 +5,27 @@ import redis
 import threading
 import sys
 import RPi.GPIO as GPIO
+from .worker import Worker
 sys.path.append('..')
 
 import variables
 
-#r = redis.Redis(host='127.0.0.1', port=6379)
-# GPIO.setmode(GPIO.BCM)
-
-# ToDO Update relay to make a key if one is not set in config
-
-class RelayWorker():
+class RelayWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, relay_available, relay_active):
-		#self.config = {**config, **self.config}
-		self.config = config
+		super().__init__(config, main_thread_running, system_ready)
 		self.config['pin'] = int(self.config['pin']) #parse possbile strings to avoid errors
 
-		#Events
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
+		# Events
 		self.relay_available = relay_available
 		self.relay_active = relay_active
 
-		#Dynamic Properties based on config
+		# Dynamic Properties based on config
 		self.active = False
 		self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/relay/'
 		self.pin_state_off = GPIO.HIGH if self.config['normally_open'] is not None and self.config['normally_open'] else GPIO.LOW
 		self.pin_state_on = GPIO.LOW if self.config['normally_open'] is not None and self.config['normally_open'] else GPIO.HIGH
 
-		#Pubsub Listeners
+		# Pubsub Listeners
 		self.pubsub = variables.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
 
@@ -56,26 +49,8 @@ class RelayWorker():
 		return
 
 	def run(self): 
-		t = threading.Thread(target=self.work, args=())
-		t.start()
 		print('Relay Worker {key}...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
-		return t
-
-	def decodeMessageData(self, message):
-		if isinstance(message, dict):
-			#print('Dict Found')
-			return message
-		elif isinstance(message.decode('utf-8'), str):
-			try:
-				temp = json.loads(message.decode('utf-8'))
-				#print('Json Found')
-				return temp
-			except:
-				#print('Json Error. Str Found')
-				return {'event':'Unknown', 'data':message}
-		else:
-			#print('Failed to detect type')
-			return {'event':'Unknown', 'data':message}
+		return super().run()
 
 	def handleMessage(self, message):
 		data = message['data']
@@ -97,14 +72,6 @@ class RelayWorker():
 					print('Toggle Relay \033[1;36m{0} {1} \033[0;0m'.format(self.config['key'], state))
 			except:
 				print('Error Decoding Message for Relay {0}'.format(self.config['key']))
-
-	def elapsedTime(self):
-		self.time_elapsed = time.perf_counter() - self.time_start
-		return self.time_elapsed
-
-	def resetElapsedTime(self):
-		self.time_start = time.perf_counter()
-		pass
 	
 	def turnOn(self):
 		#Turn on relay if its available
@@ -155,7 +122,6 @@ class RelayWorker():
 				self.resetElapsedTime()
 				
 			time.sleep(0.1)
-
 
 		#This is only ran after the main thread is shut down
 		#Close the pubsub connection

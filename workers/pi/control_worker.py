@@ -3,6 +3,7 @@ import datetime
 import json
 import redis
 import threading
+from .worker import Worker
 import sys
 sys.path.append('..')
 from controls.pi.button_control import (ButtonControl)
@@ -10,33 +11,17 @@ from controls.pi.switch_control import (SwitchControl)
 
 import variables
 
-#r = redis.Redis(host='127.0.0.1', port=6379)
-# def clamp(n, smallest, largest): return max(smallest, min(n, largest))
-
-class PiControlWorker():
+class PiControlWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
-		#self.config = {**config, **self.config}
-		self.config = config
+		super().__init__(config, main_thread_running, system_ready)
 		self.channel = config.get('channel', 'controls').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 0.5)
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
-		#Store pump event so we can shutdown pump with float readings
+
 		self.controls = []
-		self.init_controls()
+		self.init()
 		return
 
-	def dynamic_import(self, name):
-		#Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor
-		components = name.split('.')
-		#Dynamically import root of component path
-		module = __import__(components[0])
-		#Get component attributes
-		for component in components[1:]:
-			module = getattr(module, component)
-		return module
-
-	def init_controls(self):
+	def init(self):
 		for control in self.config['controls']:
 			if control.get('type', None) is not None:
 				#Get the control from the controls folder {control name}_control.{ControlName}Control
@@ -67,13 +52,10 @@ class PiControlWorker():
 		return
 
 	def run(self): 
-		t = threading.Thread(target=self.work, args=())
-		t.start()
 		print('Pi Control Worker [' + str(len(self.config['controls'])) + ' Controls]...\t\033[1;32m Online\033[0;0m')
-		return t
+		return super().run()
 
 	def work(self):
-
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
 				readings = {}

@@ -9,14 +9,14 @@ sys.path.append('..')
 from action import Action
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
-from workers.relay_worker import RelayWorker
-from workers.camera_worker import CameraWorker
+from workers.pi.i2c_worker import PiI2CWorker	
+from workers.pi.relay_worker import RelayWorker
+from workers.pi.camera_worker import CameraWorker
+from workers.pi.sensor_worker import PiSensorWorker
+from workers.pi.control_worker import PiControlWorker
 from workers.trigger_worker import TriggerWorker
-from workers.pi_sensor_worker import PiSensorWorker
-from workers.pi_control_worker import PiControlWorker
-from workers.pi_i2c_worker import PiI2CWorker	
 try:
-	from workers.arduino_worker import ArduinoWorker
+	from workers.arduino.arduino_worker import ArduinoWorker
 	NANPY_ENABLED = True
 except ImportError:
 	NANPY_ENABLED = False

@@ -7,25 +7,21 @@ import board
 import busio
 import adafruit_character_lcd.character_lcd_rgb_i2c as character_rgb_lcd
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
+from .worker import Worker
 import sys
 sys.path.append('..')
 
 import variables
 
-#r = redis.Redis(host='127.0.0.1', port=6379)
-
-
-class LcdWorker():
+class LcdWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, lcd_available):
-		self.config = config
+		super().__init__(config, main_thread_running, system_ready)
 		self.address = str(self.config['address']) if self.config['address'] is not None else None
 		self.model = str(self.config['model']) if self.config['model'] is not None else None
 		self.columns = int(self.config['columns']) if self.config['columns'] is not None else 16
 		self.rows = int(self.config['rows']) if self.config['rows'] is not None else 2
 
 		#Events
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
 		self.lcd_available = lcd_available
 
 		#Dynamic Properties based on config
@@ -41,7 +37,6 @@ class LcdWorker():
 
 	def init(self):
 		# prepare sensor on specified pin
-		# 
 		if (self.model.lower() == 'rgb'):
 			self.lcd = character_lcd.Character_LCD_RGB_I2C(self.i2c, self.columns, self.rows, self.address)
 		else:
@@ -52,26 +47,8 @@ class LcdWorker():
 		return
 
 	def run(self): 
-		t = threading.Thread(target=self.work, args=())
-		t.start()
 		print('LCD Worker ...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
-		return t
-
-	def decodeMessageData(self, message):
-		if isinstance(message, dict):
-			#print('Dict Found')
-			return message
-		elif isinstance(message.decode('utf-8'), str):
-			try:
-				temp = json.loads(message.decode('utf-8'))
-				#print('Json Found')
-				return temp
-			except:
-				#print('Json Error. Str Found')
-				return {'event':'Unknown', 'data':message}
-		else:
-			#print('Failed to detect type')
-			return {'event':'Unknown', 'data':message}
+		return super().run()
 
 	def handleMessage(self, message):
 		data = message['data']
@@ -89,14 +66,6 @@ class LcdWorker():
 					print('Cleared the LCD Screen')
 			except:
 				print('Error Decoding Message for LCD')
-
-	def elapsedTime(self):
-		self.time_elapsed = time.perf_counter() - self.time_start
-		return self.time_elapsed
-
-	def resetElapsedTime(self):
-		self.time_start = time.perf_counter()
-		pass
 	
 	def addMessageToQueue(self, message):
 		#Add message to queue if LCD available
@@ -129,7 +98,6 @@ class LcdWorker():
 				self.resetElapsedTime()
 				
 			time.sleep(0.1)
-
 
 		#This is only ran after the main thread is shut down
 		#Close the pubsub connection
