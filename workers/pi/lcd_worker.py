@@ -67,22 +67,25 @@ class LcdWorker(Worker):
 			except:
 				print('Error Decoding Message for LCD')
 	
-	def addMessageToQueue(self, message):
+	def addMessageToQueue(self, message, duration = 3):
 		#Add message to queue if LCD available
 		if self.lcd_available.is_set():
-			if not self.active:
-				message = {'event':'StateChanged', 'data':1}
-				variables.r.set(self.config['key']+'_state', 1)
-				variables.r.publish(self.topic, json.dumps(message))
-				self.active = True
-				#self.relay_active.set() This is handled by the redis listener now
-				self.resetElapsedTime()	
+
+			new_message = {
+				"message": message,
+				"duration": duration
+			}
+			self.message_queue.append(message)
+
+			msg = { 'event':'MessageQueued', 'data': new_message }
+			variables.r.publish(self.topic, json.dumps(msg))
+
+			self.resetElapsedTime()	
 
 	def work(self):
 		self.resetElapsedTime()
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
-
 				try:
 					self.pubsub.get_message()
 					if self.lcd_available.is_set():
@@ -91,7 +94,6 @@ class LcdWorker(Worker):
 						time.sleep(1)
 				except:
 					print("LCD Worker \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
-
 			else:
 				#System not ready
 				time.sleep(1)

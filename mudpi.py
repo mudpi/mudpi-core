@@ -9,6 +9,7 @@ sys.path.append('..')
 from action import Action
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
+from workers.pi.lcd_worker import LCDWorker
 from workers.pi.i2c_worker import PiI2CWorker	
 from workers.pi.relay_worker import RelayWorker
 from workers.pi.camera_worker import CameraWorker
@@ -88,6 +89,7 @@ try:
 	main_thread_running = threading.Event() 	# Event to signal workers to close
 	system_ready = threading.Event() 			# Event to tell workers to begin working
 	camera_available = threading.Event() 		# Event to signal if camera can be used
+	lcd_available = threading.Event() 			# Event to signal if lcd can be used
 
 	main_thread_running.set() 					# Main event to tell workers to run/shutdown
 	time.sleep(0.1)
@@ -115,6 +117,9 @@ try:
 			elif worker['type'] == "i2c":
 				pw = PiI2CWorker(worker, main_thread_running, system_ready)
 				print('MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
+			elif worker['type'] == "lcd":
+				pw = LCDWorker(worker, main_thread_running, system_ready, lcd_available)
+				print('MudPi LCD...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
 				print('MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')

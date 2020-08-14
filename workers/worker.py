@@ -19,8 +19,6 @@ def log(func):
 class Worker():
 	def __init__(self, config, main_thread_running, system_ready):
 		self.config = config
-		self.sleep_duration = config.get('sleep_duration', 15)
-
 		# Threading Events to Keep Everything in Sync
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
