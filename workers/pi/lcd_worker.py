@@ -52,7 +52,7 @@ class LcdWorker(Worker):
 
 	def init(self):
 		# prepare sensor on specified pin
-		self.i2c = I2C(board.SCL, board.SDA)
+		self.i2c = busio.I2C(board.SCL, board.SDA)
 		if(self.model):
 			if (self.model.lower() == 'rgb'):
 				self.lcd = character_lcd.Character_LCD_RGB_I2C(self.i2c, self.columns, self.rows, self.address)
