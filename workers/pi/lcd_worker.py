@@ -16,10 +16,22 @@ import variables
 class LcdWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, lcd_available):
 		super().__init__(config, main_thread_running, system_ready)
-		self.address = str(self.config['address']) if self.config['address'] is not None else None
-		self.model = str(self.config['model']) if self.config['model'] is not None else None
-		self.columns = int(self.config['columns']) if self.config['columns'] is not None else 16
-		self.rows = int(self.config['rows']) if self.config['rows'] is not None else 2
+		try:
+			self.address = str(self.config['address']) if self.config['address'] is not None else None
+		except KeyError:
+			self.address = None
+		try:
+			self.model = str(self.config['model']) if self.config['model'] is not None else None
+		except KeyError:
+			self.model = None
+		try:
+			self.columns = int(self.config['columns']) if self.config['columns'] is not None else 16
+		except KeyError:
+			self.columns = 16
+		try:
+			self.rows = int(self.config['rows']) if self.config['rows'] is not None else 2
+		except KeyError:
+			self.rows = 2
 
 		#Events
 		self.lcd_available = lcd_available
