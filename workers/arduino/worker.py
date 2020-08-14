@@ -3,7 +3,6 @@ import datetime
 import json
 import redis
 import threading
-from .worker import Worker
 import sys
 sys.path.append('..')
 
