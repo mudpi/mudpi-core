@@ -132,7 +132,7 @@ class LcdWorker(Worker):
 				try:
 					self.pubsub.get_message()
 					if self.lcd_available.is_set():
-						if self.cached_message and not need_new_message:
+						if self.cached_message and not self.need_new_message:
 							if self.current_message != self.cached_message['message']:
 								self.lcd.clear()
 								self.lcd.message = self.cached_message['message']
