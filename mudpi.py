@@ -118,8 +118,9 @@ try:
 				pw = PiI2CWorker(worker, main_thread_running, system_ready)
 				print('MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "lcd":
-				pw = LCDWorker(worker, main_thread_running, system_ready, lcd_available)
-				print('MudPi LCD...\t\t\t\t\033[1;32m Initializing\033[0;0m')
+				for lcd = in worker.lcds:
+					pw = LCDWorker(lcd, main_thread_running, system_ready, lcd_available)
+					print('MudPi LCD...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
 				print('MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')
