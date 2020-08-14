@@ -133,19 +133,20 @@ class LcdWorker(Worker):
 					self.pubsub.get_message()
 					if self.lcd_available.is_set():
 						if self.cached_message and not need_new_message:
-							if self.current_message != self.cached_message.message:
+							if self.current_message != self.cached_message['message']:
 								self.lcd.clear()
-								self.lcd.message = self.cached_message.message
-								self.current_message = self.cached_message.message # store message to only display once and prevent flickers
-							if self.elapsedTime() > self.cached_message.duration + 1:
+								self.lcd.message = self.cached_message['message']
+								self.current_message = self.cached_message['message'] # store message to only display once and prevent flickers
+							if self.elapsedTime() > self.cached_message['duration ']+ 1:
 								self.need_new_message = True
 						else:
 							# Get first time message after clear
 							self.cached_message = self.nextMessageFromQueue()
 					else:
 						time.sleep(1)
-				except:
+				except Exception as e:
 					print("LCD Worker \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
+					print(e)
 			else:
 				#System not ready
 				time.sleep(1)
