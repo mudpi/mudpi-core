@@ -57,7 +57,7 @@ class LcdWorker(Worker):
 			if (self.model.lower() == 'rgb'):
 				self.lcd = character_lcd.Character_LCD_RGB_I2C(self.i2c, self.columns, self.rows, self.address)
 			elif (self.model.lower() == 'pcf'):
-				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, address=self.address usingPCF=True)
+				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, address=self.address, usingPCF=True)
 			else:
 				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 		else:
