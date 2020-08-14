@@ -9,7 +9,7 @@ sys.path.append('..')
 from action import Action
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
-from workers.pi.lcd_worker import LCDWorker
+from workers.pi.lcd_worker import LcdWorker
 from workers.pi.i2c_worker import PiI2CWorker	
 from workers.pi.relay_worker import RelayWorker
 from workers.pi.camera_worker import CameraWorker
@@ -119,7 +119,7 @@ try:
 				print('MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "lcd":
 				for lcd in worker.lcds:
-					pw = LCDWorker(lcd, main_thread_running, system_ready, lcd_available)
+					pw = LcdWorker(lcd, main_thread_running, system_ready, lcd_available)
 					print('MudPi LCD...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
