@@ -19,7 +19,6 @@ def log(func):
 class Worker():
 	def __init__(self, config, main_thread_running, system_ready):
 		self.config = config
-		self.channel = config.get('channel', 'mudpi').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 15)
 
 		# Threading Events to Keep Everything in Sync
@@ -45,7 +44,7 @@ class Worker():
 				time.sleep(self.sleep_duration)
 		#This is only ran after the main thread is shut down
 		print("Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
-		
+
 	def elapsedTime(self):
 		self.time_elapsed = time.perf_counter() - self.time_start
 		return self.time_elapsed
