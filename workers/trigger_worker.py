@@ -11,7 +11,7 @@ from triggers.trigger_group import TriggerGroup
 import variables
 import importlib
 
-class TriggerWorker():
+class TriggerWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, actions):
 		super().__init__(config, main_thread_running, system_ready)
 		self.actions = actions
