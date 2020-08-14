@@ -21,7 +21,7 @@ class LcdWorker(Worker):
 		except KeyError:
 			self.address = None
 		try:
-			self.model = str(self.config['model']) if self.config['model'] is not None else None
+			self.model = str(self.config['model']) if self.config['model'] is not None else ''
 		except KeyError:
 			self.model = ''
 		try:
