@@ -10,7 +10,7 @@ sys.path.append('..')
 import variables
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
-GPIO.setmode(GPIO.BCM)
+# GPIO.setmode(GPIO.BCM)
 
 # ToDO Update relay to make a key if one is not set in config
 

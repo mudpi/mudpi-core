@@ -2,7 +2,6 @@ import time
 import json
 import redis
 from .sensor import Sensor
-import RPi.GPIO as GPIO
 import board
 from busio import I2C
 import adafruit_bme680
@@ -12,8 +11,6 @@ sys.path.append('..')
 
 import variables
 
-#r = redis.Redis(host='127.0.0.1', port=6379)
-#PIN MODE : OUT | IN
 
 class Bme680Sensor(Sensor):
 
@@ -22,15 +19,12 @@ class Bme680Sensor(Sensor):
 		return
 
 	def init_sensor(self):
-		#Initialize the sensor here (i.e. set pin mode, get addresses, etc) this gets called by the worker
 		self.sensor = adafruit_bme680.Adafruit_BME680_I2C(self.i2c, debug=False)
 		# change this to match the location's pressure (hPa) at sea level
 		self.sensor.sea_level_pressure = 1013.25
 		return
 
 	def read(self):
-		#Read the sensor(s), parse the data and store it in redis if redis is configured
-
 		temperature = round((self.sensor.temperature - 5) * 1.8 + 32, 2)
 		gas = self.sensor.gas
 		humidity = round(self.sensor.humidity, 1)
@@ -49,7 +43,6 @@ class Bme680Sensor(Sensor):
 			return readings
 		else:
 			print('Failed to get reading [BME680]. Try again!')
-
 
 	def readRaw(self):
 		#Read the sensor(s) but return the raw data, useful for debugging

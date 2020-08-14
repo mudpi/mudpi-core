@@ -5,6 +5,7 @@ import redis
 import threading
 import sys
 sys.path.append('..')
+from .worker import Worker
 from sensors.pi.i2c.bme680_sensor import (Bme680Sensor)
 
 import variables
@@ -12,29 +13,17 @@ import variables
 #r = redis.Redis(host='127.0.0.1', port=6379)
 # def clamp(n, smallest, largest): return max(smallest, min(n, largest))
 
-class PiI2CWorker():
+class PiI2CWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
-		#self.config = {**config, **self.config}
-		self.config = config
+		super().__init__(config, main_thread_running, system_ready)
 		self.channel = config.get('channel', 'i2c').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 30)
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
+
 		self.sensors = []
-		self.init_sensors()
+		self.init()
 		return
 
-	def dynamic_import(self, name):
-		#Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor
-		components = name.split('.')
-		#Dynamically import root of component path
-		module = __import__(components[0])
-		#Get component attributes
-		for component in components[1:]:
-			module = getattr(module, component)
-		return module
-
-	def init_sensors(self):
+	def init(self):
 		for sensor in self.config['sensors']:
 			if sensor.get('type', None) is not None:
 				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
@@ -49,7 +38,7 @@ class PiI2CWorker():
 					'key'  : sensor.get('key', None)
 				}
 
-				# optional sensor variables 
+				# Optional sensor variables 
 				# Model is specific to DHT modules to specify DHT11 DHT22 or DHT2302
 				if sensor.get('model'):
 					sensor_kwargs['model'] = str(sensor.get('model'))
@@ -65,15 +54,13 @@ class PiI2CWorker():
 		return
 
 	def run(self): 
-		t = threading.Thread(target=self.work, args=())
-		t.start()
 		print('Pi I2C Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\033[1;32m Online\033[0;0m')
-		return t
+		return super().run()
 
 	def work(self):
-
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
+				
 				message = {'event':'PiSensorUpdate'}
 				readings = {}
 
@@ -83,7 +70,7 @@ class PiI2CWorker():
 					variables.r.set(sensor.key, json.dumps(result))
 				
 				message['data'] = readings
-				print("Reaadings I2C: ", readings);
+				print(readings);
 				variables.r.publish(self.channel, json.dumps(message))
 				time.sleep(self.sleep_duration)
 				
