@@ -33,11 +33,14 @@ class LcdWorker(Worker):
 		except KeyError:
 			self.rows = 2
 
-		#Events
+		# Events
 		self.lcd_available = lcd_available
 
-		#Dynamic Properties based on config
-		self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/lcd/'
+		# Dynamic Properties based on config
+		try:
+			self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/lcd/'
+		except KeyError:
+			self.topic = 'mudpi/lcd/'
 		self.message_queue = []
 
 		#Pubsub Listeners
