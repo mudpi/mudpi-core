@@ -90,7 +90,7 @@ class LcdWorker(Worker):
 			try:
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
-						self.addMessageToQueue(decoded_message['data'].get('message', ''), decoded_message['data'].get('duration', self.default_duration))
+						self.addMessageToQueue(decoded_message['data'].get('message', ''), int(decoded_message['data'].get('duration', self.default_duration)))
 						print('LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data']))
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
@@ -137,7 +137,7 @@ class LcdWorker(Worker):
 								self.lcd.clear()
 								self.lcd.message = self.cached_message['message']
 								self.current_message = self.cached_message['message'] # store message to only display once and prevent flickers
-							if self.elapsedTime() > self.cached_message['duration ']+ 1:
+							if self.elapsedTime() > self.cached_message['duration'] + 1:
 								self.need_new_message = True
 						else:
 							# Get first time message after clear

@@ -38,7 +38,7 @@ if __name__ == "__main__":
 							"message":"",
 							"duration":10
 						}
-						msg["message"] = int(input('Enter Message to Display: '))
+						msg["message"] = str(input('Enter Message to Display: '))
 						msg["duration"] = int(input('Enter Duration to Display (seconds): '))
 						
 					except:
