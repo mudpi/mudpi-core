@@ -46,6 +46,14 @@ class Worker():
 		#This is only ran after the main thread is shut down
 		print("Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
 
+	def elapsedTime(self):
+		self.time_elapsed = time.perf_counter() - self.time_start
+		return self.time_elapsed
+
+	def resetElapsedTime(self):
+		self.time_start = time.perf_counter()
+		pass
+
 	def dynamic_import(self, name):
 		# Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor
 		components = name.split('.')

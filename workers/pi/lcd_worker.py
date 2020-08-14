@@ -62,11 +62,11 @@ class LcdWorker(Worker):
 			self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 
 		self.lcd.message = "MudPi\nGarden Online"
-		print('LCD Worker...\t\t\t\033[1;32m Initialized\033[0;0m'.format(**self.config))
+		print('LCD Display Worker...\t\t\t\033[1;32m Initialized\033[0;0m'.format(**self.config))
 		return
 
 	def run(self): 
-		print('LCD Worker ...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
+		print('LCD Display Worker ...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
 		return super().run()
 
 	def handleMessage(self, message):
