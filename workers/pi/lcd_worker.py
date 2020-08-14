@@ -42,7 +42,7 @@ class LcdWorker(Worker):
 			self.default_duration = 5
 			
 		self.current_message = ""
-		self.cached_message = {}
+		self.cached_message = {'message':''}
 		self.need_new_message = True
 		self.message_queue = []
 
@@ -109,7 +109,7 @@ class LcdWorker(Worker):
 				"message": message,
 				"duration": duration
 			}
-			self.message_queue.append(message)
+			self.message_queue.append(new_message)
 
 			msg = { 'event':'MessageQueued', 'data': new_message }
 			variables.r.publish(self.topic, json.dumps(msg))
