@@ -90,8 +90,8 @@ class LcdWorker(Worker):
 			try:
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
-						self.addMessageToQueue(decoded_message['data'].get('data', ''), decoded_message['data'].get('duration', self.default_duration))
-					print('LCD New Message: \033[1;36m{0}\033[0;0m'.format(decoded_message['data']))
+						self.addMessageToQueue(decoded_message['data'].get('message', ''), decoded_message['data'].get('duration', self.default_duration))
+						print('LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data']))
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
 					print('Cleared the LCD Screen')

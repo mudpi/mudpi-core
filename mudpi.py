@@ -201,7 +201,7 @@ try:
 
 
 	print('MudPi Garden Controls...\t\t\033[1;32m Initialized\033[0;0m')
-	print('Signaling MudPi Controls...\t\t\033[1;32m Online\033[0;0m')
+	print('Engaging MudPi Workers...\t\t\033[1;32m \033[0;0m')
 	for worker in workers:
 		t = worker.run()
 		threads.append(t)
