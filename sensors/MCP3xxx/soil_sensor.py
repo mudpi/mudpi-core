@@ -25,7 +25,7 @@ class SoilSensor(Sensor):
         return
 
     def init_sensor(self):
-        self.channel = AnalogIn(self.mcp, Sensor.PINS[self.pin])
+        self.topic = AnalogIn(self.mcp, Sensor.PINS[self.pin])
 
     def read(self):
         resistance = self.readPin()

@@ -8,16 +8,16 @@ import variables
 
 class ControlTrigger(Trigger):
 
-	def __init__(self, main_thread_running, system_ready, name='ControlTrigger',key=None, source=None, thresholds=None, channel="controls", trigger_active=None, frequency='once', actions=[], group=None):
+	def __init__(self, main_thread_running, system_ready, name='ControlTrigger',key=None, source=None, thresholds=None, topic="controls", trigger_active=None, frequency='once', actions=[], group=None):
 		super().__init__(main_thread_running, system_ready, name=name, key=key, source=source, thresholds=thresholds, trigger_active=trigger_active, frequency=frequency, actions=actions, trigger_interval=0.5, group=group)
-		self.channel = channel.replace(" ", "_").lower() if channel is not None else "controls"
+		self.topic = topic.replace(" ", "_").lower() if topic is not None else "controls"
 		return
 
 	def init_trigger(self):
 		#Initialize the trigger here (i.e. set listeners or create cron jobs)
 		#Pubsub Listeners
 		self.pubsub = variables.r.pubsub()
-		self.pubsub.subscribe(**{self.channel: self.handleEvent})
+		self.pubsub.subscribe(**{self.topic: self.handleEvent})
 		pass
 
 	def check(self):

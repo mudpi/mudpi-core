@@ -8,9 +8,9 @@ import variables
 
 class SensorTrigger(Trigger):
 
-	def __init__(self, main_thread_running, system_ready, name='SensorTrigger',key=None, source=None, nested_source=None, thresholds=None, channel="sensors", trigger_active=None, frequency='once', actions=[], group=None):
+	def __init__(self, main_thread_running, system_ready, name='SensorTrigger',key=None, source=None, nested_source=None, thresholds=None, topic="sensors", trigger_active=None, frequency='once', actions=[], group=None):
 		super().__init__(main_thread_running, system_ready, name=name, key=key, source=source, thresholds=thresholds, trigger_active=trigger_active, frequency=frequency, actions=actions, trigger_interval=0.5, group=group)
-		self.channel = channel.replace(" ", "_").lower() if channel is not None else "sensors"
+		self.topic = topic.replace(" ", "_").lower() if topic is not None else "sensors"
 		self.nested_source = nested_source.lower() if nested_source is not None else nested_source
 		return
 
@@ -18,7 +18,7 @@ class SensorTrigger(Trigger):
 		#Initialize the trigger here (i.e. set listeners or create cron jobs)
 		#Pubsub Listeners
 		self.pubsub = variables.r.pubsub()
-		self.pubsub.subscribe(**{self.channel: self.handleEvent})
+		self.pubsub.subscribe(**{self.topic: self.handleEvent})
 		pass
 
 	def check(self):

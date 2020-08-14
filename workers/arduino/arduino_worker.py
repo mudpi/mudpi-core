@@ -9,6 +9,7 @@ from nanpy.sockconnection import (SocketManager, SocketManagerError)
 from workers.arduino.arduino_control_worker import ArduinoControlWorker
 from workers.arduino.arduino_sensor_worker import ArduinoSensorWorker
 from workers.arduino.arduino_relay_worker import ArduinoRelayWorker
+from .worker import Worker
 import sys
 sys.path.append('..')
 
@@ -17,22 +18,20 @@ import importlib
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
 
-class ArduinoWorker():
+class ArduinoWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, connection=None):
-		#self.config = {**config, **self.config}
-		self.config = config
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
-		self.sleep_duration = config.get('sleep_duration', 15)
+		super().__init__(config, main_thread_running, system_ready)
 		self.connection = connection
 		self.threads = []
+
+		# Events
 		self.node_ready = threading.Event()
-		self.node_connected = threading.Event() #Event to signal if camera can be used
+		self.node_connected = threading.Event() # Event to signal if node can be used
+
 		self.workers = []
 		self.relays = []
 		self.relayEvents = {}
 		self.relay_index = 0
-		self.api = None
 		if connection is None:
 			self.connection = self.connect()
 
@@ -141,8 +140,9 @@ class ArduinoWorker():
 
 	def run(self):
 		for worker in self.workers:
-			self.threads.append(worker.run())
-			time.sleep(4)
+			t = worker.run()
+			self.threads.append(t)
+			time.sleep(1)
 			
 		t = threading.Thread(target=self.work, args=())
 		t.start()
@@ -182,8 +182,8 @@ class ArduinoWorker():
 			# Main loop delay between cycles			
 			time.sleep(self.sleep_duration)
 
-		#This is only ran after the main thread is shut down
-		#Join all our sub threads for shutdown
+		# This is only ran after the main thread is shut down
+		# Join all our sub threads for shutdown
 		for thread in self.threads:
 			thread.join()
 		print("{name} Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))

@@ -19,7 +19,7 @@ def log(func):
 class Worker():
 	def __init__(self, config, main_thread_running, system_ready):
 		self.config = config
-		self.channel = config.get('channel', 'mudpi').replace(" ", "_").lower()
+		self.topic = config.get('topic', 'mudpi').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 15)
 
 		# Threading Events to Keep Everything in Sync

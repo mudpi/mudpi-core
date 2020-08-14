@@ -3,23 +3,18 @@ import datetime
 import json
 import redis
 import threading
+from .worker import Worker
 import sys
 sys.path.append('..')
 
 import variables
-
-def log(func):
-	def wrapper(*args, **kwargs):
-		print("MudPi Debug Log: " + " ".join([str(arg) for arg in args]) + " at " + str(datetime.datetime.now()))
-		value = func(*args, **kwargs)
-		return value
 
 # Base Worker Class
 # A worker is responsible for handling its set of operations and running on a thread
 class Worker():
 	def __init__(self, config, main_thread_running, system_ready):
 		self.config = config
-		self.channel = config.get('channel', 'mudpi').replace(" ", "_").lower()
+		self.topic = config.get('topic', 'mudpi').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 15)
 
 		# Threading Events to Keep Everything in Sync
@@ -27,6 +22,7 @@ class Worker():
 		self.system_ready = system_ready
 		self.worker_available = threading.Event()
 
+		self.api = None
 		self.components = []
 		return
 

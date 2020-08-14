@@ -18,7 +18,7 @@ class Sensor:
     def __init__(self, pin: int, mcp, name='Sensor', key=None):
         self.pin = pin
         self.mcp = mcp
-        self.channel = None
+        self.topic = None
 
         self.name = name
         self.key = key.replace(" ", "_").lower() if key is not None else self.name\
@@ -43,8 +43,8 @@ class Sensor:
         Read the sensor(s) but return the raw voltage, useful for debugging
         :return:
         """
-        return self.channel.voltage
+        return self.topic.voltage
 
     def readPin(self):
         """ Read the pin from the MCP3xxx as unaltered digital value"""
-        return self.channel.value
+        return self.topic.value

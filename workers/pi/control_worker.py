@@ -14,7 +14,7 @@ import variables
 class PiControlWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
 		super().__init__(config, main_thread_running, system_ready)
-		self.channel = config.get('channel', 'controls').replace(" ", "_").lower()
+		self.topic = config.get('topic', 'controls').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 0.5)
 
 		self.controls = []

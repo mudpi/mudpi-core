@@ -16,7 +16,7 @@ import variables
 class PiI2CWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
 		super().__init__(config, main_thread_running, system_ready)
-		self.channel = config.get('channel', 'i2c').replace(" ", "_").lower()
+		self.topic = config.get('topic', 'i2c').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 30)
 
 		self.sensors = []
@@ -71,7 +71,7 @@ class PiI2CWorker(Worker):
 				
 				message['data'] = readings
 				print(readings);
-				variables.r.publish(self.channel, json.dumps(message))
+				variables.r.publish(self.topic, json.dumps(message))
 				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)

@@ -21,7 +21,7 @@ class ArduinoSensorWorker():
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		self.sleep_duration = config.get('sleep_duration', 15)
-		self.channel = config.get('channel', 'sensors').replace(" ", "_").lower()
+		self.topic = config.get('topic', 'sensors').replace(" ", "_").lower()
 		self.sensors_ready = False
 		self.node_connected = node_connected
 		self.connection = connection
@@ -105,7 +105,7 @@ class ArduinoSensorWorker():
 								
 							print("Node Readings: ", readings)
 							message['data'] = readings
-							variables.r.publish(self.channel, json.dumps(message))
+							variables.r.publish(self.topic, json.dumps(message))
 						except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
 							print('\033[1;36m{name}\033[0;0m -> \033[1;33mSensors Timeout!\033[0;0m'.format(**self.config))
 							self.sensors = []

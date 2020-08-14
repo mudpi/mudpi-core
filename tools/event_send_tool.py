@@ -15,7 +15,7 @@ if __name__ == "__main__":
 		message = {}
 		r = redis.Redis(host='127.0.0.1', port=6379, decode_responses=True)
 		publisher = r
-		channel = None
+		topic = None
 		while option != 0:
 			#Clear the screen command
 			print(chr(27) + "[2J")
@@ -53,22 +53,22 @@ if __name__ == "__main__":
 						'data': "/home/pi/Desktop/mudpi/img/mudpi-0039-2019-04-14-02-21.jpg",
 						'source': "camera_1"
 					}
-					channel = 'garden/pi/camera'
+					topic = 'garden/pi/camera'
 				else:
 					timedMessage('Option not recognized')
 					print(chr(27) + "[2J")
 					continue
 
-				if channel is None:
-					channel = str(input('Enter Channel to Broadcast: '))
+				if topic is None:
+					topic = str(input('Enter Topic to Broadcast: '))
 
-				if channel is not None and channel != '':
+				if topic is not None and topic != '':
 					#Publish the message
-					publisher.publish(channel, json.dumps(message))
+					publisher.publish(topic, json.dumps(message))
 					print(message)
 					timedMessage('Message Successfully Published!')
 				else:
-					timedMessage('Channel Input Invalid')
+					timedMessage('Topic Input Invalid')
 					time.sleep(2)
 
 		print('Exit')

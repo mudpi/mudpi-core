@@ -93,8 +93,8 @@ class TriggerWorker(Worker):
 			if config.get('nested_source'):
 				trigger_kwargs['nested_source'] = config.get('nested_source')
 
-			if config.get('channel'):
-				trigger_kwargs['channel'] = config.get('channel')
+			if config.get('topic'):
+				trigger_kwargs['topic'] = config.get('topic')
 
 			if config.get('thresholds'):
 				trigger_kwargs['thresholds'] = config.get('thresholds')

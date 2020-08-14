@@ -8,33 +8,29 @@ import socket
 from nanpy import (SerialManager, ArduinoApi)
 from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
+from .worker import Worker
 sys.path.append('..')
 
 import variables
 
-#r = redis.Redis(host='127.0.0.1', port=6379)
-
-# ToDO Update relay to make a key if one is not set in config
-
-class ArduinoRelayWorker():
+class ArduinoRelayWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, relay_available, relay_active, node_connected, connection=None, api=None):
-		#self.config = {**config, **self.config}
-		self.config = config
-		self.config['pin'] = int(self.config['pin']) #parse possbile strings to avoid errors
+		super().__init__(config, main_thread_running, system_ready)
+		self.config['pin'] = int(self.config['pin']) # parse possbile strings to avoid errors
 
-		#Events
+		# Events
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		self.relay_available = relay_available
 		self.relay_active = relay_active
 		self.node_connected = node_connected
 
-		#Dynamic Properties based on config
+		# Dynamic Properties based on config
 		self.active = False
 		self.relay_ready = False
 		self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/relay/*'
 
-		#Pubsub Listeners
+		# Pubsub Listeners
 		self.pubsub = variables.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
 		self.api = api
