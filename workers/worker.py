@@ -43,7 +43,7 @@ class Worker():
 	def work(self):
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
-			time.sleep(self.sleep_duration)
+				time.sleep(self.sleep_duration)
 		#This is only ran after the main thread is shut down
 		print("Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
 

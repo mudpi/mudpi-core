@@ -159,7 +159,6 @@ try:
 	except KeyError:
 		print('MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
-
 	# Worker for nodes attached to pi via serial or wifi[esp8266, esp32]
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others (esp32 with custom nanpy fork)
 	try:
