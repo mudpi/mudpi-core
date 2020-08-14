@@ -32,8 +32,6 @@ class ArduinoWorker(Worker):
 		self.relays = []
 		self.relayEvents = {}
 		self.relay_index = 0
-		if connection is None:
-			self.connection = self.connect()
 
 		try:
 			if self.config['controls'] is not None:
@@ -136,6 +134,9 @@ class ArduinoWorker(Worker):
 
 
 	def run(self):
+		if connection is None:
+			self.connection = self.connect()
+			
 		for worker in self.workers:
 			t = worker.run()
 			self.threads.append(t)

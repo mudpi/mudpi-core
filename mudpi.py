@@ -89,7 +89,7 @@ try:
 	main_thread_running = threading.Event() 	# Event to signal workers to close
 	system_ready = threading.Event() 			# Event to tell workers to begin working
 	camera_available = threading.Event() 		# Event to signal if camera can be used
-	lcd_available = threading.Event() 			# Event to signal if lcd can be used
+	lcd_available = threading.Event() 			# Event to signal if lcd displays can be used
 
 	main_thread_running.set() 					# Main event to tell workers to run/shutdown
 	time.sleep(0.1)
@@ -120,6 +120,7 @@ try:
 			elif worker['type'] == "lcd":
 				for lcd in worker['lcds']:
 					pw = LcdWorker(lcd, main_thread_running, system_ready, lcd_available)
+					lcd_available.set()
 					print('MudPi LCD Displays...\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control

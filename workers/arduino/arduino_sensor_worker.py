@@ -6,6 +6,7 @@ import socket
 from nanpy import (SerialManager)
 from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
+from .worker import Worker
 import sys
 sys.path.append('..')
 
@@ -14,13 +15,9 @@ import importlib
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
 
-class ArduinoSensorWorker():
+class ArduinoSensorWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, node_connected, connection=None, api=None):
-		#self.config = {**config, **self.config}
-		self.config = config
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
-		self.sleep_duration = config.get('sleep_duration', 15)
+		super().__init__(config, main_thread_running, system_ready)
 		self.topic = config.get('topic', 'sensors').replace(" ", "_").lower()
 		self.sensors_ready = False
 		self.node_connected = node_connected
@@ -28,23 +25,11 @@ class ArduinoSensorWorker():
 		self.api = api
 		self.sensors = []
 		if node_connected.is_set():
-			self.init_sensors()
+			self.init()
 			self.sensors_ready = True
 		return
 
-	def dynamic_import(self, path):
-		components = path.split('.')
-
-		s = ''
-		for component in components[:-1]:
-			s += component + '.'
-
-		parent = importlib.import_module(s[:-1])
-		sensor = getattr(parent, components[-1])
-
-		return sensor
-
-	def init_sensors(self, connection=None):
+	def init(self, connection=None):
 		print('{name} Sensor Worker...\t\t\033[1;32m Preparing\033[0;0m'.format(**self.config))
 		try:
 			for sensor in self.config['sensors']:
@@ -88,6 +73,7 @@ class ArduinoSensorWorker():
 	def run(self):
 		t = threading.Thread(target=self.work, args=())
 		t.start()
+		print('Node {name} Sensor Worker...\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
 		return t
 
 	def work(self):
