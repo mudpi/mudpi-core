@@ -17,7 +17,7 @@ class LcdWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, lcd_available):
 		super().__init__(config, main_thread_running, system_ready)
 		try:
-			self.address = str(self.config['address']) if self.config['address'] is not None else None
+			self.address = int(self.config['address']) if self.config['address'] is not None else None
 		except KeyError:
 			self.address = None
 		try:
