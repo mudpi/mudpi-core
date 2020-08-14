@@ -43,7 +43,7 @@ class HumiditySensor(Sensor):
 			variables.r.set(self.key, json.dumps(readings))
 			return readings
 		else:
-			print('Failed to get reading. Try again!')
+			print('Failed to get DHT reading. Try again!')
 
 
 	def readRaw(self):

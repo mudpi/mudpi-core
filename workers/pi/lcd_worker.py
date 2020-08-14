@@ -44,16 +44,16 @@ class LcdWorker(Worker):
 		self.current_message = ""
 		self.cached_message = {}
 		self.need_new_message = True
+		self.message_queue = []
 
 		# Events
 		self.lcd_available = lcd_available
 
 		# Dynamic Properties based on config
 		try:
-			self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/lcd/*'
+			self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/lcd'
 		except KeyError:
-			self.topic = 'mudpi/lcd/*'
-		self.message_queue = []
+			self.topic = 'mudpi/lcd'
 
 		# Pubsub Listeners
 		self.pubsub = variables.r.pubsub()
@@ -90,10 +90,8 @@ class LcdWorker(Worker):
 			try:
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
-						self.addMessageToQueue(decoded_message.get('data', ''), decoded_message.get('duration', self.default_duration))
-					elif decoded_message.get('data', None) == 0:
-						self.lcd.clear()
-					print('LCD Message to \033[1;36m{0}\033[0;0m'.format(decoded_message['data']))
+						self.addMessageToQueue(decoded_message['data'].get('data', ''), decoded_message['data'].get('duration', self.default_duration))
+					print('LCD New Message: \033[1;36m{0}\033[0;0m'.format(decoded_message['data']))
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
 					print('Cleared the LCD Screen')
