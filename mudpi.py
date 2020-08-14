@@ -120,7 +120,7 @@ try:
 			elif worker['type'] == "lcd":
 				for lcd in worker['lcds']:
 					pw = LcdWorker(lcd, main_thread_running, system_ready, lcd_available)
-					print('MudPi LCD...\t\t\t\t\033[1;32m Initializing\033[0;0m')
+					print('MudPi LCD Displays...\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "relay":
 				# Add Relay Worker Here for Better Config Control
 				print('MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')
@@ -196,10 +196,11 @@ try:
 			threads.append(s)
 			s.start()
 	except KeyError:
-		print('No Server Config Found to Load')
+		print('MudPi Socket Server...\t\t\033[1;31m Disabled\033[0;0m')
 
 
-	print('MudPi Garden Control...\t\t\t\033[1;32m Initialized\033[0;0m')
+	print('MudPi Garden Controls...\t\t\t\033[1;32m Initialized\033[0;0m')
+	print('Signaling MudPi Controls...\t\t\t\033[1;32m Online\033[0;0m')
 	for worker in workers:
 		t = worker.run()
 		threads.append(t)

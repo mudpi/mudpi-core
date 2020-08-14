@@ -32,18 +32,28 @@ class LcdWorker(Worker):
 			self.rows = int(self.config['rows']) if self.config['rows'] is not None else 2
 		except KeyError:
 			self.rows = 2
+		try:
+			self.address = int(self.config['address']) if self.config['address'] is not None else None
+		except KeyError:
+			try:
+			self.default_duration = int(self.config['default_duration']) if self.config['default_duration'] is not None else 5
+		except KeyError:
+			self.default_duration = 5
+		self.current_message = ""
+		self.cached_message = {}
+		self.need_new_message = True
 
 		# Events
 		self.lcd_available = lcd_available
 
 		# Dynamic Properties based on config
 		try:
-			self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/lcd/'
+			self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/lcd/*'
 		except KeyError:
-			self.topic = 'mudpi/lcd/'
+			self.topic = 'mudpi/lcd/*'
 		self.message_queue = []
 
-		#Pubsub Listeners
+		# Pubsub Listeners
 		self.pubsub = variables.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
 
@@ -51,6 +61,7 @@ class LcdWorker(Worker):
 		return
 
 	def init(self):
+		print('LCD Display Worker...\t\t\t\033[1;32m Initializing\033[0;0m'.format(**self.config))
 		# prepare sensor on specified pin
 		self.i2c = busio.I2C(board.SCL, board.SDA)
 		if(self.model):
@@ -64,7 +75,6 @@ class LcdWorker(Worker):
 			self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 		self.lcd.clear()
 		self.lcd.message = "MudPi\nGarden Online"
-		print('LCD Display Worker...\t\t\t\033[1;32m Initialized\033[0;0m'.format(**self.config))
 		return
 
 	def run(self): 
@@ -78,13 +88,16 @@ class LcdWorker(Worker):
 			try:
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
-						self.lcd.message = decoded_message.get('data', '')
+						self.addMessageToQueue(decoded_message.get('data', ''), decoded_message.get('duration', self.default_duration))
 					elif decoded_message.get('data', None) == 0:
 						self.lcd.clear()
 					print('LCD Message to \033[1;36m{0}\033[0;0m'.format(decoded_message['data']))
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
 					print('Cleared the LCD Screen')
+				elif decoded_message['event'] == 'ClearQueue':
+					self.message_queue = []
+					print('Cleared the LCD Message Queue')
 			except:
 				print('Error Decoding Message for LCD')
 	
@@ -100,18 +113,35 @@ class LcdWorker(Worker):
 
 			msg = { 'event':'MessageQueued', 'data': new_message }
 			variables.r.publish(self.topic, json.dumps(msg))
+			return
 
-			self.resetElapsedTime()	
+	def nextMessageFromQueue():
+		if len(self.message_queue) > 0:
+			self.need_new_message = False
+			self.resetElapsedTime()
+			return self.message_queue.pop(0)
+		else:
+			return None
 
 	def work(self):
 		self.resetElapsedTime()
 		self.lcd.clear()
+		self.need_new_message = True
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
 				try:
 					self.pubsub.get_message()
 					if self.lcd_available.is_set():
-						pass
+						if self.cached_message and not need_new_message:
+							if self.current_message != self.cached_message.message:
+								self.lcd.clear()
+								self.lcd.message = self.cached_message.message
+								self.current_message = self.cached_message.message # store message to only display once and prevent flickers
+							if self.elapsedTime() > self.cached_message.duration + 1:
+								self.need_new_message = True
+						else:
+							# Get first time message after clear
+							self.cached_message = self.nextMessageFromQueue()
 					else:
 						time.sleep(1)
 				except:

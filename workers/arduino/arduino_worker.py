@@ -39,8 +39,6 @@ class ArduinoWorker(Worker):
 			if self.config['controls'] is not None:
 				acw = ArduinoControlWorker(self.config, main_thread_running, system_ready, self.node_connected, self.connection)
 				self.workers.append(acw)
-				if acw is not None:
-					self.threads.append(acw)
 				time.sleep(3)
 		except KeyError:
 			print('{name} Node Controls...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
@@ -88,7 +86,6 @@ class ArduinoWorker(Worker):
 					self.api = ArduinoApi(connection=conn)
 				except (SocketManagerError, BrokenPipeError, ConnectionResetError, socket.timeout) as e:
 					print('{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
-					# print(e);
 					if attempts > 0:
 						print('{name} -> Preparing Reconnect...  \t'.format(**self.config))
 					else:
