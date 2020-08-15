@@ -186,7 +186,7 @@ try:
 				raise Exception("Unknown Node Type: " + node['type'])
 			nodes.append(t)
 	except KeyError as e:
-		print('MudPi Node Workers...\t\t\033[1;31m Disabled\033[0;0m')
+		print('MudPi Node Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	try:
 		if (CONFIGS['server'] is not None):
