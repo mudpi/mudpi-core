@@ -3,40 +3,23 @@ import datetime
 import json
 import redis
 import threading
+from .worker import Worker
 import sys
 sys.path.append('..')
 from sensors.pi.float_sensor import (FloatSensor)
 from sensors.pi.humidity_sensor import (HumiditySensor)
 
-import variables
-
-#r = redis.Redis(host='127.0.0.1', port=6379)
-# def clamp(n, smallest, largest): return max(smallest, min(n, largest))
-
-class PiSensorWorker():
+class PiSensorWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
-		#self.config = {**config, **self.config}
-		self.config = config
-		self.channel = config.get('channel', 'sensors').replace(" ", "_").lower()
+		super().__init__(config, main_thread_running, system_ready)
+		self.topic = config.get('topic', 'sensors').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 30)
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
-		#Store pump event so we can shutdown pump with float readings
+
 		self.sensors = []
-		self.init_sensors()
+		self.init()
 		return
 
-	def dynamic_import(self, name):
-		#Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor
-		components = name.split('.')
-		#Dynamically import root of component path
-		module = __import__(components[0])
-		#Get component attributes
-		for component in components[1:]:
-			module = getattr(module, component)
-		return module
-
-	def init_sensors(self):
+	def init(self):
 		for sensor in self.config['sensors']:
 			if sensor.get('type', None) is not None:
 				#Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
@@ -47,14 +30,14 @@ class PiSensorWorker():
 				# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
 				sensor_kwargs = { 
 					'name' : sensor.get('name', sensor.get('type')),
-					'pin' : int(sensor.get('pin')),
+					'pin' : int(sensor.get('pin', 0)),
 					'key'  : sensor.get('key', None)
 				}
 
 				# optional sensor variables 
 				# Model is specific to DHT modules to specify DHT11 DHT22 or DHT2302
 				if sensor.get('model'):
-					sensor_kwargs['model'] = sensor.get('model')
+					sensor_kwargs['model'] = str(sensor.get('model'))
 
 				new_sensor = imported_sensor(**sensor_kwargs)
 				new_sensor.init_sensor()
@@ -67,17 +50,14 @@ class PiSensorWorker():
 					new_sensor.critical = False
 
 				self.sensors.append(new_sensor)
-				print('{type} Sensor (Pi) {pin}...\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+				# print('{type} Sensor (Pi) {pin}...\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
 		return
 
 	def run(self): 
-		t = threading.Thread(target=self.work, args=())
-		t.start()
-		print('Pi Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\t\033[1;32m Running\033[0;0m')
-		return t
+		print('Pi Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\t\033[1;32m Online\033[0;0m')
+		return super().run()
 
 	def work(self):
-
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
 				message = {'event':'PiSensorUpdate'}
@@ -85,7 +65,7 @@ class PiSensorWorker():
 				for sensor in self.sensors:
 					result = sensor.read()
 					readings[sensor.key] = result
-					variables.r.set(sensor.key, json.dumps(result))
+					self.r.set(sensor.key, json.dumps(result))
 					#print(sensor.name, result)
 
 					#Check for a critical water level from any float sensors
@@ -97,11 +77,10 @@ class PiSensorWorker():
 							else:
 								pass
 								#self.pump_ready.clear()
-						
-
-				#print(readings)
+					
+				print(readings)
 				message['data'] = readings
-				variables.r.publish(self.channel, json.dumps(message))
+				self.r.publish(self.topic, json.dumps(message))
 				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)

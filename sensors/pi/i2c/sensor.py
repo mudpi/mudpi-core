@@ -1,17 +1,20 @@
 import time
 import json
 import redis
+import board
+from busio import I2C
 import RPi.GPIO as GPIO
 
 #PIN MODE : OUT | IN
 
 class Sensor():
 
-	def __init__(self, pin, name='Sensor', key=None, redis_conn=None):
-		self.pin = pin
+	def __init__(self, address, name='Sensor', key=None, redis_conn=None):
+		self.address = address
 		self.name = name
 		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
 		self.gpio = GPIO
+		self.i2c = I2C(board.SCL, board.SDA)
 		try:
 			self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
 		except KeyError:

@@ -7,25 +7,19 @@ import sys
 import os
 import RPi.GPIO as GPIO
 from picamera import PiCamera
+from .worker import Worker
 sys.path.append('..')
 
-import variables
 
-#r = redis.Redis(host='127.0.0.1', port=6379)
-GPIO.setmode(GPIO.BCM)
-
-class CameraWorker():
+class CameraWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, camera_available):
-		#self.config = {**config, **self.config}
-		self.config = config
+		super().__init__(config, main_thread_running, system_ready)
 		self.pending_reset = False
 
-		#Events
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
+		# Events
 		self.camera_available = camera_available
 
-		#Dynamic Properties based on config
+		# Dynamic Properties based on config
 		self.path = self.config['path'].replace(" ", "-") if self.config['path'] is not None else '/etc/mudpi/img/'
 		self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/camera/'
 		if self.config['resolution'] is not None:
@@ -56,7 +50,7 @@ class CameraWorker():
 			self.camera = PiCamera()
 
 		#Pubsub Listeners
-		self.pubsub = variables.r.pubsub()
+		self.pubsub = self.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleEvent})
 
 		print('Camera Worker...\t\t\t\033[1;32m Ready\033[0;0m')
@@ -67,7 +61,7 @@ class CameraWorker():
 		t.start()
 		self.listener = threading.Thread(target=self.listen, args=())
 		self.listener.start()
-		print('Camera Worker...\t\t\t\033[1;32m Running\033[0;0m')
+		print('Camera Worker...\t\t\t\033[1;32m Online\033[0;0m')
 		return t
 
 	def wait(self):
@@ -75,18 +69,10 @@ class CameraWorker():
 		try:
 			self.next_time = (datetime.datetime.now() + datetime.timedelta(hours=self.hours, minutes=self.minutes, seconds=self.seconds)).replace(microsecond=0)
 		except:
-			#Default every hour
+			# Default every hour
 			self.next_time = (datetime.datetime.now() + datetime.timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
 		delay = (self.next_time - datetime.datetime.now()).seconds
 		time.sleep(delay)
-
-	def elapsedTime(self):
-		self.time_elapsed = time.perf_counter() - self.time_start
-		return self.time_elapsed
-
-	def resetElapsedTime(self):
-		self.time_start = time.perf_counter()
-		pass
 
 	def handleEvent(self, message):
 		data = message['data']
@@ -135,8 +121,8 @@ class CameraWorker():
 									print("Error During Camera Reset Cleanup")
 							break;
 						message = {'event':'StateChanged', 'data':filename}
-						variables.r.set('last_camera_image', filename)
-						variables.r.publish(self.topic, json.dumps(message))
+						self.r.set('last_camera_image', filename)
+						self.r.publish(self.topic, json.dumps(message))
 						print('Image Captured \033[1;36m%s\033[0;0m' % filename)
 						self.wait()
 					# except:

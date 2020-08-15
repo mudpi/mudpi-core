@@ -9,7 +9,6 @@ try:
 except ImportError:
 	CRON_ENABLED = False
 sys.path.append('..')
-import variables
 
 class TimeTrigger(Trigger):
 

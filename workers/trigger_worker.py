@@ -3,6 +3,7 @@ import datetime
 import json
 import redis
 import threading
+from .worker import Worker
 import sys
 sys.path.append('..')
 from triggers.trigger_group import TriggerGroup
@@ -10,32 +11,17 @@ from triggers.trigger_group import TriggerGroup
 import variables
 import importlib
 
-class TriggerWorker():
+class TriggerWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, actions):
-		#self.config = {**config, **self.config}
-		self.config = config
-		self.main_thread_running = main_thread_running
-		self.system_ready = system_ready
+		super().__init__(config, main_thread_running, system_ready)
 		self.actions = actions
 		self.triggers = []
 		self.trigger_threads = []
 		self.trigger_events = {}
-		self.init_triggers()
+		self.init()
 		return
 
-	def dynamic_import(self, path):
-		components = path.split('.')
-
-		s = ''
-		for component in components[:-1]:
-			s += component + '.'
-
-		parent = importlib.import_module(s[:-1])
-		sensor = getattr(parent, components[-1])
-
-		return sensor
-
-	def init_triggers(self):
+	def init(self):
 		trigger_index = 0
 		for trigger in self.config:
 			if trigger.get("triggers", False):
@@ -107,8 +93,8 @@ class TriggerWorker():
 			if config.get('nested_source'):
 				trigger_kwargs['nested_source'] = config.get('nested_source')
 
-			if config.get('channel'):
-				trigger_kwargs['channel'] = config.get('channel')
+			if config.get('topic'):
+				trigger_kwargs['topic'] = config.get('topic')
 
 			if config.get('thresholds'):
 				trigger_kwargs['thresholds'] = config.get('thresholds')
@@ -124,23 +110,20 @@ class TriggerWorker():
 			return new_trigger
 
 	def run(self): 
-		t = threading.Thread(target=self.work, args=())
-		t.start()
-		print('Trigger Worker [' + str(len(self.config)) + ' Triggers]...\t\t\033[1;32m Running\033[0;0m')
-		return t
+		print('Trigger Worker [' + str(len(self.config)) + ' Triggers]...\t\t\033[1;32m Online\033[0;0m')
+		return super().run()
 
 	def work(self):
-
 		while self.main_thread_running.is_set():
 			if self.system_ready.is_set():
-				#Main Loop
+				# Main Loop
 				time.sleep(1)
 				
 			time.sleep(2)
-		#This is only ran after the main thread is shut down
+		# This is only ran after the main thread is shut down
 		for trigger in self.triggers:
 			trigger.shutdown()
-		#Join all our sub threads for shutdown
+		# Join all our sub threads for shutdown
 		for thread in self.trigger_threads:
 			thread.join()
 		print("Trigger Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")

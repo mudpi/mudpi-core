@@ -10,8 +10,8 @@ default_connection = SerialManager(device='/dev/ttyUSB0')
 
 class ButtonControl(Control):
 
-	def __init__(self, pin, name='ButtonControl', key=None, connection=default_connection, analog_pin_mode=False, topic=None):
-		super().__init__(pin, name=name, key=key, connection=connection, analog_pin_mode=analog_pin_mode)
+	def __init__(self, pin, name='ButtonControl', key=None, connection=default_connection, analog_pin_mode=False, topic=None, redis_conn=None):
+		super().__init__(pin, name=name, key=key, connection=connection, analog_pin_mode=analog_pin_mode, redis_conn=redis_conn)
 		self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/relay/'
 		self.state_counter = 3
 		self.previous_state = 0

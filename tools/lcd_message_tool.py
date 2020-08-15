@@ -19,10 +19,11 @@ if __name__ == "__main__":
 		while option != 0:
 			#Clear the screen command
 			print(chr(27) + "[2J")
-			print('--------- Redis MudPi ---------')
-			print('|3. Test Event                |')
-			print('|2. Toggle                    |')
-			print('|1. Switch                    |')
+			print('---------  LCD MudPi  ---------')
+			print('|4. Clear Message Queue       |')
+			print('|3. Clear Display             |')
+			print('|2. Test Message              |')
+			print('|1. Add Message               |')
 			print('|0. Shutdown                  |')
 			print('-------------------------------')
 			try:
@@ -33,40 +34,54 @@ if __name__ == "__main__":
 			if option != 0:
 				if option == 1:
 					try:
-						new_state = int(input('Enter State to switch to (0 or 1): '))
-						if new_state != 0 and new_state != 1:
-							new_state = 0
+						msg = {
+							"message":"",
+							"duration":10
+						}
+						msg["message"] = str(input('Enter Message to Display: '))
+						msg["duration"] = int(input('Enter Duration to Display (seconds): '))
+						
 					except:
-						new_state = 0
+						msg = {
+							"message":"Error Test",
+							"duration":10
+						}
 					message = {
-						'event': 'Switch',
-						'data': new_state
+						'event': 'Message',
+						'data': msg
 					}
 				elif option == 2:
+					msg = {
+						"message":"Test Message\nMudPi Test",
+						"duration":15
+					}
 					message = {
-						'event': 'Toggle',
-						'data': None
+						'event': 'Message',
+						'data': msg
 					}
 				elif option == 3:
 					message = {
-						'event': "StateChanged",
-						'data': "/home/pi/Desktop/mudpi/img/mudpi-0039-2019-04-14-02-21.jpg",
-						'source': "camera_1"
+						'event': 'Clear',
+						'data': 1
 					}
-					topic = 'garden/pi/camera'
+				elif option == 4:
+					message = {
+						'event': 'ClearQueue',
+						'data': 1
+					}
 				else:
 					timedMessage('Option not recognized')
 					print(chr(27) + "[2J")
 					continue
 
 				if topic is None:
-					topic = str(input('Enter Topic to Broadcast: '))
+					topic = str(input('Enter the LCD Topic to Broadcast: '))
 
 				if topic is not None and topic != '':
 					#Publish the message
 					publisher.publish(topic, json.dumps(message))
 					print(message)
-					timedMessage('Message Successfully Published!')
+					timedMessage('Message Successfully Queued!')
 				else:
 					timedMessage('Topic Input Invalid')
 					time.sleep(2)
@@ -75,7 +90,7 @@ if __name__ == "__main__":
 	except KeyboardInterrupt:
 		#Kill The Server
 		#r.publish('test', json.dumps({'EXIT':True}))
-		print('Publish Program Terminated...')
+		print('LCD Message Program Terminated...')
 	finally:
 		pass
 	

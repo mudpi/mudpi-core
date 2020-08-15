@@ -4,20 +4,23 @@ import redis
 from nanpy import (ArduinoApi, SerialManager)
 import sys
 sys.path.append('..')
-import variables
 
 default_connection = SerialManager()
 
 # Base sensor class to extend all other arduino sensors from.
 class Control():
 
-	def __init__(self, pin, name='Control', connection=default_connection, analog_pin_mode=False, key=None):
+	def __init__(self, pin, name='Control', connection=default_connection, analog_pin_mode=False, key=None, redis_conn=None):
 		self.pin = pin
 		self.name = name
 		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
 		self.analog_pin_mode = analog_pin_mode
 		self.connection = connection
 		self.api = ArduinoApi(connection)
+		try:
+			self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
+		except KeyError:
+			self.r = redis.Redis(host='127.0.0.1', port=6379)
 		return
 
 	def init_control(self):
@@ -46,4 +49,4 @@ class Control():
 			}
 		}
 		print(message["data"])
-		variables.r.publish('controls', json.dumps(message))
+		self.r.publish('controls', json.dumps(message))

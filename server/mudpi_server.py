@@ -9,7 +9,7 @@ import pickle
 
 class MudpiServer(object):
 
-	def __init__(self, system_running, host='127.0.0.1', port=6601):
+	def __init__(self, system_running, host='127.0.0.1', port=7002):
 		self.port = int(port)
 		self.host = host
 		self.system_running = system_running
@@ -24,7 +24,7 @@ class MudpiServer(object):
 
 	def listen(self):
 		self.sock.listen(10) #number of clients to listen for
-		print('MudPi Server...\t\t\t\t\033[1;32m Running\033[0;0m ')
+		print('MudPi Server...\t\t\t\t\033[1;32m Online\033[0;0m ')
 		while self.system_running.is_set():
 			try:
 				client, address = self.sock.accept()
@@ -57,7 +57,7 @@ class MudpiServer(object):
 
 if __name__ == "__main__":
 	host = '127.0.0.1'
-	port = 6002
+	port = 7002
 	server = MudpiServer(host, port)
 	server.listen();
 	while True:

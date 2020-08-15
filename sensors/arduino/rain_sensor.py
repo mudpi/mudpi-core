@@ -21,8 +21,8 @@ DOWNPOUR_BOUNDS = 300 # and below
 
 class RainSensor(Sensor):
 
-	def __init__(self, pin, name='RainSensor', key=None, connection=default_connection):
-		super().__init__(pin, name=name, key=key, connection=connection)
+	def __init__(self, pin, name='RainSensor', key=None, connection=default_connection, redis_conn=None):
+		super().__init__(pin, name=name, key=key, connection=connection, redis_conn=redis_conn)
 		return
 
 	def init_sensor(self):
@@ -32,13 +32,13 @@ class RainSensor(Sensor):
 	def read(self):
 		rain = self.api.analogRead(self.pin) #TODO: REMOVE (PERSONAL CONFIG)
 		#rain = self.parseSensorReading(self.api.analogRead(self.pin))
-		variables.r.set(self.key, rain)
+		self.r.set(self.key, rain)
 		return rain
 
 	def readRaw(self):
 			resistance = self.api.analogRead(self.pin)
 			#print("Resistance: %d" % resistance)
-			variables.r.set(self.key+'_raw', resistance)
+			self.r.set(self.key+'_raw', resistance)
 			return resistance
 
 	def parseSensorReading(self, raw_data):

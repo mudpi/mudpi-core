@@ -9,8 +9,8 @@ r = redis.Redis(host='127.0.0.1', port=6379)
 
 class SwitchControl(Control):
 
-	def __init__(self, pin, name='SwitchControl', key=None, resistor=None, edge_detection=None, debounce=None, topic=None):
-		super().__init__(pin, name=name, key=key, resistor=resistor, edge_detection=edge_detection, debounce=debounce)
+	def __init__(self, pin, name='SwitchControl', key=None, resistor=None, edge_detection=None, debounce=None, topic=None, redis_conn=None):
+		super().__init__(pin, name=name, key=key, resistor=resistor, edge_detection=edge_detection, debounce=debounce, redis_conn=redis_conn)
 		self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/relay/'
 		# Keep counter 1 above delay to avoid event on boot
 		self.state_counter = 3

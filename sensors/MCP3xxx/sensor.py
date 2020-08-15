@@ -1,4 +1,5 @@
 import adafruit_mcp3xxx.mcp3008 as MCP
+import redis
 
 
 # Base sensor class to extend all other mcp3xxx sensors from.
@@ -15,14 +16,18 @@ class Sensor:
         7: MCP.P7,
     }
 
-    def __init__(self, pin: int, mcp, name='Sensor', key=None):
+    def __init__(self, pin: int, mcp, name='Sensor', key=None, redis_conn=None):
         self.pin = pin
         self.mcp = mcp
-        self.channel = None
+        self.topic = None
 
         self.name = name
         self.key = key.replace(" ", "_").lower() if key is not None else self.name\
             .replace(" ", str(pin))
+        try:
+            self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
+        except KeyError:
+            self.r = redis.Redis(host='127.0.0.1', port=6379)
 
     def init_sensor(self):
         """
@@ -43,8 +48,8 @@ class Sensor:
         Read the sensor(s) but return the raw voltage, useful for debugging
         :return:
         """
-        return self.channel.voltage
+        return self.topic.voltage
 
     def readPin(self):
         """ Read the pin from the MCP3xxx as unaltered digital value"""
-        return self.channel.value
+        return self.topic.value
