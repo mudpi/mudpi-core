@@ -140,8 +140,9 @@ class LcdWorker(Worker):
 							if self.elapsedTime() > self.cached_message['duration'] + 1:
 								self.need_new_message = True
 						else:
-							# Get first time message after clear
-							self.cached_message = self.nextMessageFromQueue()
+							if self.need_new_message:
+								# Get first time message after clear
+								self.cached_message = self.nextMessageFromQueue()
 					else:
 						time.sleep(1)
 				except Exception as e:
