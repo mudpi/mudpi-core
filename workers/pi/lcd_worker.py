@@ -11,8 +11,6 @@ from .worker import Worker
 import sys
 sys.path.append('..')
 
-import variables
-
 class LcdWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, lcd_available):
 		super().__init__(config, main_thread_running, system_ready)
@@ -56,7 +54,7 @@ class LcdWorker(Worker):
 			self.topic = 'mudpi/lcd'
 
 		# Pubsub Listeners
-		self.pubsub = variables.r.pubsub()
+		self.pubsub = self.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
 
 		self.init()
@@ -112,7 +110,7 @@ class LcdWorker(Worker):
 			self.message_queue.append(new_message)
 
 			msg = { 'event':'MessageQueued', 'data': new_message }
-			variables.r.publish(self.topic, json.dumps(msg))
+			self.r.publish(self.topic, json.dumps(msg))
 			return
 
 	def nextMessageFromQueue(self):

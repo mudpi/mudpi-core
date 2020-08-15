@@ -3,11 +3,10 @@ import digitalio
 import board
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
-
 import threading
-import variables
 import time
 import json
+import redis
 import importlib
 
 
@@ -40,6 +39,10 @@ class ADCMCP3008Worker:
         self.main_thread_running = main_thread_running
         self.system_ready = system_ready
         self.node_ready = False
+        try:
+            self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
+        except KeyError:
+            self.r = redis.Redis(host='127.0.0.1', port=6379)
 
         spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
         cs = digitalio.DigitalInOut(ADCMCP3008Worker.PINS[config['pin']])
@@ -104,7 +107,7 @@ class ADCMCP3008Worker:
 
                 print(readings)
                 message['data'] = readings
-                variables.r.publish('sensors', json.dumps(message))
+                self.r.publish('sensors', json.dumps(message))
 
             time.sleep(15)
         # This is only ran after the main thread is shut down

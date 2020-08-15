@@ -8,8 +8,6 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 
 sys.path.append('..')
 
-import variables
-
 #  Tested using Sun3Drucker Model SX239
 # Wet Water = 287
 # Dry Air = 584
@@ -20,8 +18,8 @@ intervals = int((AirBounds - WaterBounds) / 3)
 
 class SoilSensor(Sensor):
 
-    def __init__(self, pin, mcp, name='SoilSensor', key=None):
-        super().__init__(pin, name=name, key=key, mcp=mcp)
+    def __init__(self, pin, mcp, name='SoilSensor', key=None, redis_conn=None):
+        super().__init__(pin, name=name, key=key, mcp=mcp, redis_conn=redis_conn)
         return
 
     def init_sensor(self):
@@ -40,7 +38,7 @@ class SoilSensor(Sensor):
             moisture = 'Very Wet - ' + str(int(moistpercent))
         # print("Resistance: %d" % resistance)
         # TODO: Put redis store into sensor worker
-        variables.r.set(self.key,
+        self.r.set(self.key,
                         resistance)  # TODO: CHANGE BACK TO 'moistpercent' (PERSONAL CONFIG)
 
         print("moisture: {0}".format(moisture))

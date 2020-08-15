@@ -6,13 +6,15 @@ import threading
 import sys
 sys.path.append('..')
 
-import variables
-
 # Base Worker Class
 # A worker is responsible for handling its set of operations and running on a thread
 class Worker():
 	def __init__(self, config, main_thread_running, system_ready):
 		self.config = config
+		try:
+			self.r = config["redis"]
+		except KeyError:
+			self.r = redis.Redis(host='127.0.0.1', port=6379)
 		self.topic = config.get('topic', 'mudpi').replace(" ", "_").lower()
 		self.sleep_duration = config.get('sleep_duration', 15)
 

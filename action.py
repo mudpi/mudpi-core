@@ -4,7 +4,6 @@ import redis
 import subprocess
 import sys
 sys.path.append('..')
-import variables
 
 class Action():
 
@@ -15,6 +14,10 @@ class Action():
 		self.key = config.get("key", None).replace(" ", "_").lower() if config.get("key") is not None else self.name.replace(" ", "_").lower()
 		# Actions will be either objects to publish for events or a command string to execute
 		self.action = config.get("action")
+		try:
+			self.r = config["redis"] if config["redis"] is not None else redis.Redis(host='127.0.0.1', port=6379)
+		except KeyError:
+			self.r = redis.Redis(host='127.0.0.1', port=6379)
 		return
 
 	def init_action(self):
@@ -31,7 +34,7 @@ class Action():
 		return
 
 	def emitEvent(self):
-		variables.r.publish(self.topic, json.dumps(self.action))
+		self.r.publish(self.topic, json.dumps(self.action))
 		return
 
 	def runCommand(self, value=None):

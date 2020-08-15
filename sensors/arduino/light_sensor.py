@@ -14,8 +14,8 @@ default_connection = SerialManager(device='/dev/ttyUSB0')
 
 class LightSensor(Sensor):
 
-	def __init__(self, pin, name='LightSensor', key=None, connection=default_connection):
-		super().__init__(pin, name=name, key=key, connection=connection)
+	def __init__(self, pin, name='LightSensor', key=None, connection=default_connection, redis_conn=None):
+		super().__init__(pin, name=name, key=key, connection=connection, redis_conn=redis_conn)
 		return
 
 	def init_sensor(self):
@@ -24,7 +24,7 @@ class LightSensor(Sensor):
 
 	def read(self):
 		light_intesity = self.api.analogRead(self.pin)
-		r.set(self.key, light_intesity)
+		self.r.set(self.key, light_intesity)
 		return light_intesity
 
 	def readRaw(self):

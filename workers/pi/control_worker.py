@@ -9,8 +9,6 @@ sys.path.append('..')
 from controls.pi.button_control import (ButtonControl)
 from controls.pi.switch_control import (SwitchControl)
 
-import variables
-
 class PiControlWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
 		super().__init__(config, main_thread_running, system_ready)

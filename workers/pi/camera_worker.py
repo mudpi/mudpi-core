@@ -10,8 +10,6 @@ from picamera import PiCamera
 from .worker import Worker
 sys.path.append('..')
 
-import variables
-
 
 class CameraWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, camera_available):
@@ -52,7 +50,7 @@ class CameraWorker(Worker):
 			self.camera = PiCamera()
 
 		#Pubsub Listeners
-		self.pubsub = variables.r.pubsub()
+		self.pubsub = self.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleEvent})
 
 		print('Camera Worker...\t\t\t\033[1;32m Ready\033[0;0m')
@@ -123,8 +121,8 @@ class CameraWorker(Worker):
 									print("Error During Camera Reset Cleanup")
 							break;
 						message = {'event':'StateChanged', 'data':filename}
-						variables.r.set('last_camera_image', filename)
-						variables.r.publish(self.topic, json.dumps(message))
+						self.r.set('last_camera_image', filename)
+						self.r.publish(self.topic, json.dumps(message))
 						print('Image Captured \033[1;36m%s\033[0;0m' % filename)
 						self.wait()
 					# except:

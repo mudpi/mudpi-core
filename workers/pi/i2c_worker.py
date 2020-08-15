@@ -8,10 +8,6 @@ sys.path.append('..')
 from .worker import Worker
 from sensors.pi.i2c.bme680_sensor import (Bme680Sensor)
 
-import variables
-
-#r = redis.Redis(host='127.0.0.1', port=6379)
-# def clamp(n, smallest, largest): return max(smallest, min(n, largest))
 
 class PiI2CWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
@@ -67,11 +63,11 @@ class PiI2CWorker(Worker):
 				for sensor in self.sensors:
 					result = sensor.read()
 					readings[sensor.key] = result
-					variables.r.set(sensor.key, json.dumps(result))
+					self.r.set(sensor.key, json.dumps(result))
 				
 				message['data'] = readings
 				print(readings);
-				variables.r.publish(self.topic, json.dumps(message))
+				self.r.publish(self.topic, json.dumps(message))
 				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)

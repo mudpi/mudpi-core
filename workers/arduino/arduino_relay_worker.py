@@ -31,7 +31,7 @@ class ArduinoRelayWorker(Worker):
 		self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/relay/*'
 
 		# Pubsub Listeners
-		self.pubsub = variables.r.pubsub()
+		self.pubsub = self.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
 		self.api = api
 
@@ -51,7 +51,7 @@ class ArduinoRelayWorker(Worker):
 
 		#Feature to restore relay state in case of crash  or unexpected shutdown. This will check for last state stored in redis and set relay accordingly
 		if(self.config.get('restore_last_known_state', None) is not None and self.config.get('restore_last_known_state', False) is True):
-			if(variables.r.get(self.config['key']+'_state')):
+			if(self.r.get(self.config['key']+'_state')):
 				self.api.digitalWrite(self.config['pin'], self.pin_state_on)
 				print('Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.config['key']))
 
@@ -115,8 +115,8 @@ class ArduinoRelayWorker(Worker):
 			if not self.active:
 				self.api.digitalWrite(self.config['pin'], self.pin_state_on)
 				message = {'event':'StateChanged', 'data':1}
-				variables.r.set(self.config['key']+'_state', 1)
-				variables.r.publish(self.topic, json.dumps(message))
+				self.r.set(self.config['key']+'_state', 1)
+				self.r.publish(self.topic, json.dumps(message))
 				self.active = True
 				#self.relay_active.set() This is handled by the redis listener now
 				self.resetElapsedTime()	
@@ -127,8 +127,8 @@ class ArduinoRelayWorker(Worker):
 			if self.active:
 				self.api.digitalWrite(self.config['pin'], self.pin_state_off)
 				message = {'event':'StateChanged', 'data':0}
-				variables.r.delete(self.config['key']+'_state')
-				variables.r.publish(self.topic, json.dumps(message))
+				self.r.delete(self.config['key']+'_state')
+				self.r.publish(self.topic, json.dumps(message))
 				#self.relay_active.clear() This is handled by the redis listener now
 				self.active = False
 				self.resetElapsedTime()

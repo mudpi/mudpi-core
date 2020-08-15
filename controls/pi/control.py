@@ -4,17 +4,20 @@ import redis
 import RPi.GPIO as GPIO
 import sys
 sys.path.append('..')
-import variables
 
 # Base sensor class to extend all other arduino sensors from.
 class Control():
 
-	def __init__(self, pin, name='Control',key=None, resistor=None, edge_detection=None, debounce=None):
+	def __init__(self, pin, name='Control',key=None, resistor=None, edge_detection=None, debounce=None, redis_conn=None):
 		self.pin = pin
 		self.name = name
 		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
 		self.gpio = GPIO
 		self.debounce = debounce if debounce is not None else None
+		try:
+			self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
+		except KeyError:
+			self.r = redis.Redis(host='127.0.0.1', port=6379)
 
 		if resistor is not None:
 			if resistor == "up" or resistor == GPIO.PUD_UP:
@@ -67,4 +70,4 @@ class Control():
 			}
 		}
 		print(message["data"])
-		variables.r.publish('controls', json.dumps(message))
+		self.r.publish('controls', json.dumps(message))

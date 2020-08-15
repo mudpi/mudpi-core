@@ -14,8 +14,8 @@ import variables
 
 class Bme680Sensor(Sensor):
 
-	def __init__(self, address = None, name='PressureSensor', key=None):
-		super().__init__(address, name=name, key=key)
+	def __init__(self, address = None, name='PressureSensor', key=None, redis_conn=None):
+		super().__init__(address, name=name, key=key, redis_conn=redis_conn)
 		return
 
 	def init_sensor(self):
@@ -32,13 +32,13 @@ class Bme680Sensor(Sensor):
 		altitude = round(self.sensor.altitude, 3)
 		
 		if humidity is not None and temperature is not None:
-			variables.r.set(self.key + '_temperature', temperature)
-			variables.r.set(self.key + '_humidity', humidity)
-			variables.r.set(self.key + '_gas', gas)
-			variables.r.set(self.key + '_pressure', pressure)
-			variables.r.set(self.key + '_altitude', altitude)
+			self.r.set(self.key + '_temperature', temperature)
+			self.r.set(self.key + '_humidity', humidity)
+			self.r.set(self.key + '_gas', gas)
+			self.r.set(self.key + '_pressure', pressure)
+			self.r.set(self.key + '_altitude', altitude)
 			readings = {'temperature': temperature, 'humidity': humidity, 'pressure': pressure, 'gas': gas, 'altitude': altitude}
-			variables.r.set(self.key, json.dumps(readings))
+			self.r.set(self.key, json.dumps(readings))
 			# print('BME680:', readings)
 			return readings
 		else:

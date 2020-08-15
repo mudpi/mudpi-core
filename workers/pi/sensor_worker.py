@@ -9,9 +9,6 @@ sys.path.append('..')
 from sensors.pi.float_sensor import (FloatSensor)
 from sensors.pi.humidity_sensor import (HumiditySensor)
 
-import variables
-
-
 class PiSensorWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
 		super().__init__(config, main_thread_running, system_ready)
@@ -68,7 +65,7 @@ class PiSensorWorker(Worker):
 				for sensor in self.sensors:
 					result = sensor.read()
 					readings[sensor.key] = result
-					variables.r.set(sensor.key, json.dumps(result))
+					self.r.set(sensor.key, json.dumps(result))
 					#print(sensor.name, result)
 
 					#Check for a critical water level from any float sensors
@@ -83,7 +80,7 @@ class PiSensorWorker(Worker):
 					
 				print(readings)
 				message['data'] = readings
-				variables.r.publish(self.topic, json.dumps(message))
+				self.r.publish(self.topic, json.dumps(message))
 				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)

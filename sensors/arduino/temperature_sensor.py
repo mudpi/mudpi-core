@@ -14,8 +14,8 @@ default_connection = SerialManager(device='/dev/ttyUSB0')
 
 class TemperatureSensor(Sensor):
 
-	def __init__(self, pin, name='TemperatureHumiditySensor', key=None, connection=default_connection):
-		super().__init__(pin, name=name, key=key, connection=connection)
+	def __init__(self, pin, name='TemperatureHumiditySensor', key=None, connection=default_connection, redis_conn=None):
+		super().__init__(pin, name=name, key=key, connection=connection, redis_conn=redis_conn)
 		return
 
 	def init_sensor(self):
@@ -35,7 +35,7 @@ class TemperatureSensor(Sensor):
 	#sensor = id of sensor you want in addresses[]
 	def read(self):
 		#temp = self.sensors.getTempF(sensor)
-		#variables.r.set('temp_'+str(sensor), temp)
+		#self.r.set('temp_'+str(sensor), temp)
 		#return temp
 		return self.readAll()
 
@@ -45,10 +45,10 @@ class TemperatureSensor(Sensor):
 		for i in range(self.sensor_bus):
 			temp = self.sensors.getTempC(i)
 			temps['temp_'+str(i)] = temp
-			#variables.r.set(self.key+'_'+str(i), temp)
+			#self.r.set(self.key+'_'+str(i), temp)
 			#print("Device %d (%s) " % (i, self.addresses[i]))
 			#print("Let's convert it in Fahrenheit degrees: %0.2f" % DallasTemperature.toFahrenheit(temp))
-		variables.r.set(self.key, temps)
+		self.r.set(self.key, temps)
 		return temps
 
 if __name__ == '__main__':

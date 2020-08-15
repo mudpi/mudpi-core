@@ -10,8 +10,8 @@ default_connection = SerialManager(device='/dev/ttyUSB0')
 
 class PotentiometerControl(Control):
 
-	def __init__(self, pin, name='PotentiometerControl', key=None, connection=default_connection, analog_pin_mode=True, topic=None, reading_buffer=3):
-		super().__init__(pin, name=name, key=key, connection=connection, analog_pin_mode=analog_pin_mode)
+	def __init__(self, pin, name='PotentiometerControl', key=None, connection=default_connection, analog_pin_mode=True, topic=None, reading_buffer=3, redis_conn=None):
+		super().__init__(pin, name=name, key=key, connection=connection, analog_pin_mode=analog_pin_mode, redis_conn=redis_conn)
 		self.previous_state = 0
 		# Reading buffer helps prevent multiple events when values are floating between small amounts
 		self.reading_buffer = reading_buffer

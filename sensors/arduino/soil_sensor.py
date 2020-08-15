@@ -19,8 +19,8 @@ WaterBounds = 280;
 intervals = int((AirBounds - WaterBounds)/3);
 class SoilSensor(Sensor):
 
-	def __init__(self, pin, name='SoilSensor', key=None, connection=default_connection):
-		super().__init__(pin, name=name, key=key, connection=connection)
+	def __init__(self, pin, name='SoilSensor', key=None, connection=default_connection, redis_conn=None):
+		super().__init__(pin, name=name, key=key, connection=connection, redis_conn=redis_conn)
 		return
 
 	def init_sensor(self):
@@ -40,11 +40,11 @@ class SoilSensor(Sensor):
 			moisture = 'Very Wet - ' + str(int(moistpercent))
 		#print("Resistance: %d" % resistance)
 		#TODO: Put redis store into sensor worker
-		variables.r.set(self.key, resistance) #TODO: CHANGE BACK TO 'moistpercent' (PERSONAL CONFIG)
+		self.r.set(self.key, resistance) #TODO: CHANGE BACK TO 'moistpercent' (PERSONAL CONFIG)
 		return resistance
 
 	def readRaw(self):
 			resistance = self.api.analogRead(self.pin)
 			#print("Resistance: %d" % resistance)
-			variables.r.set(self.key+'_raw', resistance)
+			self.r.set(self.key+'_raw', resistance)
 			return resistance

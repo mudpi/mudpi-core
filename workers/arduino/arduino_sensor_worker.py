@@ -16,7 +16,6 @@ from sensors.arduino.temperature_sensor import (TemperatureSensor)
 import sys
 sys.path.append('..')
 
-import variables
 import importlib
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
@@ -97,7 +96,7 @@ class ArduinoSensorWorker(Worker):
 								
 							print("Node Readings: ", readings)
 							message['data'] = readings
-							variables.r.publish(self.topic, json.dumps(message))
+							self.r.publish(self.topic, json.dumps(message))
 						except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
 							print('\033[1;36m{name}\033[0;0m -> \033[1;33mSensors Timeout!\033[0;0m'.format(**self.config))
 							self.sensors = []

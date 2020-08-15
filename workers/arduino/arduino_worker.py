@@ -13,7 +13,6 @@ from .worker import Worker
 import sys
 sys.path.append('..')
 
-import variables
 import importlib
 
 #r = redis.Redis(host='127.0.0.1', port=6379)

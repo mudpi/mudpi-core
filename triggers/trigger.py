@@ -4,7 +4,6 @@ import redis
 import threading
 import sys
 sys.path.append('..')
-import variables
 
 class Trigger():
 

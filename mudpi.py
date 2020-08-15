@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import threading
 import datetime
 import socket
+import redis
 import time
 import json
 import sys
@@ -48,6 +49,11 @@ nodes = []
 print(chr(27) + "[2J")
 print('Loading MudPi Configs...\r', end="", flush=True)
 CONFIGS = loadConfigJson()
+# Singleton redis to prevent connection conflicts
+try:
+	r = redis.Redis(host=CONFIGS['redis'].get('host', '127.0.0.1'), port=int(CONFIGS['redis'].get('port', 6379)))
+except KeyError:
+	r = redis.Redis(host='127.0.0.1', port=6379)
 # Waiting for redis and services to be running
 time.sleep(5) 
 print('Loading MudPi Configs...\t\033[1;32m Complete\033[0;0m')                       
@@ -64,7 +70,7 @@ print('_________________________________________________')
 print('')
 print('Eric Davisson @theDavisson')
 print('https://mudpi.app')
-print('Version: ', CONFIGS.get('version', '0.8.14'))
+print('Version: ', CONFIGS.get('version', '0.9.0'))
 print('\033[0;0m')
 
 if CONFIGS['debug'] is True:
@@ -97,6 +103,7 @@ try:
 
 	# Worker for Camera
 	try:
+		CONFIGS["camera"]["redis"] = r
 		c = CameraWorker(CONFIGS['camera'], main_thread_running, system_ready, camera_available)
 		print('MudPi Camera...\t\t\t\033[1;32m Initializing\033[0;0m')
 		workers.append(c)
@@ -108,6 +115,7 @@ try:
 	try:
 		for worker in CONFIGS['workers']:
 			# Create worker for worker
+			worker["redis"] = r
 			if worker['type'] == "sensor":
 				pw = PiSensorWorker(worker, main_thread_running, system_ready)
 				print('MudPi Sensors...\t\t\t\033[1;32m Initializing\033[0;0m')
@@ -119,6 +127,7 @@ try:
 				print('MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 			elif worker['type'] == "lcd":
 				for lcd in worker['lcds']:
+					lcd["redis"] = r
 					pw = LcdWorker(lcd, main_thread_running, system_ready, lcd_available)
 					lcd_available.set()
 					print('MudPi LCD Displays...\t\t\t\033[1;32m Initializing\033[0;0m')
@@ -135,13 +144,14 @@ try:
 	# Worker for relays attached to pi
 	try:
 		for relay in CONFIGS['relays']:
+			relay["redis"] = r
 			relayState = {
 				"available": threading.Event(), # Event to allow relay to activate
 				"active": threading.Event() 	# Event to signal relay to open/close
 			}
 			relayEvents[relay.get("key", relay_index)] = relayState
-			r = RelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'])
-			workers.append(r)
+			rw = RelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'])
+			workers.append(rw)
 			# Make the relays available, this event is toggled off elsewhere if we need to disable relays
 			relayState['available'].set()
 			relay_index +=1
@@ -152,6 +162,7 @@ try:
 	try:
 		for action in CONFIGS["actions"]:
 			print('MudPi Actions...\t\t\t\033[1;32m Initializing\033[0;0m')
+			action["redis"] = r
 			a = Action(action)
 			a.init_action()
 			actions[a.key] = a
@@ -160,6 +171,7 @@ try:
 
 	# Worker for Triggers
 	try:
+		CONFIGS["triggers"]["redis"] = r
 		t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
 		print('MudPi Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
 		workers.append(t)
@@ -170,6 +182,7 @@ try:
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others (esp32 with custom nanpy fork)
 	try:
 		for node in CONFIGS['nodes']:
+			node["redis"] = r
 			if node['type'] == "arduino":
 				if NANPY_ENABLED:
 					print('MudPi Arduino Workers...\t\t\033[1;32m Initializing\033[0;0m')
@@ -215,9 +228,9 @@ try:
 	print('MudPi Garden Control...\t\t\t\033[1;32m Online\033[0;0m')
 	print('_________________________________________________')
 	system_ready.set() #Workers will not process until system is ready
-	variables.r.set('started_at', str(datetime.datetime.now())) #Store current time to track uptime
+	r.set('started_at', str(datetime.datetime.now())) #Store current time to track uptime
 	system_message = {'event':'SystemStarted', 'data':1}
-	variables.r.publish('mudpi', json.dumps(system_message))
+	r.publish('mudpi', json.dumps(system_message))
 	
 	# Hold the program here until its time to graceful shutdown
 	while PROGRAM_RUNNING:

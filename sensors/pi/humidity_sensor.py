@@ -7,15 +7,13 @@ import Adafruit_DHT
 import sys
 sys.path.append('..')
 
-import variables
-
 #r = redis.Redis(host='127.0.0.1', port=6379)
 #PIN MODE : OUT | IN
 
 class HumiditySensor(Sensor):
 
-	def __init__(self, pin, name='HumdityTempSensor', key=None, model='11'):
-		super().__init__(pin, name=name, key=key)
+	def __init__(self, pin, name='HumdityTempSensor', key=None, model='11', redis_conn=None):
+		super().__init__(pin, name=name, key=key, redis_conn=redis_conn)
 		self.type = model
 		return
 
@@ -37,10 +35,10 @@ class HumiditySensor(Sensor):
 		humidity, temperature = Adafruit_DHT.read_retry(self.sensor, self.pin)
 		
 		if humidity is not None and temperature is not None:
-			variables.r.set(self.key + '_temperature', round(temperature * 1.8 + 32, 2))
-			variables.r.set(self.key + '_humidity', humidity)
+			self.r.set(self.key + '_temperature', round(temperature * 1.8 + 32, 2))
+			self.r.set(self.key + '_humidity', humidity)
 			readings = {'temperature': round(temperature * 1.8 + 32, 2), 'humidity': round(humidity, 2)}
-			variables.r.set(self.key, json.dumps(readings))
+			self.r.set(self.key, json.dumps(readings))
 			return readings
 		else:
 			print('Failed to get DHT reading. Try again!')
