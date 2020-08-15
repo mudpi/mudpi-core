@@ -103,101 +103,107 @@ try:
 
 	# Worker for Camera
 	try:
-		CONFIGS["camera"]["redis"] = r
-		c = CameraWorker(CONFIGS['camera'], main_thread_running, system_ready, camera_available)
-		print('MudPi Camera...\t\t\t\033[1;32m Initializing\033[0;0m')
-		workers.append(c)
-		camera_available.set()
+		if len(CONFIGS["camera"]) > 0:
+			CONFIGS["camera"]["redis"] = r
+			c = CameraWorker(CONFIGS['camera'], main_thread_running, system_ready, camera_available)
+			print('MudPi Camera...\t\t\t\033[1;32m Initializing\033[0;0m')
+			workers.append(c)
+			camera_available.set()
 	except KeyError:
 		print('MudPi Pi Camera...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Workers for pi (Sensors, Controls, Relays, I2C)
 	try:
-		for worker in CONFIGS['workers']:
-			# Create worker for worker
-			worker["redis"] = r
-			if worker['type'] == "sensor":
-				pw = PiSensorWorker(worker, main_thread_running, system_ready)
-				print('MudPi Sensors...\t\t\t\033[1;32m Initializing\033[0;0m')
-			elif worker['type'] == "control":
-				pw = PiControlWorker(worker, main_thread_running, system_ready)
-				print('MudPi Controls...\t\t\t\033[1;32m Initializing\033[0;0m')
-			elif worker['type'] == "i2c":
-				pw = PiI2CWorker(worker, main_thread_running, system_ready)
-				print('MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
-			elif worker['type'] == "lcd":
-				for lcd in worker['lcds']:
-					lcd["redis"] = r
-					pw = LcdWorker(lcd, main_thread_running, system_ready, lcd_available)
-					lcd_available.set()
-					print('MudPi LCD Displays...\t\t\t\033[1;32m Initializing\033[0;0m')
-			elif worker['type'] == "relay":
-				# Add Relay Worker Here for Better Config Control
-				print('MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')
-			else:
-				raise Exception("Unknown Worker Type: " + worker['type'])
-			workers.append(pw)
+		if len(CONFIGS["workers"]) > 0:
+			for worker in CONFIGS['workers']:
+				# Create worker for worker
+				worker["redis"] = r
+				if worker['type'] == "sensor":
+					pw = PiSensorWorker(worker, main_thread_running, system_ready)
+					print('MudPi Sensors...\t\t\t\033[1;32m Initializing\033[0;0m')
+				elif worker['type'] == "control":
+					pw = PiControlWorker(worker, main_thread_running, system_ready)
+					print('MudPi Controls...\t\t\t\033[1;32m Initializing\033[0;0m')
+				elif worker['type'] == "i2c":
+					pw = PiI2CWorker(worker, main_thread_running, system_ready)
+					print('MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
+				elif worker['type'] == "lcd":
+					for lcd in worker['lcds']:
+						lcd["redis"] = r
+						pw = LcdWorker(lcd, main_thread_running, system_ready, lcd_available)
+						lcd_available.set()
+						print('MudPi LCD Displays...\t\t\t\033[1;32m Initializing\033[0;0m')
+				elif worker['type'] == "relay":
+					# Add Relay Worker Here for Better Config Control
+					print('MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')
+				else:
+					raise Exception("Unknown Worker Type: " + worker['type'])
+				workers.append(pw)
 	except KeyError as e:
 		print('MudPi Pi Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
 		print(e)
 
 	# Worker for relays attached to pi
 	try:
-		for relay in CONFIGS['relays']:
-			relay["redis"] = r
-			relayState = {
-				"available": threading.Event(), # Event to allow relay to activate
-				"active": threading.Event() 	# Event to signal relay to open/close
-			}
-			relayEvents[relay.get("key", relay_index)] = relayState
-			rw = RelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'])
-			workers.append(rw)
-			# Make the relays available, this event is toggled off elsewhere if we need to disable relays
-			relayState['available'].set()
-			relay_index +=1
+		if len(CONFIGS["relays"]) > 0:
+			for relay in CONFIGS['relays']:
+				relay["redis"] = r
+				relayState = {
+					"available": threading.Event(), # Event to allow relay to activate
+					"active": threading.Event() 	# Event to signal relay to open/close
+				}
+				relayEvents[relay.get("key", relay_index)] = relayState
+				rw = RelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'])
+				workers.append(rw)
+				# Make the relays available, this event is toggled off elsewhere if we need to disable relays
+				relayState['available'].set()
+				relay_index +=1
 	except KeyError:
 		print('MudPi Relays Workers...\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Load in Actions
 	try:
-		for action in CONFIGS["actions"]:
-			print('MudPi Actions...\t\t\t\033[1;32m Initializing\033[0;0m')
-			action["redis"] = r
-			a = Action(action)
-			a.init_action()
-			actions[a.key] = a
+		if len(CONFIGS["actions"]) > 0:
+			for action in CONFIGS["actions"]:
+				print('MudPi Actions...\t\t\t\033[1;32m Initializing\033[0;0m')
+				action["redis"] = r
+				a = Action(action)
+				a.init_action()
+				actions[a.key] = a
 	except KeyError:
 		print('MudPi Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Worker for Triggers
-	try:
-		CONFIGS["triggers"]["redis"] = r
-		t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
-		print('MudPi Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
-		workers.append(t)
+	try: 
+		if len(CONFIGS["triggers"]) > 0:
+			CONFIGS["triggers"]["redis"] = r
+			t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
+			print('MudPi Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
+			workers.append(t)
 	except KeyError:
 		print('MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Worker for nodes attached to pi via serial or wifi[esp8266, esp32]
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others (esp32 with custom nanpy fork)
 	try:
-		for node in CONFIGS['nodes']:
-			node["redis"] = r
-			if node['type'] == "arduino":
-				if NANPY_ENABLED:
-					print('MudPi Arduino Workers...\t\t\033[1;32m Initializing\033[0;0m')
-					t = ArduinoWorker(node, main_thread_running, system_ready)
+		if len(CONFIGS["nodes"]) > 0:
+			for node in CONFIGS['nodes']:
+				node["redis"] = r
+				if node['type'] == "arduino":
+					if NANPY_ENABLED:
+						print('MudPi Arduino Workers...\t\t\033[1;32m Initializing\033[0;0m')
+						t = ArduinoWorker(node, main_thread_running, system_ready)
+					else:
+						print('Error Loading Nanpy library. Did you pip3 install -r requirements.txt?')
+				elif node['type'] == "ADC-MCP3008":
+					if MCP_ENABLED:
+						print('MudPi ADC Workers...\t\t\033[1;32m Initializing\033[0;0m')
+						t = ADCMCP3008Worker(node, main_thread_running, system_ready)
+					else:
+						print('Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt;?')
 				else:
-					print('Error Loading Nanpy library. Did you pip3 install -r requirements.txt?')
-			elif node['type'] == "ADC-MCP3008":
-				if MCP_ENABLED:
-					print('MudPi ADC Workers...\t\t\033[1;32m Initializing\033[0;0m')
-					t = ADCMCP3008Worker(node, main_thread_running, system_ready)
-				else:
-					print('Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt;?')
-			else:
-				raise Exception("Unknown Node Type: " + node['type'])
-			nodes.append(t)
+					raise Exception("Unknown Node Type: " + node['type'])
+				nodes.append(t)
 	except KeyError as e:
 		print('MudPi Node Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
