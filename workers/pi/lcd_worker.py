@@ -31,10 +31,6 @@ class LcdWorker(Worker):
 		except KeyError:
 			self.rows = 2
 		try:
-			self.address = int(self.config['address']) if self.config['address'] is not None else None
-		except KeyError:
-			self.address = None
-		try:
 			self.default_duration = int(self.config['default_duration']) if self.config['default_duration'] is not None else 5
 		except KeyError:
 			self.default_duration = 5
