@@ -1,13 +1,6 @@
 import logging
 import sys
 
-config = {
-    "logging": {
-        "file_log_level": "debug",
-        "terminal_log_level": "info",
-        "file": "some/path/to/logFile"
-    }
-}  # Example Config  # TODO remove
 
 LOG_LEVEL = {
     "unknown": logging.NOTSET,
