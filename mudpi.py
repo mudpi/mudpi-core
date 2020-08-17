@@ -10,7 +10,7 @@ sys.path.append('..')
 from action import Action
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
-#from workers.pi.lcd_worker import LcdWorker  # TODO only import this if LCD is required/available, causes crash otherwise
+from workers.pi.lcd_worker import LcdWorker
 from workers.pi.i2c_worker import PiI2CWorker	
 from workers.pi.relay_worker import RelayWorker
 from workers.pi.camera_worker import CameraWorker
