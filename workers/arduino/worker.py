@@ -6,6 +6,8 @@ import threading
 import sys
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 # Base Worker Class
 # A worker is responsible for handling its set of operations and running on a thread
 class Worker():
@@ -41,7 +43,7 @@ class Worker():
 			if self.system_ready.is_set():
 				time.sleep(self.sleep_duration)
 		#This is only ran after the main thread is shut down
-		print("Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
+		Logger.log(LOG_LEVEL["info"], "Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
 
 	def dynamic_import(self, name):
 		# Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor

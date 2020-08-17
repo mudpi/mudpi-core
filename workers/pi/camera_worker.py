@@ -10,6 +10,8 @@ from picamera import PiCamera
 from .worker import Worker
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 
 class CameraWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, camera_available):
@@ -53,7 +55,7 @@ class CameraWorker(Worker):
 		self.pubsub = self.r.pubsub()
 		self.pubsub.subscribe(**{self.topic: self.handleEvent})
 
-		print('Camera Worker...\t\t\t\033[1;32m Ready\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Camera Worker...\t\t\t\033[1;32m Ready\033[0;0m')
 		return
 
 	def run(self): 
@@ -61,7 +63,7 @@ class CameraWorker(Worker):
 		t.start()
 		self.listener = threading.Thread(target=self.listen, args=())
 		self.listener.start()
-		print('Camera Worker...\t\t\t\033[1;32m Online\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Camera Worker...\t\t\t\033[1;32m Online\033[0;0m')
 		return t
 
 	def wait(self):
@@ -85,11 +87,11 @@ class CameraWorker(Worker):
 					temp = json.loads(data.decode('utf-8'))
 					decoded_message = temp
 					if decoded_message['event'] == 'Timelapse':
-						print("Camera Signaled for Reset")
+						Logger.log(LOG_LEVEL["info"], "Camera Signaled for Reset")
 						self.camera_available.clear()
 						self.pending_reset = True
 			except:
-				print('Error Handling Event for Camera')
+				Logger.log(LOG_LEVEL["error"], 'Error Handling Event for Camera')
 
 	def listen(self):
 		while self.main_thread_running.is_set():
@@ -118,12 +120,12 @@ class CameraWorker(Worker):
 									os.remove(filename) #cleanup previous file
 									self.pending_reset = False
 								except:
-									print("Error During Camera Reset Cleanup")
+									Logger.log(LOG_LEVEL["error"], "Error During Camera Reset Cleanup")
 							break;
 						message = {'event':'StateChanged', 'data':filename}
 						self.r.set('last_camera_image', filename)
 						self.r.publish(self.topic, json.dumps(message))
-						print('Image Captured \033[1;36m%s\033[0;0m' % filename)
+						Logger.log(LOG_LEVEL["debug"], 'Image Captured \033[1;36m%s\033[0;0m' % filename)
 						self.wait()
 					# except:
 					# 	print("Camera Worker \t\033[1;31m Unexpected Error\033[0;0m")
@@ -142,4 +144,4 @@ class CameraWorker(Worker):
 		self.camera.close()
 		self.listener.join()
 		self.pubsub.close()
-		print("Camera Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")
+		Logger.log(LOG_LEVEL["info"], "Camera Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")

@@ -7,6 +7,8 @@ import Adafruit_DHT
 import sys
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 #r = redis.Redis(host='127.0.0.1', port=6379)
 #PIN MODE : OUT | IN
 
@@ -25,7 +27,7 @@ class HumiditySensor(Sensor):
 		if self.type in sensor_types:
 			self.sensor = sensor_types[self.type]
 		else:
-			print('Sensor Model Error: Defaulting to DHT11')
+			Logger.log(LOG_LEVEL["warning"], 'Sensor Model Error: Defaulting to DHT11')
 			self.sensor = Adafruit_DHT.DHT11
 		return
 
@@ -41,7 +43,7 @@ class HumiditySensor(Sensor):
 			self.r.set(self.key, json.dumps(readings))
 			return readings
 		else:
-			print('Failed to get DHT reading. Try again!')
+			Logger.log(LOG_LEVEL["error"], 'Failed to get DHT reading. Try again!')
 
 
 	def readRaw(self):

@@ -12,6 +12,7 @@ sys.path.append('..')
 
 import variables
 import importlib
+from logger.Logger import Logger, LOG_LEVEL
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
 
@@ -83,7 +84,7 @@ class ArduinoControlWorker(Worker):
 								result = control.read()
 								readings[control.key] = result
 						except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
-							print('\033[1;36m{name}\033[0;0m -> \033[1;33mControls Timeout!\033[0;0m'.format(**self.config))
+							Logger.log(LOG_LEVEL["warning"], '\033[1;36m{name}\033[0;0m -> \033[1;33mControls Timeout!\033[0;0m'.format(**self.config))
 							self.controls_ready = False
 							self.controls = []
 							self.node_connected.clear()
@@ -99,4 +100,4 @@ class ArduinoControlWorker(Worker):
 			#Will this nuke the connection?	
 			time.sleep(0.05)
 		#This is only ran after the main thread is shut down
-		print("{name} Controls Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		Logger.log(LOG_LEVEL["info"], "{name} Controls Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))

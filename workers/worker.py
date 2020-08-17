@@ -7,6 +7,7 @@ import sys
 sys.path.append('..')
 
 import variables
+from logger.Logger import Logger, LOG_LEVEL
 
 def log(func):
 	def wrapper(*args, **kwargs):
@@ -41,7 +42,7 @@ class Worker():
 			if self.system_ready.is_set():
 				time.sleep(self.sleep_duration)
 		#This is only ran after the main thread is shut down
-		print("Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
+		Logger.log(LOG_LEVEL["info"], "Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
 
 	def elapsedTime(self):
 		self.time_elapsed = time.perf_counter() - self.time_start

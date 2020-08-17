@@ -8,6 +8,8 @@ import RPi.GPIO as GPIO
 from .worker import Worker
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 class RelayWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, relay_available, relay_active):
 		super().__init__(config, main_thread_running, system_ready)
@@ -40,14 +42,14 @@ class RelayWorker(Worker):
 		if(self.config.get('restore_last_known_state', None) is not None and self.config.get('restore_last_known_state', False) is True):
 			if(self.r.get(self.config['key']+'_state')):
 				GPIO.output(self.config['pin'], self.pin_state_on)
-				print('Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.config['key']))
+				Logger.log(LOG_LEVEL["info"], 'Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.config['key']))
 
 
-		print('Relay Worker {key}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**self.config))
+		Logger.log(LOG_LEVEL["info"], 'Relay Worker {key}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**self.config))
 		return
 
 	def run(self): 
-		print('Relay Worker {key}...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
+		Logger.log(LOG_LEVEL["info"], 'Relay Worker {key}...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
 		return super().run()
 
 	def handleMessage(self, message):
@@ -60,16 +62,16 @@ class RelayWorker(Worker):
 						self.relay_active.set()
 					elif decoded_message.get('data', None) == 0:
 						self.relay_active.clear()
-					print('Switch Relay \033[1;36m{0}\033[0;0m state to \033[1;36m{1}\033[0;0m'.format(self.config['key'], decoded_message['data']))
+					Logger.log(LOG_LEVEL["info"], 'Switch Relay \033[1;36m{0}\033[0;0m state to \033[1;36m{1}\033[0;0m'.format(self.config['key'], decoded_message['data']))
 				elif decoded_message['event'] == 'Toggle':
 					state = 'Off' if self.active else 'On'
 					if self.relay_active.is_set():
 						self.relay_active.clear()
 					else:
 						self.relay_active.set()
-					print('Toggle Relay \033[1;36m{0} {1} \033[0;0m'.format(self.config['key'], state))
+					Logger.log(LOG_LEVEL["info"], 'Toggle Relay \033[1;36m{0} {1} \033[0;0m'.format(self.config['key'], state))
 			except:
-				print('Error Decoding Message for Relay {0}'.format(self.config['key']))
+				Logger.log(LOG_LEVEL["error"], 'Error Decoding Message for Relay {0}'.format(self.config['key']))
 	
 	def turnOn(self):
 		#Turn on relay if its available
@@ -111,7 +113,7 @@ class RelayWorker(Worker):
 						self.turnOff()
 						time.sleep(1)
 				except:
-					print("Relay Worker \033[1;36m{key}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
+					Logger.log(LOG_LEVEL["error"], "Relay Worker \033[1;36m{key}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
 
 			else:
 				#System not ready relay should be off
@@ -124,4 +126,4 @@ class RelayWorker(Worker):
 		#This is only ran after the main thread is shut down
 		#Close the pubsub connection
 		self.pubsub.close()
-		print("Relay Worker {key} Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		Logger.log(LOG_LEVEL["info"], "Relay Worker {key} Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))

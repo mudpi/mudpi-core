@@ -5,6 +5,8 @@ import redis
 from .sensor import Sensor
 from nanpy import (DallasTemperature, SerialManager)
 import sys
+
+from logger.Logger import Logger, LOG_LEVEL
 sys.path.append('..')
 
 import variables
@@ -22,13 +24,13 @@ class TemperatureSensor(Sensor):
 		self.sensors = DallasTemperature(self.pin, connection=self.connection)
 		self.sensor_bus = self.sensors.getDeviceCount()
 		# read data using pin specified pin
-		print("There are",self.sensor_bus, "devices connected on pin ", self.sensors.pin)
+		Logger.log(LOG_LEVEL["debug"], "There are",self.sensor_bus, "devices connected on pin ", self.sensors.pin)
 		self.addresses = []
 
 		for i in range(self.sensor_bus):
 			self.addresses.append(self.sensors.getAddress(i))
 
-		print("There addresses", self.addresses)
+		Logger.log(LOG_LEVEL["debug"], "Their addresses", self.addresses)
 		#I guess this is something with bit rates? TODO: Look this up
 		self.sensors.setResolution(10)
 
