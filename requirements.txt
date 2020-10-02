@@ -6,3 +6,4 @@ adafruit-circuitpython-mcp3xxx
 adafruit-blinka
 adafruit-circuitpython-bme680
 https://github.com/olixr/nanpy/archive/master.zip
+git+ssh://git@github.com:Tim-Jackins/Adafruit_CircuitPython_CharLCD.git#egg=adafruit-circuitpython-charlcd
