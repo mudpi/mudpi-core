@@ -36,7 +36,7 @@ class LcdWorker(Worker):
 			self.default_duration = 5
 			
 		self.current_message = ""
-		self.cached_message = {'message':'', duration: self.default_duration}
+		self.cached_message = {'message':'', 'duration': self.default_duration}
 		self.need_new_message = True
 		self.message_queue = []
 
