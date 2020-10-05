@@ -69,8 +69,14 @@ class LcdWorker(Worker):
 				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 		else:
 			self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
+			
+		self.lcd.backlight = True
+		time.sleep(1)
 		self.lcd.clear()
+		time.sleep(2)
 		self.lcd.message = "MudPi\nGarden Online"
+		time.sleep(2)
+		self.lcd.clear()
 		return
 
 	def run(self): 
@@ -85,7 +91,7 @@ class LcdWorker(Worker):
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
 						self.addMessageToQueue(decoded_message['data'].get('message', ''), int(decoded_message['data'].get('duration', self.default_duration)))
-						print('LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data']))
+						print('LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data'].replace("\\n", "\n")))
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
 					print('Cleared the LCD Screen')
@@ -100,7 +106,7 @@ class LcdWorker(Worker):
 		if self.lcd_available.is_set():
 
 			new_message = {
-				"message": message,
+				"message": message.replace("\\n", "\n"),
 				"duration": duration
 			}
 			self.message_queue.append(new_message)
