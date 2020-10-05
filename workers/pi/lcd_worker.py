@@ -36,7 +36,7 @@ class LcdWorker(Worker):
 			self.default_duration = 5
 			
 		self.current_message = ""
-		self.cached_message = {'message':''}
+		self.cached_message = {'message':'', duration: self.default_duration}
 		self.need_new_message = True
 		self.message_queue = []
 
@@ -69,11 +69,9 @@ class LcdWorker(Worker):
 				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 		else:
 			self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
-			
+
 		self.lcd.backlight = True
-		time.sleep(1)
 		self.lcd.clear()
-		time.sleep(2)
 		self.lcd.message = "MudPi\nGarden Online"
 		time.sleep(2)
 		self.lcd.clear()
@@ -135,6 +133,7 @@ class LcdWorker(Worker):
 						if self.cached_message and not self.need_new_message:
 							if self.current_message != self.cached_message['message']:
 								self.lcd.clear()
+								time.sleep(0.01)
 								self.lcd.message = self.cached_message['message']
 								self.current_message = self.cached_message['message'] # store message to only display once and prevent flickers
 							if self.elapsedTime() > self.cached_message['duration'] + 1:
