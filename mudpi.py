@@ -176,7 +176,8 @@ try:
 	# Worker for Triggers
 	try: 
 		if len(CONFIGS["triggers"]) > 0:
-			CONFIGS["triggers"]["redis"] = r
+			for trigger in CONFIGS["triggers"]:
+				trigger["redis"] = r
 			t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
 			print('MudPi Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
 			workers.append(t)
@@ -219,7 +220,7 @@ try:
 		print('MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	print('MudPi Garden Controls...\t\t\033[1;32m Initialized\033[0;0m')
-	
+
 	print('Engaging MudPi Workers...\t\t\033[1;32m \033[0;0m')
 	for worker in workers:
 		t = worker.run()
