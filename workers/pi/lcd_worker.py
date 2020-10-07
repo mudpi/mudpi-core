@@ -109,6 +109,11 @@ class LcdWorker(Worker):
 				data = self.r.get(code)
 				if data is None:
 					data = ''
+				else:
+					try:
+						data = data.decode('utf-8')
+					except:
+						data = ''
 				message = message.replace('['+code+']', str(data))
 
 			new_message = {
