@@ -7,6 +7,7 @@ from .worker import Worker
 import sys
 sys.path.append('..')
 from triggers.trigger_group import TriggerGroup
+from triggers.sensor_trigger import SensorTrigger
 
 import variables
 import importlib
