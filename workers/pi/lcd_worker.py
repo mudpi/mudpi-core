@@ -109,7 +109,7 @@ class LcdWorker(Worker):
 				data = self.r.get(code)
 				if data is None:
 					data = ''
-				message.replace('['+code+']', str(data))
+				message = message.replace('['+code+']', str(data))
 
 			new_message = {
 				"message": message.replace("\\n", "\n"),
