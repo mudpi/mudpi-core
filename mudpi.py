@@ -31,7 +31,7 @@ import variables
 
 ##############################
 #	MudPi Core 
-#	Author: Eric Davisson (@theDavisson)
+#	Author: Eric Davisson (@theDavisson) [EricDavisson.com]
 #	https://mudpi.app
 #	MudPi Core is a python library to gather sensor readings, control components, 
 #	and manage devices using a Raspberry Pi on an event based system using redis. 
@@ -218,8 +218,8 @@ try:
 	except KeyError:
 		print('MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
 
-
 	print('MudPi Garden Controls...\t\t\033[1;32m Initialized\033[0;0m')
+	
 	print('Engaging MudPi Workers...\t\t\033[1;32m \033[0;0m')
 	for worker in workers:
 		t = worker.run()
@@ -233,8 +233,9 @@ try:
 	time.sleep(.5)
 	print('MudPi Garden Control...\t\t\t\033[1;32m Online\033[0;0m')
 	print('_________________________________________________')
-	system_ready.set() #Workers will not process until system is ready
-	r.set('started_at', str(datetime.datetime.now())) #Store current time to track uptime
+	system_ready.set() # Workers will not process until system is ready
+
+	r.set('started_at', str(datetime.datetime.now()))
 	system_message = {'event':'SystemStarted', 'data':1}
 	r.publish('mudpi', json.dumps(system_message))
 	

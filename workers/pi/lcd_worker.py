@@ -1,15 +1,14 @@
+import re
 import time
-import datetime
 import json
 import redis
-import threading
 import board
 import busio
+import datetime
+import threading
 import adafruit_character_lcd.character_lcd_rgb_i2c as character_rgb_lcd
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 from .worker import Worker
-import sys
-sys.path.append('..')
 
 class LcdWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, lcd_available):
@@ -103,6 +102,15 @@ class LcdWorker(Worker):
 		#Add message to queue if LCD available
 		if self.lcd_available.is_set():
 
+			# Replace any codes such as [temperature] with a value found in redis
+			short_codes = re.findall(r'\[(.*?) *\]', message)
+
+			for code in short_codes:
+				data = self.r.get(code)
+				if data is None:
+					data = ''
+				message.replace('['+code+']', data)
+
 			new_message = {
 				"message": message.replace("\\n", "\n"),
 				"duration": duration
@@ -119,6 +127,7 @@ class LcdWorker(Worker):
 			self.resetElapsedTime()
 			return self.message_queue.pop(0)
 		else:
+			time.sleep(3) # pause to reduce system load on message loop
 			return None
 
 	def work(self):
@@ -148,7 +157,7 @@ class LcdWorker(Worker):
 					print("LCD Worker \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
 					print(e)
 			else:
-				#System not ready
+				# System not ready
 				time.sleep(1)
 				self.resetElapsedTime()
 				
