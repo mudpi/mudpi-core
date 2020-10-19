@@ -38,7 +38,7 @@ class LcdWorker(Worker):
 			self.default_duration = 5
 			
 		self.current_message = ""
-		self.cached_message = {'message':''}
+		self.cached_message = {'message':'', 'duration': self.default_duration}
 		self.need_new_message = True
 		self.message_queue = []
 
@@ -71,8 +71,12 @@ class LcdWorker(Worker):
 				self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
 		else:
 			self.lcd = character_lcd.Character_LCD_I2C(self.i2c, self.columns, self.rows, self.address)
+
+		self.lcd.backlight = True
 		self.lcd.clear()
 		self.lcd.message = "MudPi\nGarden Online"
+		time.sleep(2)
+		self.lcd.clear()
 		return
 
 	def run(self): 
@@ -87,7 +91,8 @@ class LcdWorker(Worker):
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
 						self.addMessageToQueue(decoded_message['data'].get('message', ''), int(decoded_message['data'].get('duration', self.default_duration)))
-						Logger.log(LOG_LEVEL["debug"], 'LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data']))
+						Logger.log(LOG_LEVEL["debug"], 'LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data'].get('message', '').replace("\\n", "\n")))
+
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
 					Logger.log(LOG_LEVEL["debug"], 'Cleared the LCD Screen')
@@ -102,7 +107,7 @@ class LcdWorker(Worker):
 		if self.lcd_available.is_set():
 
 			new_message = {
-				"message": message,
+				"message": message.replace("\\n", "\n"),
 				"duration": duration
 			}
 			self.message_queue.append(new_message)
@@ -131,6 +136,7 @@ class LcdWorker(Worker):
 						if self.cached_message and not self.need_new_message:
 							if self.current_message != self.cached_message['message']:
 								self.lcd.clear()
+								time.sleep(0.01)
 								self.lcd.message = self.cached_message['message']
 								self.current_message = self.cached_message['message'] # store message to only display once and prevent flickers
 							if self.elapsedTime() > self.cached_message['duration'] + 1:
