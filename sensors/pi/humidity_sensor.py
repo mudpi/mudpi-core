@@ -12,7 +12,7 @@ sys.path.append('..')
 
 class HumiditySensor(Sensor):
 
-	def __init__(self, pin, name='HumdityTempSensor', key=None, model='11', redis_conn=None):
+	def __init__(self, pin, name=None, key=None, model='11', redis_conn=None):
 		super().__init__(pin, name=name, key=key, redis_conn=redis_conn)
 		self.type = model
 		return
@@ -42,6 +42,7 @@ class HumiditySensor(Sensor):
 			return readings
 		else:
 			print('Failed to get DHT reading. Try again!')
+			return None
 
 
 	def readRaw(self):

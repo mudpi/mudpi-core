@@ -9,10 +9,19 @@ import RPi.GPIO as GPIO
 
 class Sensor():
 
-	def __init__(self, address, name='Sensor', key=None, redis_conn=None):
+	def __init__(self, address, name=None, key=None, redis_conn=None):
 		self.address = address
-		self.name = name
-		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
+
+		if key is None:
+			raise Exception('No "key" Found in I2C Sensor Config')
+		else:
+			self.key = key.replace(" ", "_").lower()
+
+		if name is None:
+			self.name = self.key.replace("_", " ").title()
+		else:
+			self.name = name
+
 		self.gpio = GPIO
 		self.i2c = I2C(board.SCL, board.SDA)
 		try:

@@ -9,9 +9,9 @@ r = redis.Redis(host='127.0.0.1', port=6379)
 
 class ButtonControl(Control):
 
-	def __init__(self, pin, name='ButtonControl', key=None, resistor=None, edge_detection=None, debounce=None, topic=None, redis_conn=None):
+	def __init__(self, pin, name=None, key=None, resistor=None, edge_detection=None, debounce=None, topic=None, redis_conn=None):
 		super().__init__(pin, name=name, key=key, resistor=resistor, edge_detection=edge_detection, debounce=debounce, redis_conn=redis_conn)
-		self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/relay/'
+		self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/controls/'+self.key
 		return
 
 	def init_control(self):

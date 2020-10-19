@@ -51,11 +51,11 @@ class ArduinoWorker(Worker):
 						"available": threading.Event(), #Event to allow relay to activate
 						"active": threading.Event() #Event to signal relay to open/close
 					}
-					#Store the relays under the key or index if no key is found, this way we can reference the right relays
+					# Store the relays under the key or index if no key is found, this way we can reference the right relays
 					self.relayEvents[relay.get("key", self.relay_index)] = relayState
-					#Create sensor worker for a relay
+					# Create sensor worker for a relay
 					arw = ArduinoRelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'], self.node_connected, self.connection, self.api)
-					#Make the relays available, this event is toggled off elsewhere if we need to disable relays
+					# Make the relays available, this event is toggled off elsewhere if we need to disable relays
 					relayState['available'].set()
 					self.relay_index +=1
 					self.workers.append(arw)

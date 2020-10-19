@@ -8,10 +8,19 @@ sys.path.append('..')
 # Base sensor class to extend all other arduino sensors from.
 class Control():
 
-	def __init__(self, pin, name='Control',key=None, resistor=None, edge_detection=None, debounce=None, redis_conn=None):
+	def __init__(self, pin, name=None, key=None, resistor=None, edge_detection=None, debounce=None, redis_conn=None):
 		self.pin = pin
-		self.name = name
-		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
+
+		if key is None:
+			raise Exception('No "key" Found in Control Config')
+		else:
+			self.key = key.replace(" ", "_").lower()
+
+		if name is None:
+			self.name = self.key.replace("_", " ").title()
+		else:
+			self.name = name
+
 		self.gpio = GPIO
 		self.debounce = debounce if debounce is not None else None
 		try:

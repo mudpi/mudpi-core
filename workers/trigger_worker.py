@@ -41,14 +41,14 @@ class TriggerWorker(Worker):
 					new_trigger = self.init_trigger(trigger, trigger_index, group=new_trigger_group)
 					self.triggers.append(new_trigger)
 					new_trigger_group.add_trigger(new_trigger)
-					#Start the trigger thread
+					# Start the trigger thread
 					trigger_thread = new_trigger.run()
 					self.trigger_threads.append(trigger_thread)
 					trigger_index += 1
 			else:
 				new_trigger = self.init_trigger(trigger, trigger_index)
 				self.triggers.append(new_trigger)
-				#Start the trigger thread
+				# Start the trigger thread
 				trigger_thread = new_trigger.run()
 				self.trigger_threads.append(trigger_thread)
 				trigger_index += 1
@@ -57,20 +57,20 @@ class TriggerWorker(Worker):
 
 	def init_trigger(self, config, trigger_index, group=None):
 		if config.get('type', None) is not None:
-			#Get the trigger from the triggers folder {trigger name}_trigger.{SensorName}Sensor
+			# Get the trigger from the triggers folder triggers/{trigger type}_trigger.py
 			trigger_type = 'triggers.' + config.get('type').lower() + '_trigger.' + config.get('type').capitalize() + 'Trigger'
 
 			imported_trigger = self.dynamic_import(trigger_type)
 
 			trigger_state = {
-				"active": threading.Event() #Event to signal relay to open/close
+				"active": threading.Event() # Event to signal if trigger is active
 			}
 
 			self.trigger_events[config.get("key", trigger_index)] = trigger_state
 
 			# Define default kwargs for all trigger types, conditionally include optional variables below if they exist
 			trigger_kwargs = { 
-				'name' : config.get('name', config.get('type')),
+				'name' : config.get('name', None),
 				'key'  : config.get('key', None),
 				'trigger_active' : trigger_state["active"],
 				'main_thread_running' : self.main_thread_running,

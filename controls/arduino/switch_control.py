@@ -10,9 +10,9 @@ r = redis.Redis(host='127.0.0.1', port=6379)
 
 class SwitchControl(Control):
 
-	def __init__(self, pin, name='SwitchControl', key=None, connection=default_connection, analog_pin_mode=False, topic=None, redis_conn=None):
+	def __init__(self, pin, name=None, key=None, connection=default_connection, analog_pin_mode=False, topic=None, redis_conn=None):
 		super().__init__(pin, name=name, key=key, connection=connection, analog_pin_mode=analog_pin_mode, redis_conn=redis_conn)
-		self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/relay/'
+		self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/controls/'+self.key
 		self.state_counter = 3
 		self.previous_state = 0
 		self.trigger_delay = 2

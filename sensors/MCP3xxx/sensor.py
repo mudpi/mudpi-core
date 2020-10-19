@@ -16,14 +16,21 @@ class Sensor:
         7: MCP.P7,
     }
 
-    def __init__(self, pin: int, mcp, name='Sensor', key=None, redis_conn=None):
+    def __init__(self, pin: int, mcp, name=None, key=None, redis_conn=None):
         self.pin = pin
         self.mcp = mcp
         self.topic = None
 
-        self.name = name
-        self.key = key.replace(" ", "_").lower() if key is not None else self.name\
-            .replace(" ", str(pin))
+        if key is None:
+            raise Exception('No "key" Found in Sensor Config')
+        else:
+            self.key = key.replace(" ", "_").lower()
+
+        if name is None:
+            self.name = self.key.replace("_", " ").title()
+        else:
+            self.name = name
+            
         try:
             self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
         except KeyError:

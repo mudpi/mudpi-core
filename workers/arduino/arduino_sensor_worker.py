@@ -49,7 +49,7 @@ class ArduinoSensorWorker(Worker):
 					
 					# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
 					sensor_kwargs = { 
-						'name' : sensor.get('name', sensor.get('type')),
+						'name' : sensor.get('name', None),
 						'pin' : int(sensor.get('pin')),
 						'connection': self.connection,
 						'key'  : sensor.get('key', None)

@@ -19,7 +19,7 @@ WaterBounds = 280;
 intervals = int((AirBounds - WaterBounds)/3);
 class SoilSensor(Sensor):
 
-	def __init__(self, pin, name='SoilSensor', key=None, connection=default_connection, redis_conn=None):
+	def __init__(self, pin, name=None, key=None, connection=default_connection, redis_conn=None):
 		super().__init__(pin, name=name, key=key, connection=connection, redis_conn=redis_conn)
 		return
 
