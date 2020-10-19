@@ -193,7 +193,7 @@ try:
 				sequenceState['available'].set()
 				sequence_index +=1
 			print('MudPi Sequences...\t\t\t\033[1;32m Initializing\033[0;0m')
-			workers.append(t)
+			workers.append(s)
 	except KeyError:
 		print('MudPi Sequences...\t\t\t\033[1;31m Disabled\033[0;0m')
 
