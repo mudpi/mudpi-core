@@ -184,4 +184,4 @@ class ArduinoWorker(Worker):
 		# Join all our sub threads for shutdown
 		for thread in self.threads:
 			thread.join()
-		Logger.log(LOG_LEVEL["info"], ("{name} Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		Logger.log(LOG_LEVEL["info"], ("{name} Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config)))
