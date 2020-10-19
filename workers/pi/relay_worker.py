@@ -60,7 +60,7 @@ class RelayWorker(Worker):
 		return
 
 	def run(self): 
-		Logger.log(LOG_LEVEL["info"], 'Relay Worker {key}...\t\t\t\033[1;32m Online\033[0;0m'.format(self.key))
+		Logger.log(LOG_LEVEL["info"], 'Relay Worker {0}...\t\t\t\033[1;32m Online\033[0;0m'.format(self.key))
 		return super().run()
 
 	def handleMessage(self, message):

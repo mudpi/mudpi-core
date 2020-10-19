@@ -51,7 +51,7 @@ class ArduinoRelayWorker(Worker):
 		return
 
 	def init(self):
-		Logger.log(LOG_LEVEL["info"], '{name} Relay Worker {key}...\t\t\033[1;32m Initializing\033[0;0m'.format(**self.config))
+		Logger.log(LOG_LEVEL["info"], '{name} Relay Worker {0}...\t\t\033[1;32m Initializing\033[0;0m'.format(self.key))
 		self.api = self.api if self.api is not None else ArduinoApi(connection)
 		self.pin_state_off = self.api.HIGH if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.LOW
 		self.pin_state_on = self.api.LOW if self.config['normally_open'] is not None and self.config['normally_open'] else self.api.HIGH
