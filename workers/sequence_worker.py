@@ -22,7 +22,7 @@ class SequenceWorker(Worker):
 		if self.config.get('name', None) is None:
 			self.name = self.key.replace("_", " ").title()
 		else:
-			self.name = name
+			self.name = self.config.get('name', '')
 
 		self.actions = actions
 		self.sequence = self.config['sequence'] if self.config['sequence'] is not None else [] 
