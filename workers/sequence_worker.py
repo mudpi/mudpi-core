@@ -79,6 +79,7 @@ class SequenceWorker(Worker):
 						"key": self.key
 					}
 				}))
+			print('Sequence {0} Started\033[0;0m'.format(self.name))
 
 	def next_step(self):
 		if self.step_complete:
@@ -88,7 +89,7 @@ class SequenceWorker(Worker):
 				if not self.step_triggered:
 					self.trigger()
 				# Sequence is already active, advance to next step
-				if self.current_step < self.total_steps:
+				if self.current_step < self.total_steps - 1:
 					self.reset_step()
 					self.current_step+=1
 					self.r.publish(self.topic, json.dumps({
@@ -211,7 +212,7 @@ class SequenceWorker(Worker):
 			time_remaining-=1
 
 	def run(self): 
-		print('Sequence Worker [' + str(len(self.sequence)) + ' Steps]...\t\t\033[1;32m Online\033[0;0m')
+		print('Sequence Worker [' + str(self.name) + ']...\t\t\033[1;32m Online\033[0;0m')
 		return super().run()
 
 	def work(self):
@@ -260,4 +261,4 @@ class SequenceWorker(Worker):
 		# This is only ran after the main thread is shut down
 		# Close the pubsub connection
 		self.pubsub.close()
-		print("Sequence Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")
+		print("Sequence Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
