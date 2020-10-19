@@ -81,6 +81,7 @@ class Logger:
             Logger.logger.log_this(log_level, msg)
 
     def log_this_file(self, log_level: int, msg: str):
+        msg = str(msg)
         msg = msg.replace("\x1b[1;32m", "")
         msg = msg.replace("\x1b[1;31m", "")
         msg = msg.replace("\x1b[0;0m", "")
