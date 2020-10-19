@@ -7,9 +7,16 @@ sys.path.append('..')
 
 class TriggerGroup():
 
-	def __init__(self, name='TriggerGroup', key=None, triggers=[], group_active=None, frequency='once', actions=[]):
-		self.name = name
-		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
+	def __init__(self, name='TriggerGroup', key=None, triggers=[], group_active=None, frequency='once', actions=[], sequences=[]):
+		if key is None:
+			raise Exception('No "key" Found in Trigger Group Config')
+		else:
+			self.key = key.replace(" ", "_").lower()
+
+		if name is None:
+			self.name = self.key.replace("_", " ").title()
+		else:
+			self.name = name
 		self.frequency = frequency
 		self.actions = actions
 		# Used to check if trigger already fired without reseting
@@ -43,10 +50,14 @@ class TriggerGroup():
 				if self.trigger_count == 1:
 					for action in self.actions:
 							action.trigger(value)
+					for sequence in self.sequences:
+							sequence.update(value)
 				else:
 					if self.frequency == 'many':
 						for action in self.actions:
 							action.trigger(value)
+						for sequence in self.sequences:
+								sequence.update(value)
 			else:
 				self.trigger_count = 0
 		except Exception as e:

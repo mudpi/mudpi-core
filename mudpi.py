@@ -17,6 +17,7 @@ from workers.pi.camera_worker import CameraWorker
 from workers.pi.sensor_worker import PiSensorWorker
 from workers.pi.control_worker import PiControlWorker
 from workers.trigger_worker import TriggerWorker
+from workers.sequence_worker import SequenceWorker
 try:
 	from workers.arduino.arduino_worker import ArduinoWorker
 	NANPY_ENABLED = True
@@ -40,9 +41,12 @@ CONFIGS = {}
 PROGRAM_RUNNING = True
 threads = []
 actions = {}
+sequences = {}
 relays = []
 relayEvents = {}
 relay_index = 0
+sequenceEvents = {}
+sequence_index = 0
 workers = []
 nodes = []
 
@@ -173,16 +177,37 @@ try:
 	except KeyError:
 		print('MudPi Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
 
+	# Worker for Sequences
+	try: 
+		if len(CONFIGS["sequences"]) > 0:
+			for sequence in CONFIGS["sequences"]:
+				sequence["redis"] = r
+				sequenceState = {
+					"available": threading.Event(), # Event to allow sequence to activate
+					"active": threading.Event() 	# Event to signal sequence to open/close
+				}
+				sequenceEvents[sequence.get("key", sequence_index)] = sequenceState
+				s = SequenceWorker(CONFIGS['sequences'], main_thread_running, system_ready, sequenceState['available'], sequenceState['active'], actions)
+				workers.append(s)
+				sequences[s.key] = s
+				sequenceState['available'].set()
+				sequence_index +=1
+			print('MudPi Sequences...\t\t\t\033[1;32m Initializing\033[0;0m')
+			workers.append(t)
+	except KeyError:
+		print('MudPi Sequences...\t\t\t\033[1;31m Disabled\033[0;0m')
+
 	# Worker for Triggers
 	try: 
 		if len(CONFIGS["triggers"]) > 0:
 			for trigger in CONFIGS["triggers"]:
 				trigger["redis"] = r
-			t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
+			t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions, sequences)
 			print('MudPi Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
 			workers.append(t)
 	except KeyError:
 		print('MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
+
 
 	# Worker for nodes attached to pi via serial or wifi[esp8266, esp32]
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others (esp32 with custom nanpy fork)

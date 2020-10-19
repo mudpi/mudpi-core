@@ -7,29 +7,39 @@ sys.path.append('..')
 
 class Trigger():
 
-	def __init__(self, main_thread_running, system_ready, name='Trigger',key=None, source=None, thresholds=None, trigger_active=None, frequency='once', actions=[], trigger_interval=1, group=None):
-		self.name = name
-		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
+	def __init__(self, main_thread_running, system_ready, name=None, key=None, source=None, thresholds=None, trigger_active=None, frequency='once', actions=[], trigger_interval=1, group=None, sequences=[]):
+		
+		if key is None:
+			raise Exception('No "key" Found in Trigger Config')
+		else:
+			self.key = key.replace(" ", "_").lower()
+
+		if name is None:
+			self.name = self.key.replace("_", " ").title()
+		else:
+			self.name = name
+
 		self.thresholds = thresholds
 		self.source = source.lower() if source is not None else source
 		self.trigger_interval = trigger_interval
 		self.actions = actions
+		self.sequences = sequences
 		self.group = group
 		self.frequency = frequency if group is None else "many"
 		# Used to check if trigger already fired without reseting
 		self.trigger_active = trigger_active
 		self.previous_state = trigger_active.is_set()
-		#Main thread events
+		# Main thread events
 		self.main_thread_running = main_thread_running
 		self.system_ready = system_ready
 		return
 
 	def init_trigger(self):
-		#Initialize the trigger here (i.e. set listeners or create cron jobs)
+		# Initialize the trigger here (i.e. set listeners or create cron jobs)
 		pass
 
 	def check(self):
-		#Main trigger check loop to do things like fetch messages or check time
+		# Main trigger check loop to do things like fetch messages or check time
 		if self.group is not None:
 			self.group.check_group()
 		return
@@ -45,6 +55,9 @@ class Trigger():
 				# Trigger the actions of the trigger
 				for action in self.actions:
 					action.trigger(value)
+				# Trigger the sequences of the trigger
+				for sequence in self.sequences:
+					sequence.update(value)
 			else:
 				self.group.trigger()
 		except Exception as e:
@@ -106,5 +119,5 @@ class Trigger():
 			return {'event':'Unknown', 'data':message}
 
 	def shutdown(self):
-		#Put any closing functions here that should be called as MudPi shutsdown (i.e. close connections)
+		# Put any closing functions here that should be called as MudPi shutsdown (i.e. close connections)
 		return
