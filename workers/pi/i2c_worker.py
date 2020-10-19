@@ -8,6 +8,8 @@ sys.path.append('..')
 from .worker import Worker
 from sensors.pi.i2c.bme680_sensor import (Bme680Sensor)
 
+from logger.Logger import Logger, LOG_LEVEL
+
 
 class PiI2CWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
@@ -50,7 +52,7 @@ class PiI2CWorker(Worker):
 		return
 
 	def run(self): 
-		print('Pi I2C Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\033[1;32m Online\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Pi I2C Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\033[1;32m Online\033[0;0m')
 		return super().run()
 
 	def work(self):
@@ -66,10 +68,10 @@ class PiI2CWorker(Worker):
 					self.r.set(sensor.key, json.dumps(result))
 				
 				message['data'] = readings
-				print(readings);
+				Logger.log(LOG_LEVEL["debug"], readings);
 				self.r.publish(self.topic, json.dumps(message))
 				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)
 		#This is only ran after the main thread is shut down
-		print("Pi I2C Sensor Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
+		Logger.log(LOG_LEVEL["info"], "Pi I2C Sensor Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")

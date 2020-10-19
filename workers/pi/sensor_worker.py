@@ -8,6 +8,7 @@ import sys
 sys.path.append('..')
 from sensors.pi.float_sensor import (FloatSensor)
 from sensors.pi.humidity_sensor import (HumiditySensor)
+from logger.Logger import Logger, LOG_LEVEL
 
 class PiSensorWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
@@ -54,7 +55,7 @@ class PiSensorWorker(Worker):
 		return
 
 	def run(self): 
-		print('Pi Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\t\033[1;32m Online\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Pi Sensor Worker [' + str(len(self.sensors)) + ' Sensors]...\t\t\033[1;32m Online\033[0;0m')
 		return super().run()
 
 	def work(self):
@@ -75,5 +76,6 @@ class PiSensorWorker(Worker):
 				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)
+
 		# This is only ran after the main thread is shut down
-		print("Pi Sensor Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
+		Logger.log(LOG_LEVEL["info"], "Pi Sensor Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")

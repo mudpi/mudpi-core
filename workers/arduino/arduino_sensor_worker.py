@@ -17,6 +17,7 @@ import sys
 sys.path.append('..')
 
 import importlib
+from logger.Logger import Logger, LOG_LEVEL
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
 
@@ -35,7 +36,7 @@ class ArduinoSensorWorker(Worker):
 		return
 
 	def init(self, connection=None):
-		print('{name} Sensor Worker...\t\t\033[1;32m Preparing\033[0;0m'.format(**self.config))
+		Logger.log(LOG_LEVEL["info"], '{name} Sensor Worker...\t\t\033[1;32m Preparing\033[0;0m'.format(**self.config))
 		try:
 			for sensor in self.config['sensors']:
 				if sensor.get('type', None) is not None:
@@ -78,7 +79,7 @@ class ArduinoSensorWorker(Worker):
 	def run(self):
 		t = threading.Thread(target=self.work, args=())
 		t.start()
-		print('Node {name} Sensor Worker...\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
+		Logger.log(LOG_LEVEL["info"], 'Node {name} Sensor Worker...\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
 		return t
 
 	def work(self):
@@ -94,11 +95,11 @@ class ArduinoSensorWorker(Worker):
 								readings[sensor.key] = result
 								#r.set(sensor.get('key', sensor.get('type')), value)
 								
-							print("Node Readings: ", readings)
+							Logger.log(LOG_LEVEL["debug"], "Node Readings: ", readings)
 							message['data'] = readings
 							self.r.publish(self.topic, json.dumps(message))
 						except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
-							print('\033[1;36m{name}\033[0;0m -> \033[1;33mSensors Timeout!\033[0;0m'.format(**self.config))
+							Logger.log(LOG_LEVEL["warning"], '\033[1;36m{name}\033[0;0m -> \033[1;33mSensors Timeout!\033[0;0m'.format(**self.config))
 							self.sensors = []
 							self.node_connected.clear()
 							time.sleep(15)
@@ -115,4 +116,4 @@ class ArduinoSensorWorker(Worker):
 			time.sleep(self.sleep_duration)
 
 		#This is only ran after the main thread is shut down
-		print("{name} Sensors Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		Logger.log(LOG_LEVEL["info"], "{name} Sensors Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))

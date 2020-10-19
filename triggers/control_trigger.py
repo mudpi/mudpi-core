@@ -5,6 +5,8 @@ import sys
 from .trigger import Trigger
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 class ControlTrigger(Trigger):
 
 	def __init__(self, main_thread_running, system_ready, name='ControlTrigger',key=None, source=None, thresholds=None, topic="controls", trigger_active=None, frequency='once', actions=[], group=None, redis_conn=None, sequences=[]):
@@ -51,7 +53,7 @@ class ControlTrigger(Trigger):
 					else:
 						self.trigger_active.clear()
 			except:
-				print('Error During Trigger Actions {0}'.format(self.key))
+				Logger.log(LOG_LEVEL["error"], 'Error During Trigger Actions {0}'.format(self.key))
 		self.previous_state = self.trigger_active.is_set()
 
 	def parseControlData(self, data):

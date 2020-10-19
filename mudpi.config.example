@@ -1,6 +1,11 @@
 {
     "name": "MudPi",
     "debug": false,
+    "logging": {
+        "file_log_level": "debug",
+        "terminal_log_level": "debug",
+        "file": "mudpi.log"
+    },
     "server": {
         "host": "127.0.0.1",
         "port": 6602

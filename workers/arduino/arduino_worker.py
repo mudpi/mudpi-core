@@ -14,6 +14,7 @@ import sys
 sys.path.append('..')
 
 import importlib
+from logger.Logger import Logger, LOG_LEVEL
 
 #r = redis.Redis(host='127.0.0.1', port=6379)
 
@@ -41,7 +42,7 @@ class ArduinoWorker(Worker):
 				self.workers.append(acw)
 				time.sleep(3)
 		except KeyError:
-			print('{name} Node Controls...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
+			Logger.log(LOG_LEVEL["info"], '{name} Node Controls...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
 
 		try:
 			if self.config['relays'] is not None:
@@ -61,7 +62,7 @@ class ArduinoWorker(Worker):
 					self.workers.append(arw)
 					time.sleep(3)
 		except KeyError:
-			print('{name} Node Relays...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
+			Logger.log(LOG_LEVEL["info"], '{name} Node Relays...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
 
 		try:
 			if self.config['sensors'] is not None:
@@ -69,7 +70,7 @@ class ArduinoWorker(Worker):
 				self.workers.append(asw)
 				time.sleep(3)
 		except KeyError:
-			print('{name} Node Sensors...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
+			Logger.log(LOG_LEVEL["info"], '{name} Node Sensors...\t\t\033[1;31m Disabled\033[0;0m'.format(**self.config))
 
 		return
 
@@ -79,27 +80,27 @@ class ArduinoWorker(Worker):
 		if self.config.get('use_wifi', False):
 			while attempts > 0 and self.main_thread_running.is_set():
 				try:
-					print('\033[1;36m{0}\033[0;0m -> Connecting...         \t'.format(self.config["name"], (3-attempts)))
+					Logger.log(LOG_LEVEL["debug"], '\033[1;36m{0}\033[0;0m -> Connecting...         \t'.format(self.config["name"], (3-attempts)))
 					attempts-= 1
 					conn = SocketManager(host=str(self.config.get('address', 'mudpi.local')))
 					# Test the connection with api
 					self.api = ArduinoApi(connection=conn)
 				except (SocketManagerError, BrokenPipeError, ConnectionResetError, socket.timeout) as e:
-					print('{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
+					Logger.log(LOG_LEVEL["warning"], '{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
 					if attempts > 0:
-						print('{name} -> Preparing Reconnect...  \t'.format(**self.config))
+						Logger.log(LOG_LEVEL["info"], '{name} -> Preparing Reconnect...  \t'.format(**self.config))
 					else:
-						print('{name} -> Connection Attempts...\t\033[1;31m Failed\033[0;0m           '.format(**self.config))
+						Logger.log(LOG_LEVEL["error"], '{name} -> Connection Attempts...\t\033[1;31m Failed\033[0;0m           '.format(**self.config))
 					conn = None
 					self.resetConnection()
 					time.sleep(15)
 				except (OSError, KeyError) as e:
-					print('[{name}] \033[1;33m Node Not Found. (Is it online?)\033[0;0m'.format(**self.config))
+					Logger.log(LOG_LEVEL["error"], '[{name}] \033[1;33m Node Not Found. (Is it online?)\033[0;0m'.format(**self.config))
 					conn = None
 					self.resetConnection()
 					time.sleep(15)
 				else:
-					print('{name} -> Wifi Connection \t\t\033[1;32m Success\033[0;0m                 '.format(**self.config))
+					Logger.log(LOG_LEVEL["info"], '{name} -> Wifi Connection \t\t\033[1;32m Success\033[0;0m                 '.format(**self.config))
 					for worker in self.workers:
 							worker.connection = conn
 					self.node_connected.set()
@@ -111,17 +112,17 @@ class ArduinoWorker(Worker):
 					attempts-= 1
 					conn = SerialManager(device=str(self.config.get('address', '/dev/ttyUSB1')))
 				except SerialManagerError:
-					print('{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
+					Logger.log(LOG_LEVEL["warning"], '{name} -> Connecting...\t\t\033[1;33m Timeout\033[0;0m           '.format(**self.config))
 					if attempts > 0:
-						print('{name} -> Preparing Reconnect...  \t'.format(**self.config), end='\r', flush=True)
+						Logger.log(LOG_LEVEL["info"], '{name} -> Preparing Reconnect...  \t'.format(**self.config), end='\r', flush=True)
 					else:
-						print('{name} -> Connection Attempts...\t\033[1;31m Failed\033[0;0m           '.format(**self.config))
+						Logger.log(LOG_LEVEL["error"], '{name} -> Connection Attempts...\t\033[1;31m Failed\033[0;0m           '.format(**self.config))
 					self.resetConnection()
 					conn = None
 					time.sleep(15)
 				else:
 					if conn is not None:
-						print('[{name}] Serial Connection \t\033[1;32m Success\033[0;0m         '.format(**self.config))
+						Logger.log(LOG_LEVEL["info"], '[{name}] Serial Connection \t\033[1;32m Success\033[0;0m         '.format(**self.config))
 						for worker in self.workers:
 							worker.connection = conn
 						self.node_connected.set()
@@ -144,9 +145,9 @@ class ArduinoWorker(Worker):
 		t = threading.Thread(target=self.work, args=())
 		t.start()
 		if self.node_ready.is_set():
-			print(str(self.config['name']) +' Node Worker '+ '[S: ' + str(len(self.config['sensors'])) + ']' + '[C: ' + str(len(self.config['controls'])) + ']...\t\033[1;32m Online\033[0;0m')
+			Logger.log(LOG_LEVEL["info"], str(self.config['name']) +' Node Worker '+ '[S: ' + str(len(self.config['sensors'])) + ']' + '[C: ' + str(len(self.config['controls'])) + ']...\t\033[1;32m Online\033[0;0m')
 		else:
-			print(str(self.config['name']) +'...\t\t\t\t\033[1;33m Pending Reconnect\033[0;0m ')
+			Logger.log(LOG_LEVEL["info"], str(self.config['name']) +'...\t\t\t\t\033[1;33m Pending Reconnect\033[0;0m ')
 		return t
 
 	def work(self):
@@ -156,7 +157,7 @@ class ArduinoWorker(Worker):
 				if not self.node_connected.is_set():
 					#Connection Broken - Reset Connection
 					self.resetConnection()
-					print('\033[1;36m{name}\033[0;0m -> \033[1;33mTimeout!\033[0;0m \t\t\t\033[1;31m Connection Broken\033[0;0m'.format(**self.config))
+					Logger.log(LOG_LEVEL["warning"], '\033[1;36m{name}\033[0;0m -> \033[1;33mTimeout!\033[0;0m \t\t\t\033[1;31m Connection Broken\033[0;0m'.format(**self.config))
 					time.sleep(30)
 			else:
 				# Node reconnection cycle
@@ -164,7 +165,7 @@ class ArduinoWorker(Worker):
 					# Random delay before connections to offset multiple attempts (1-5 min delay)
 					random_delay = (random.randrange(30, self.config.get("max_reconnect_delay", 300)) * delay_multiplier) / 2
 					time.sleep(10)
-					print('\033[1;36m'+str(self.config['name']) +'\033[0;0m -> Retrying in '+ '{0}s...'.format(random_delay)+'\t\033[1;33m Pending Reconnect\033[0;0m ')
+					Logger.log(LOG_LEVEL["info"], '\033[1;36m'+str(self.config['name']) +'\033[0;0m -> Retrying in '+ '{0}s...'.format(random_delay)+'\t\033[1;33m Pending Reconnect\033[0;0m ')
 					# Two separate checks for main thread event to prevent re-connections during shutdown
 					if self.main_thread_running.is_set():
 						time.sleep(random_delay)
@@ -183,4 +184,4 @@ class ArduinoWorker(Worker):
 		# Join all our sub threads for shutdown
 		for thread in self.threads:
 			thread.join()
-		print("{name} Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		Logger.log(LOG_LEVEL["info"], ("{name} Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))

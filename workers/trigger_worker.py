@@ -13,6 +13,7 @@ from triggers.control_trigger import ControlTrigger
 
 import variables
 import importlib
+from logger.Logger import Logger, LOG_LEVEL
 
 class TriggerWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, actions, sequences):
@@ -120,7 +121,7 @@ class TriggerWorker(Worker):
 			return new_trigger
 
 	def run(self): 
-		print('Trigger Worker [' + str(len(self.config)) + ' Triggers]...\t\t\033[1;32m Online\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Trigger Worker [' + str(len(self.config)) + ' Triggers]...\t\t\033[1;32m Online\033[0;0m')
 		return super().run()
 
 	def work(self):
@@ -136,4 +137,4 @@ class TriggerWorker(Worker):
 		# Join all our sub threads for shutdown
 		for thread in self.trigger_threads:
 			thread.join()
-		print("Trigger Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")
+		Logger.log(LOG_LEVEL["info"], "Trigger Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")

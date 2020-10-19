@@ -8,6 +8,7 @@ import time
 import json
 import redis
 import importlib
+from logger.Logger import Logger, LOG_LEVEL
 
 
 class ADCMCP3008Worker:
@@ -81,17 +82,17 @@ class ADCMCP3008Worker:
                                              mcp=self.mcp)
                 new_sensor.init_sensor()
                 self.sensors.append(new_sensor)
-                print('{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+                Logger.log(LOG_LEVEL["info"], '{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
 
     def run(self):
         if self.node_ready:
             t = threading.Thread(target=self.work, args=())
             t.start()
-            print(str(self.config['name']) + ' Node Worker [' + str(
+            Logger.log(LOG_LEVEL["info"], str(self.config['name']) + ' Node Worker [' + str(
                 len(self.config['sensors'])) + ' Sensors]...\t\033[1;32m Online\033[0;0m')
             return t
         else:
-            print("Node Connection...\t\t\t\033[1;31m Failed\033[0;0m")
+            Logger.log(LOG_LEVEL["warning"], "Node Connection...\t\t\t\033[1;31m Failed\033[0;0m")
             return None
 
     def work(self):
@@ -105,11 +106,11 @@ class ADCMCP3008Worker:
                     readings[sensor.key] = result
                 # r.set(sensor.get('key', sensor.get('type')), value)
 
-                print(readings)
+                Logger.log(LOG_LEVEL["info"], readings)
                 message['data'] = readings
                 self.r.publish('sensors', json.dumps(message))
 
             time.sleep(15)
         # This is only ran after the main thread is shut down
-        print("{name} Node Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(
+        Logger.log(LOG_LEVEL["info"], "{name} Node Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(
             **self.config))

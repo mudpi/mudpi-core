@@ -9,6 +9,8 @@ sys.path.append('..')
 from controls.pi.button_control import (ButtonControl)
 from controls.pi.switch_control import (SwitchControl)
 
+from logger.Logger import Logger, LOG_LEVEL
+
 class PiControlWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready):
 		super().__init__(config, main_thread_running, system_ready)
@@ -46,11 +48,11 @@ class PiControlWorker(Worker):
 
 				new_control.init_control()
 				self.controls.append(new_control)
-				print('{type} Control {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**control))
+				Logger.log(LOG_LEVEL["info"], '{type} Control {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**control))
 		return
 
 	def run(self): 
-		print('Pi Control Worker [' + str(len(self.config['controls'])) + ' Controls]...\t\033[1;32m Online\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Pi Control Worker [' + str(len(self.config['controls'])) + ' Controls]...\t\033[1;32m Online\033[0;0m')
 		return super().run()
 
 	def work(self):
@@ -62,4 +64,4 @@ class PiControlWorker(Worker):
 					readings[control.key] = result
 			time.sleep(self.sleep_duration)
 		#This is only ran after the main thread is shut down
-		print("Pi Control Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
+		Logger.log(LOG_LEVEL["info"], "Pi Control Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")

@@ -6,6 +6,8 @@ from .sensor import Sensor
 import sys
 from adafruit_mcp3xxx.analog_in import AnalogIn
 
+from logger.Logger import Logger, LOG_LEVEL
+
 sys.path.append('..')
 
 #  Tested using Sun3Drucker Model SX239
@@ -41,5 +43,5 @@ class SoilSensor(Sensor):
         self.r.set(self.key,
                         resistance)  # TODO: CHANGE BACK TO 'moistpercent' (PERSONAL CONFIG)
 
-        print("moisture: {0}".format(moisture))
+        Logger.log(LOG_LEVEL["debug"], "moisture: {0}".format(moisture))
         return resistance
