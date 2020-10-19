@@ -212,7 +212,7 @@ class SequenceWorker(Worker):
 			time_remaining-=1
 
 	def run(self): 
-		print('Sequence Worker [' + str(self.name) + ']...\t\t\033[1;32m Online\033[0;0m')
+		print('Sequence Worker [' + str(self.name) + ']...\t\033[1;32m Online\033[0;0m')
 		return super().run()
 
 	def work(self):
