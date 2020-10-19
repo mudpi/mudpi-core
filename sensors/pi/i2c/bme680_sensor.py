@@ -6,6 +6,8 @@ import board
 from busio import I2C
 import adafruit_bme680
 
+from logger.Logger import Logger, LOG_LEVEL
+
 import sys
 sys.path.append('..')
 
@@ -42,7 +44,7 @@ class Bme680Sensor(Sensor):
 			# print('BME680:', readings)
 			return readings
 		else:
-			print('Failed to get reading [BME680]. Try again!')
+			Logger.log(LOG_LEVEL["error"], 'Failed to get reading [BME680]. Try again!')
 
 	def readRaw(self):
 		#Read the sensor(s) but return the raw data, useful for debugging

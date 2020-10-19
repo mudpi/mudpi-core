@@ -4,6 +4,7 @@ scripts/
 tests/
 img/
 mudpi.config
+*.log
 # Python compiled
 __pycache__/
 

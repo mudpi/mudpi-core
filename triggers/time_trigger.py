@@ -10,6 +10,8 @@ except ImportError:
 	CRON_ENABLED = False
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 class TimeTrigger(Trigger):
 
 	def __init__(self, main_thread_running, system_ready, name='TimeTrigger',key=None, trigger_active=None, actions=[], schedule=None, group=None):
@@ -33,9 +35,9 @@ class TimeTrigger(Trigger):
 						else:
 							self.trigger_active.clear()
 					else:
-						print("Error pycron not found.")
+						Logger.log(LOG_LEVEL["error"], "Error pycron not found.")
 				except:
-					print("Error evaluating time trigger schedule.")
+					Logger.log(LOG_LEVEL["error"], "Error evaluating time trigger schedule.")
 				time.sleep(self.trigger_interval)
 			else:
 				time.sleep(2)

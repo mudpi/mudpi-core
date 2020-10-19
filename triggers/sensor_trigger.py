@@ -5,6 +5,8 @@ import sys
 from .trigger import Trigger
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 class SensorTrigger(Trigger):
 
 	def __init__(self, main_thread_running, system_ready, name='SensorTrigger',key=None, source=None, nested_source=None, thresholds=None, topic="sensors", trigger_active=None, frequency='once', actions=[], group=None, redis_conn=None):
@@ -52,7 +54,7 @@ class SensorTrigger(Trigger):
 					else:
 						self.trigger_active.clear()
 			except:
-				print('Error Triggering Actions for {0}'.format(self.name))
+				Logger.log(LOG_LEVEL["error"], 'Error Triggering Actions for {0}'.format(self.name))
 		self.previous_state = self.trigger_active.is_set()
 
 	def parseSensorData(self, data):

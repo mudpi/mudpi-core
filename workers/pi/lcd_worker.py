@@ -11,6 +11,8 @@ from .worker import Worker
 import sys
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 class LcdWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, lcd_available):
 		super().__init__(config, main_thread_running, system_ready)
@@ -57,7 +59,7 @@ class LcdWorker(Worker):
 		return
 
 	def init(self):
-		print('LCD Display Worker...\t\t\t\033[1;32m Initializing\033[0;0m'.format(**self.config))
+		Logger.log(LOG_LEVEL["info"], 'LCD Display Worker...\t\t\t\033[1;32m Initializing\033[0;0m'.format(**self.config))
 		# prepare sensor on specified pin
 		self.i2c = busio.I2C(board.SCL, board.SDA)
 		if(self.model):
@@ -78,7 +80,7 @@ class LcdWorker(Worker):
 		return
 
 	def run(self): 
-		print('LCD Display Worker ...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
+		Logger.log(LOG_LEVEL["info"], 'LCD Display Worker ...\t\t\t\033[1;32m Online\033[0;0m'.format(**self.config))
 		return super().run()
 
 	def handleMessage(self, message):
@@ -89,15 +91,16 @@ class LcdWorker(Worker):
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
 						self.addMessageToQueue(decoded_message['data'].get('message', ''), int(decoded_message['data'].get('duration', self.default_duration)))
-						print('LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data'].get('message', '').replace("\\n", "\n")))
+						Logger.log(LOG_LEVEL["debug"], 'LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data'].get('message', '').replace("\\n", "\n")))
+
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
-					print('Cleared the LCD Screen')
+					Logger.log(LOG_LEVEL["debug"], 'Cleared the LCD Screen')
 				elif decoded_message['event'] == 'ClearQueue':
 					self.message_queue = []
-					print('Cleared the LCD Message Queue')
+					Logger.log(LOG_LEVEL["debug"], 'Cleared the LCD Message Queue')
 			except:
-				print('Error Decoding Message for LCD')
+				Logger.log(LOG_LEVEL["error"], 'Error Decoding Message for LCD')
 	
 	def addMessageToQueue(self, message, duration = 3):
 		#Add message to queue if LCD available
@@ -145,8 +148,8 @@ class LcdWorker(Worker):
 					else:
 						time.sleep(1)
 				except Exception as e:
-					print("LCD Worker \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
-					print(e)
+					Logger.log(LOG_LEVEL["error"], "LCD Worker \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
+					Logger.log(LOG_LEVEL["error"], "Exception: {0}".format(e)) 
 			else:
 				#System not ready
 				time.sleep(1)
@@ -157,4 +160,4 @@ class LcdWorker(Worker):
 		#This is only ran after the main thread is shut down
 		#Close the pubsub connection
 		self.pubsub.close()
-		print("LCD Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))
+		Logger.log(LOG_LEVEL["info"], "LCD Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(**self.config))

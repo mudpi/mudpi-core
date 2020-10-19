@@ -5,6 +5,8 @@ import threading
 import sys
 sys.path.append('..')
 
+from logger.Logger import Logger, LOG_LEVEL
+
 class TriggerGroup():
 
 	def __init__(self, name='TriggerGroup', key=None, triggers=[], group_active=None, frequency='once', actions=[]):
@@ -50,7 +52,7 @@ class TriggerGroup():
 			else:
 				self.trigger_count = 0
 		except Exception as e:
-			print("Error triggering group {0} ".format(self.key), e)
+			Logger.log(LOG_LEVEL["error"], "Error triggering group {0} ".format(self.key), e)
 			pass
 		return
 

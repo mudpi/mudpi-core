@@ -27,6 +27,8 @@ try:
 	MCP_ENABLED = True
 except ImportError:
 	MCP_ENABLED = False
+
+from logger.Logger import Logger, LOG_LEVEL
 import variables
 
 ##############################
@@ -82,13 +84,25 @@ if CONFIGS['debug'] is True:
 	time.sleep(10)
 
 try:
+	print('Initializing Logger \r', end="", flush=True)
+	Logger.logger = Logger(CONFIGS)
+	time.sleep(0.05)
+	Logger.log(LOG_LEVEL["info"], 'Initializing Logger...\t\t\t\033[1;32m Complete\033[0;0m')
+	Logger.log_to_file(LOG_LEVEL["debug"], "Dumping the config file: ")
+	for index, config in CONFIGS.items():
+			Logger.log_to_file(LOG_LEVEL["debug"], '%s: %s' % (index, config))
+	Logger.log_to_file(LOG_LEVEL["debug"], "End of config file dump!\n")
+except Exception as e:
+	Logger.log(LOG_LEVEL["info"], 'Initializing Logger...\t\t\t\033[1;31m Disabled\033[0;0m')
+
+try:
 	print('Initializing Garden Control \r', end="", flush=True)
 	GPIO.setwarnings(False)
 	GPIO.setmode(GPIO.BCM)
 	GPIO.cleanup()
 	# Pause for GPIO to finish
 	time.sleep(0.1)
-	print('Initializing Garden Control...\t\t\033[1;32m Complete\033[0;0m')
+	Logger.log(LOG_LEVEL["info"], 'Initializing Garden Control...\t\t\033[1;32m Complete\033[0;0m')
 	print('Preparing Threads for Workers\r', end="", flush=True)
 
 	new_messages_waiting = threading.Event() 	# Event to signal LCD to pull new messages
@@ -99,18 +113,18 @@ try:
 
 	main_thread_running.set() 					# Main event to tell workers to run/shutdown
 	time.sleep(0.1)
-	print('Preparing Threads for Workers...\t\033[1;32m Complete\033[0;0m')
+	Logger.log(LOG_LEVEL["info"], 'Preparing Threads for Workers...\t\033[1;32m Complete\033[0;0m')
 
 	# Worker for Camera
 	try:
 		if len(CONFIGS["camera"]) > 0:
 			CONFIGS["camera"]["redis"] = r
 			c = CameraWorker(CONFIGS['camera'], main_thread_running, system_ready, camera_available)
-			print('MudPi Camera...\t\t\t\033[1;32m Initializing\033[0;0m')
+			Logger.log(LOG_LEVEL["info"], 'MudPi Camera...\t\t\t\033[1;32m Initializing\033[0;0m')
 			workers.append(c)
 			camera_available.set()
 	except KeyError:
-		print('MudPi Pi Camera...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'MudPi Pi Camera...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Workers for pi (Sensors, Controls, Relays, I2C)
 	try:
@@ -120,27 +134,28 @@ try:
 				worker["redis"] = r
 				if worker['type'] == "sensor":
 					pw = PiSensorWorker(worker, main_thread_running, system_ready)
-					print('MudPi Sensors...\t\t\t\033[1;32m Initializing\033[0;0m')
+					Logger.log(LOG_LEVEL["info"], 'MudPi Sensors...\t\t\t\033[1;32m Initializing\033[0;0m')
 				elif worker['type'] == "control":
 					pw = PiControlWorker(worker, main_thread_running, system_ready)
-					print('MudPi Controls...\t\t\t\033[1;32m Initializing\033[0;0m')
+					Logger.log(LOG_LEVEL["info"], 'MudPi Controls...\t\t\t\033[1;32m Initializing\033[0;0m')
 				elif worker['type'] == "i2c":
 					pw = PiI2CWorker(worker, main_thread_running, system_ready)
-					print('MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
+					Logger.log(LOG_LEVEL["info"], 'MudPi I2C...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 				elif worker['type'] == "display":
 					for display in worker['displays']:
 						display["redis"] = r
 						pw = LcdWorker(display, main_thread_running, system_ready, lcd_available)
 						lcd_available.set()
-						print('MudPi LCD Displays...\t\t\t\033[1;32m Initializing\033[0;0m')
+						Logger.log(LOG_LEVEL["info"], 'MudPi LCD Displays...\t\t\t\033[1;32m Initializing\033[0;0m')
 				elif worker['type'] == "relay":
 					# Add Relay Worker Here for Better Config Control
-					print('MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')
+					Logger.log(LOG_LEVEL["info"], 'MudPi Relay...\t\t\t\033[1;32m Initializing\033[0;0m')
 				else:
+					Logger.log(LOG_LEVEL["warning"], "Exception raised due to unknown Worker Type: {0}".format(worker['type']))
 					raise Exception("Unknown Worker Type: " + worker['type'])
 				workers.append(pw)
 	except KeyError as e:
-		print('MudPi Pi Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'MudPi Pi Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
 		print(e)
 
 	# Worker for relays attached to pi
@@ -159,29 +174,29 @@ try:
 				relayState['available'].set()
 				relay_index +=1
 	except KeyError:
-		print('MudPi Relays Workers...\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'MudPi Relays Workers...\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Load in Actions
 	try:
 		if len(CONFIGS["actions"]) > 0:
 			for action in CONFIGS["actions"]:
-				print('MudPi Actions...\t\t\t\033[1;32m Initializing\033[0;0m')
+				Logger.log(LOG_LEVEL["info"], 'MudPi Actions...\t\t\t\033[1;32m Initializing\033[0;0m')
 				action["redis"] = r
 				a = Action(action)
 				a.init_action()
 				actions[a.key] = a
 	except KeyError:
-		print('MudPi Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'MudPi Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Worker for Triggers
 	try: 
 		if len(CONFIGS["triggers"]) > 0:
 			CONFIGS["triggers"]["redis"] = r
 			t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions)
-			print('MudPi Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
+			Logger.log(LOG_LEVEL["info"], 'MudPi Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
 			workers.append(t)
 	except KeyError:
-		print('MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'MudPi Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Worker for nodes attached to pi via serial or wifi[esp8266, esp32]
 	# Supported nodes: arduinos, esp8266, ADC-MCP3xxx, probably others (esp32 with custom nanpy fork)
@@ -191,36 +206,37 @@ try:
 				node["redis"] = r
 				if node['type'] == "arduino":
 					if NANPY_ENABLED:
-						print('MudPi Arduino Workers...\t\t\033[1;32m Initializing\033[0;0m')
+						Logger.log(LOG_LEVEL["info"], 'MudPi Arduino Workers...\t\t\033[1;32m Initializing\033[0;0m')
 						t = ArduinoWorker(node, main_thread_running, system_ready)
 					else:
-						print('Error Loading Nanpy library. Did you pip3 install -r requirements.txt?')
+						Logger.log(LOG_LEVEL["error"], 'Error Loading Nanpy library. Did you pip3 install -r requirements.txt?')
 				elif node['type'] == "ADC-MCP3008":
 					if MCP_ENABLED:
-						print('MudPi ADC Workers...\t\t\033[1;32m Initializing\033[0;0m')
+						Logger.log(LOG_LEVEL["info"], 'MudPi ADC Workers...\t\t\033[1;32m Initializing\033[0;0m')
 						t = ADCMCP3008Worker(node, main_thread_running, system_ready)
 					else:
-						print('Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt;?')
+						Logger.log(LOG_LEVEL["error"], 'Error Loading MCP3xxx library. Did you pip3 install -r requirements.txt;?')
 				else:
+					Logger.log(LOG_LEVEL["warning"], "Exception raised due to unknown Node Type: {0}".format(node['type']))
 					raise Exception("Unknown Node Type: " + node['type'])
 				nodes.append(t)
 	except KeyError as e:
-		print('MudPi Node Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'MudPi Node Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	try:
 		if (CONFIGS['server'] is not None):
-			print('MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
+			Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
 			time.sleep(1)
 			server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
-			s = threading.Thread(target=server_worker)
+			s = threading.Thread(target=server_worker)  # TODO where is server_worker supposed to be initialized?
 			threads.append(s)
 			s.start()
 	except KeyError:
-		print('MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 
-	print('MudPi Garden Controls...\t\t\033[1;32m Initialized\033[0;0m')
-	print('Engaging MudPi Workers...\t\t\033[1;32m \033[0;0m')
+	Logger.log(LOG_LEVEL["info"], 'MudPi Garden Controls...\t\t\033[1;32m Initialized\033[0;0m')
+	Logger.log(LOG_LEVEL["info"], 'Engaging MudPi Workers...\t\t\033[1;32m \033[0;0m')
 	for worker in workers:
 		t = worker.run()
 		threads.append(t)
@@ -231,8 +247,8 @@ try:
 		time.sleep(.5)
 
 	time.sleep(.5)
-	print('MudPi Garden Control...\t\t\t\033[1;32m Online\033[0;0m')
-	print('_________________________________________________')
+	Logger.log(LOG_LEVEL["info"], 'MudPi Garden Control...\t\t\t\033[1;32m Online\033[0;0m')
+	Logger.log(LOG_LEVEL["info"], '_________________________________________________')
 	system_ready.set() #Workers will not process until system is ready
 	r.set('started_at', str(datetime.datetime.now())) #Store current time to track uptime
 	system_message = {'event':'SystemStarted', 'data':1}
@@ -247,7 +263,7 @@ try:
 except KeyboardInterrupt:
 	PROGRAM_RUNNING = False
 finally:
-	print('MudPi Shutting Down...')
+	Logger.log(LOG_LEVEL["info"], 'MudPi Shutting Down...')
 	# Perform any cleanup tasks here...
 
 	try:
@@ -265,6 +281,6 @@ finally:
 	for thread in threads:
 		thread.join()
 
-	print("MudPi Shutting Down...\t\t\t\033[1;32m Complete\033[0;0m")
-	print("Mudpi is Now...\t\t\t\t\033[1;31m Offline\033[0;0m")
+	Logger.log(LOG_LEVEL["info"], "MudPi Shutting Down...\t\t\t\033[1;32m Complete\033[0;0m")
+	Logger.log(LOG_LEVEL["info"], "Mudpi is Now...\t\t\t\t\033[1;31m Offline\033[0;0m")
 	
