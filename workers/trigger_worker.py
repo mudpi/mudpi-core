@@ -15,9 +15,10 @@ import variables
 import importlib
 
 class TriggerWorker(Worker):
-	def __init__(self, config, main_thread_running, system_ready, actions):
+	def __init__(self, config, main_thread_running, system_ready, actions, sequences):
 		super().__init__(config, main_thread_running, system_ready)
 		self.actions = actions
+		self.sequences = sequences
 		self.triggers = []
 		self.trigger_threads = []
 		self.trigger_events = {}
@@ -83,6 +84,12 @@ class TriggerWorker(Worker):
 				for action in config.get("actions"):
 					trigger_actions.append(self.actions[action])
 				trigger_kwargs['actions'] = trigger_actions
+
+			if config.get('sequences'):
+				trigger_sequences = []
+				for sequence in config.get("sequences"):
+					trigger_sequences.append(self.sequences[sequence])
+				trigger_kwargs['sequences'] = trigger_sequences
 
 			if config.get('frequency'):
 				trigger_kwargs['frequency'] = config.get('frequency')
