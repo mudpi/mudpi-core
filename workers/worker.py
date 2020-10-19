@@ -9,12 +9,6 @@ sys.path.append('..')
 import variables
 from logger.Logger import Logger, LOG_LEVEL
 
-def log(func):
-	def wrapper(*args, **kwargs):
-		print("MudPi Debug Log: " + " ".join([str(arg) for arg in args]) + " at " + str(datetime.datetime.now()))
-		value = func(*args, **kwargs)
-		return value
-
 # Base Worker Class
 # A worker is responsible for handling its set of operations and running on a thread
 class Worker():
