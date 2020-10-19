@@ -150,7 +150,7 @@ class SequenceWorker(Worker):
 		try:
 			for action in self.sequence[self.current_step].get('actions', []):
 				self.actions[action].trigger(value)
-			self.triggered = True
+			self.step_triggered = True
 		except Exception as e:
 			print("Error triggering sequence action {0} ".format(self.key), e)
 			pass
@@ -230,7 +230,7 @@ class SequenceWorker(Worker):
 									else:
 										# No Delay for this step
 										self.delay_complete = True
-								if not self.triggered:
+								if not self.step_triggered:
 									if self.delay_complete:
 										if self.evaluateThresholds():
 											self.trigger()
@@ -249,6 +249,7 @@ class SequenceWorker(Worker):
 				except Exception as e:
 					print("Sequence Worker {0} \t\033[1;31m Unexpected Error\033[0;0m".format(self.key))
 					print(e)
+					time.sleep(3)
 			else:
 				# System not ready
 				time.sleep(1)
