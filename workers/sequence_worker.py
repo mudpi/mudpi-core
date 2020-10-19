@@ -17,7 +17,7 @@ class SequenceWorker(Worker):
 		if self.config.get('key', None) is None:
 			raise Exception('No "key" Found in Sequence Config')
 		else:
-			self.key = key.replace(" ", "_").lower()
+			self.key = self.config.['key'].replace(" ", "_").lower()
 
 		if self.config.get('name', None) is None:
 			self.name = self.key.replace("_", " ").title()

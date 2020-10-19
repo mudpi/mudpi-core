@@ -74,7 +74,7 @@ print('_________________________________________________')
 print('')
 print('Eric Davisson @theDavisson')
 print('https://mudpi.app')
-print('Version: ', CONFIGS.get('version', '0.9.0'))
+print('Version: ', CONFIGS.get('version', '0.9.1'))
 print('\033[0;0m')
 
 if CONFIGS['debug'] is True:
@@ -187,7 +187,7 @@ try:
 					"active": threading.Event() 	# Event to signal sequence to open/close
 				}
 				sequenceEvents[sequence.get("key", sequence_index)] = sequenceState
-				s = SequenceWorker(CONFIGS['sequences'], main_thread_running, system_ready, sequenceState['available'], sequenceState['active'], actions)
+				s = SequenceWorker(sequence, main_thread_running, system_ready, sequenceState['available'], sequenceState['active'], actions)
 				workers.append(s)
 				sequences[s.key] = s
 				sequenceState['available'].set()
