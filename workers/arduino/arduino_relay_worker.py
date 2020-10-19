@@ -26,7 +26,7 @@ class ArduinoRelayWorker(Worker):
 		if self.config.get('name', None) is None:
 			self.name = self.key.replace("_", " ").title()
 		else:
-			self.name = name
+			self.name = self.config['name']
 
 		# Events
 		self.main_thread_running = main_thread_running

@@ -20,7 +20,7 @@ class RelayWorker(Worker):
 		if self.config.get('name', None) is None:
 			self.name = self.key.replace("_", " ").title()
 		else:
-			self.name = name
+			self.name = self.config['name']
 
 		self.config['pin'] = int(self.config['pin']) # parse possbile strings to avoid errors
 
