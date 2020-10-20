@@ -69,10 +69,11 @@ class PiSensorWorker(Worker):
 						readings[sensor.key] = result
 						self.r.set(sensor.key, json.dumps(result))
 						#print(sensor.name, result)
-					
-				print(readings)
-				message['data'] = readings
-				self.r.publish(self.topic, json.dumps(message))
+				
+				if bool(readings):
+					print(readings)
+					message['data'] = readings
+					self.r.publish(self.topic, json.dumps(message))
 				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)
