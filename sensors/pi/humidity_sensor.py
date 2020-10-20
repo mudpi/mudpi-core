@@ -43,7 +43,7 @@ class HumiditySensor(Sensor):
 			self.r.set(self.key, json.dumps(readings))
 			return readings
 		else:
-			Logger.log(LOG_LEVEL["error"], 'Failed to get DHT reading. Try again!')
+			Logger.log(LOG_LEVEL["error"], 'DHT Reading was Invalid. Trying again next cycle.')
 			return None
 
 
