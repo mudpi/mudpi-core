@@ -65,6 +65,8 @@ class SequenceWorker(Worker):
 		if not self.sequence_active.is_set():
 			self.start()
 		else:
+			if self.sequence[self.current_step].get('duration', None) is None and self.delay_complete:
+				self.step_complete = True
 			self.next_step()
 
 	def start(self):
@@ -87,7 +89,8 @@ class SequenceWorker(Worker):
 			if self.sequence_active.is_set():
 				# If skipping steps trigger unperformed actions
 				if not self.step_triggered:
-					self.trigger()
+					if self.evaluateThresholds():
+						self.trigger()
 				# Sequence is already active, advance to next step
 				if self.current_step < self.total_steps - 1:
 					self.reset_step()
@@ -132,7 +135,8 @@ class SequenceWorker(Worker):
 			decoded_message = self.last_event = self.decodeMessageData(data)
 			try:
 				if decoded_message['event'] == 'SequenceNextStep':
-					self.next_step()
+					self.sequence[self.current_step].get('duration', None) is None and self.delay_complete:
+						self.step_complete = True
 					print('Sequence {0} Next Step Triggered\033[0;0m'.format(self.name))
 				elif decoded_message['event'] == 'SequencePreviousStep':
 					self.previous_step()
@@ -142,7 +146,6 @@ class SequenceWorker(Worker):
 					print('Sequence {0} Start Triggered\033[0;0m'.format(self.name))
 				elif decoded_message['event'] == 'SequenceSkipStep':
 					self.step_complete = True
-					self.next_step()
 					print('Sequence {0} Skip Step Triggered\033[0;0m'.format(self.name))
 			except:
 				print('Error Decoding Message for Sequence {0}'.format(self.config['key']))
