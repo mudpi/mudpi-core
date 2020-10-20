@@ -40,6 +40,7 @@ class LcdWorker(Worker):
 		self.cached_message = {'message':'', 'duration': self.default_duration}
 		self.need_new_message = True
 		self.message_queue = []
+		self.message_limit = nt(self.config['message_limit']) if self.config['message_limit'] is not None else 20
 
 		# Events
 		self.lcd_available = lcd_available
@@ -90,7 +91,7 @@ class LcdWorker(Worker):
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
 						self.addMessageToQueue(decoded_message['data'].get('message', ''), int(decoded_message['data'].get('duration', self.default_duration)))
-						Logger.log(LOG_LEVEL["debug"], 'LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data'].get('message', '').replace("\\n", "\n")))
+						Logger.log(LOG_LEVEL["debug"], 'LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data'].get('message', '')))
 
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
@@ -123,6 +124,10 @@ class LcdWorker(Worker):
 				"message": message.replace("\\n", "\n"),
 				"duration": duration
 			}
+
+			if len(self.message_queue) = self.message_limit:
+				 self.message_queue.pop(0)
+
 			self.message_queue.append(new_message)
 
 			msg = { 'event':'MessageQueued', 'data': new_message }
