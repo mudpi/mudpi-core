@@ -53,7 +53,7 @@ class SequenceWorker(Worker):
 
 	def init(self):
 		self.pubsub.subscribe(**{self.topic: self.handleMessage})
-		# print('{type} - {name}...\t\t\033[1;32m Listening\033[0;0m'.format(**trigger))
+		# Logger.log(LOG_LEVEL["info"], '{type} - {name}...\t\t\033[1;32m Listening\033[0;0m'.format(**trigger))
 		return
 
 	def reset_step(self):
@@ -81,7 +81,7 @@ class SequenceWorker(Worker):
 						"key": self.key
 					}
 				}))
-			print('Sequence {0} Started\033[0;0m'.format(self.name))
+			Logger.log(LOG_LEVEL["info"], 'Sequence {0} Started\033[0;0m'.format(self.name))
 
 	def next_step(self):
 		if self.step_complete:
@@ -137,18 +137,18 @@ class SequenceWorker(Worker):
 				if decoded_message['event'] == 'SequenceNextStep':
 					if self.sequence[self.current_step].get('duration', None) is None and self.delay_complete:
 						self.step_complete = True
-					print('Sequence {0} Next Step Triggered\033[0;0m'.format(self.name))
+					Logger.log(LOG_LEVEL["info"], 'Sequence {0} Next Step Triggered\033[0;0m'.format(self.name))
 				elif decoded_message['event'] == 'SequencePreviousStep':
 					self.previous_step()
-					print('Sequence {0} Previous Step Triggered\033[0;0m'.format(self.name))
+					Logger.log(LOG_LEVEL["info"], 'Sequence {0} Previous Step Triggered\033[0;0m'.format(self.name))
 				elif decoded_message['event'] == 'SequenceStart':
 					self.start()
-					print('Sequence {0} Start Triggered\033[0;0m'.format(self.name))
+					Logger.log(LOG_LEVEL["info"], 'Sequence {0} Start Triggered\033[0;0m'.format(self.name))
 				elif decoded_message['event'] == 'SequenceSkipStep':
 					self.step_complete = True
-					print('Sequence {0} Skip Step Triggered\033[0;0m'.format(self.name))
+					Logger.log(LOG_LEVEL["info"], 'Sequence {0} Skip Step Triggered\033[0;0m'.format(self.name))
 			except:
-				print('Error Decoding Message for Sequence {0}'.format(self.config['key']))
+				Logger.log(LOG_LEVEL["info"], 'Error Decoding Message for Sequence {0}'.format(self.config['key']))
 
 	def trigger(self, value=None):
 		try:
@@ -156,7 +156,7 @@ class SequenceWorker(Worker):
 				self.actions[action].trigger(value)
 			self.step_triggered = True
 		except Exception as e:
-			print("Error triggering sequence action {0} ".format(self.key), e)
+			Logger.log(LOG_LEVEL["error"], "Error triggering sequence action {0} ".format(self.key), e)
 			pass
 		return
 
@@ -215,7 +215,7 @@ class SequenceWorker(Worker):
 			time_remaining-=1
 
 	def run(self): 
-		print('Sequence Worker [' + str(self.name) + ']...\t\033[1;32m Online\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Sequence Worker [' + str(self.name) + ']...\t\033[1;32m Online\033[0;0m')
 		return super().run()
 
 	def work(self):
@@ -251,8 +251,8 @@ class SequenceWorker(Worker):
 						# Sequence Disabled
 						time.sleep(1)
 				except Exception as e:
-					print("Sequence Worker {0} \t\033[1;31m Unexpected Error\033[0;0m".format(self.key))
-					print(e)
+					Logger.log(LOG_LEVEL["error"], "Sequence Worker {0} \t\033[1;31m Unexpected Error\033[0;0m".format(self.key))
+					Logger.log(LOG_LEVEL["error"], e)
 					time.sleep(3)
 			else:
 				# System not ready
@@ -264,4 +264,4 @@ class SequenceWorker(Worker):
 		# This is only ran after the main thread is shut down
 		# Close the pubsub connection
 		self.pubsub.close()
-		print("Sequence Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
+		Logger.log(LOG_LEVEL["info"], "Sequence Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
