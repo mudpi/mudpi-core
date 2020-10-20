@@ -135,7 +135,7 @@ class SequenceWorker(Worker):
 			decoded_message = self.last_event = self.decodeMessageData(data)
 			try:
 				if decoded_message['event'] == 'SequenceNextStep':
-					self.sequence[self.current_step].get('duration', None) is None and self.delay_complete:
+					if self.sequence[self.current_step].get('duration', None) is None and self.delay_complete:
 						self.step_complete = True
 					print('Sequence {0} Next Step Triggered\033[0;0m'.format(self.name))
 				elif decoded_message['event'] == 'SequencePreviousStep':
