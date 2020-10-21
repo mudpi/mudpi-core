@@ -19,7 +19,12 @@ class Logger:
         if "logging" in config.keys():
             logger_config = config["logging"]
         else:
-            raise Exception("No Logger configs were found!")
+            logger_config = {
+                "file_log_level": "warning",
+                "file": "mudpi.log",
+                "terminal_log_level": "info"
+            }
+            # raise Exception("No Logger configs were found!")
         
         self.__log = logging.getLogger(config['name']+"_stream")
         self.__file_log = logging.getLogger(config['name'])
