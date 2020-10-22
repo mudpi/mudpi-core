@@ -83,6 +83,20 @@ class SequenceWorker(Worker):
 				}))
 			Logger.log(LOG_LEVEL["info"], 'Sequence {0} Started\033[0;0m'.format(self.name))
 
+	def stop(self):
+		if self.sequence_active.is_set():
+			self.current_step = 0
+			self.sequence_active.clear()
+			self.reset_step()
+			self.r.publish(self.topic, json.dumps({
+					"event": "SequenceStopped",
+					"data": {
+						"name": self.name,
+						"key": self.key
+					}
+				}))
+			Logger.log(LOG_LEVEL["info"], 'Sequence {0} Stopped\033[0;0m'.format(self.name))
+
 	def next_step(self):
 		if self.step_complete:
 			# Step must be flagged complete to advance
@@ -147,6 +161,9 @@ class SequenceWorker(Worker):
 				elif decoded_message['event'] == 'SequenceSkipStep':
 					self.step_complete = True
 					Logger.log(LOG_LEVEL["info"], 'Sequence {0} Skip Step Triggered\033[0;0m'.format(self.name))
+				elif decoded_message['event'] == 'SequenceStop':
+					self.stop()
+					Logger.log(LOG_LEVEL["info"], 'Sequence {0} Stop Triggered\033[0;0m'.format(self.name))
 			except:
 				Logger.log(LOG_LEVEL["info"], 'Error Decoding Message for Sequence {0}'.format(self.config['key']))
 
@@ -209,7 +226,7 @@ class SequenceWorker(Worker):
 
 	def wait(self, duration=0):
 		time_remaining = duration
-		while time_remaining > 0:
+		while time_remaining > 0 and self.main_thread_running.is_set():
 			self.pubsub.get_message()
 			time.sleep(1)
 			time_remaining-=1
@@ -238,11 +255,23 @@ class SequenceWorker(Worker):
 									if self.delay_complete:
 										if self.evaluateThresholds():
 											self.trigger()
-								if self.sequence[self.current_step].get('duration', None) is not None:
+										else: 
+											if self.sequence[self.current_step].get('thresholds', None) is not None:
+												# Thresholds failed skip step waiting
+												self.step_complete = True
+								if self.sequence[self.current_step].get('duration', None) is not None and not self.step_complete:
 									self.wait(int(self.sequence[self.current_step].get('duration', 0)))
 									self.step_complete = True
 								time.sleep(1)
 							if self.step_complete:
+								self.r.publish(self.topic, json.dumps({
+									"event": "SequenceStepEnded",
+									"data": {
+										"name": self.name,
+										"key": self.key,
+										"step": self.current_step
+									}
+								}))
 								self.next_step()
 						else:
 							# Sequence not active and waiting to start
