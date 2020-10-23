@@ -125,7 +125,7 @@ class LcdWorker(Worker):
 				"duration": duration
 			}
 
-			if len(self.message_queue) = self.message_limit:
+			if len(self.message_queue) == self.message_limit:
 				 self.message_queue.pop(0)
 
 			self.message_queue.append(new_message)
