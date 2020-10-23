@@ -128,7 +128,7 @@ try:
 			workers.append(c)
 			camera_available.set()
 	except KeyError:
-		Logger.log(LOG_LEVEL["info"], 'Pi Camera...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Pi Camera...\t\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Workers for pi (Sensors, Controls, Relays, I2C)
 	try:
@@ -159,7 +159,7 @@ try:
 					raise Exception("Unknown Worker Type: " + worker['type'])
 				workers.append(pw)
 	except KeyError as e:
-		Logger.log(LOG_LEVEL["info"], 'Pi Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Pi Workers...\t\t\t\t\033[1;31m Disabled\033[0;0m')
 		print(e)
 
 	# Worker for relays attached to pi
@@ -188,7 +188,7 @@ try:
 				a = Action(action)
 				a.init_action()
 				actions[a.key] = a
-			Logger.log(LOG_LEVEL["info"], '{0} Actions...\t\t\t\033[1;32m Initializing\033[0;0m'.format(len(CONFIGS['actions'])))
+			Logger.log(LOG_LEVEL["info"], '{0} Actions...\t\t\t\t\033[1;32m Initializing\033[0;0m'.format(len(CONFIGS['actions'])))
 	except KeyError:
 		Logger.log(LOG_LEVEL["info"], 'Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
 
@@ -207,9 +207,9 @@ try:
 				sequences[s.key] = s
 				sequenceState['available'].set()
 				sequence_index +=1
-		Logger.log(LOG_LEVEL["info"], '{0} Sequences...\t\t\t\033[1;32m Initializing\033[0;0m'.format(len(CONFIGS["sequences"])))
+		Logger.log(LOG_LEVEL["info"], '{0} Sequences...\t\t\t\t\033[1;32m Initializing\033[0;0m'.format(len(CONFIGS["sequences"])))
 	except KeyError:
-		Logger.log(LOG_LEVEL["info"], 'Sequences...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Sequences...\t\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	# Worker for Triggers
 	try: 
@@ -217,10 +217,10 @@ try:
 			for trigger in CONFIGS["triggers"]:
 				trigger["redis"] = r
 			t = TriggerWorker(CONFIGS['triggers'], main_thread_running, system_ready, actions, sequences)
-			Logger.log(LOG_LEVEL["info"], 'Triggers...\t\t\t\033[1;32m Initializing\033[0;0m')
+			Logger.log(LOG_LEVEL["info"], 'Triggers...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 			workers.append(t)
 	except KeyError:
-		Logger.log(LOG_LEVEL["info"], 'Triggers...\t\t\t\033[1;31m Disabled\033[0;0m')
+		Logger.log(LOG_LEVEL["info"], 'Triggers...\t\t\t\t\033[1;31m Disabled\033[0;0m')
 
 
 	# Worker for nodes attached to pi via serial or wifi[esp8266, esp32]

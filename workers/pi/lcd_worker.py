@@ -40,7 +40,7 @@ class LcdWorker(Worker):
 		self.cached_message = {'message':'', 'duration': self.default_duration}
 		self.need_new_message = True
 		self.message_queue = []
-		self.message_limit = nt(self.config['message_limit']) if self.config['message_limit'] is not None else 20
+		self.message_limit = int(self.config['message_limit']) if self.config.get('message_limit', None) is not None else 20
 
 		# Events
 		self.lcd_available = lcd_available
