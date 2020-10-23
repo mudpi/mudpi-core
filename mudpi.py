@@ -138,10 +138,10 @@ try:
 				worker["redis"] = r
 				if worker['type'] == "sensor":
 					pw = PiSensorWorker(worker, main_thread_running, system_ready)
-					Logger.log(LOG_LEVEL["info"], 'Sensors...\t\t\t\033[1;32m Initializing\033[0;0m')
+					Logger.log(LOG_LEVEL["info"], 'Sensors...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 				elif worker['type'] == "control":
 					pw = PiControlWorker(worker, main_thread_running, system_ready)
-					Logger.log(LOG_LEVEL["info"], 'Controls...\t\t\t\033[1;32m Initializing\033[0;0m')
+					Logger.log(LOG_LEVEL["info"], 'Controls...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 				elif worker['type'] == "i2c":
 					pw = PiI2CWorker(worker, main_thread_running, system_ready)
 					Logger.log(LOG_LEVEL["info"], 'I2C Comms...\t\t\t\t\033[1;32m Initializing\033[0;0m')
@@ -150,7 +150,7 @@ try:
 						display["redis"] = r
 						pw = LcdWorker(display, main_thread_running, system_ready, lcd_available)
 						lcd_available.set()
-						Logger.log(LOG_LEVEL["info"], 'LCD Displays...\t\t\t\033[1;32m Initializing\033[0;0m')
+						Logger.log(LOG_LEVEL["info"], 'LCD Displays...\t\t\t\t\033[1;32m Initializing\033[0;0m')
 				elif worker['type'] == "relay":
 					# Add Relay Worker Here for Better Config Control
 					Logger.log(LOG_LEVEL["info"], 'Relay...\t\t\t\033[1;32m Initializing\033[0;0m')

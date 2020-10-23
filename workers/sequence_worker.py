@@ -10,6 +10,8 @@ sys.path.append('..')
 import variables
 import importlib
 
+from logger.Logger import Logger, LOG_LEVEL
+
 class SequenceWorker(Worker):
 	def __init__(self, config, main_thread_running, system_ready, sequence_available, sequence_active, actions):
 		super().__init__(config, main_thread_running, system_ready)

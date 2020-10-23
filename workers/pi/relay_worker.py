@@ -44,6 +44,7 @@ class RelayWorker(Worker):
 		return
 
 	def init(self):
+		Logger.log(LOG_LEVEL["info"], 'Relay Worker {0}...\t\t\t\033[1;32m Initializing\033[0;0m'.format(self.key))
 		GPIO.setup(self.config['pin'], GPIO.OUT)
 		#Close the relay by default, we use the pin state we determined based on the config at init
 		GPIO.output(self.config['pin'], self.pin_state_off)
@@ -56,7 +57,7 @@ class RelayWorker(Worker):
 				Logger.log(LOG_LEVEL["info"], 'Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.key))
 
 
-		Logger.log(LOG_LEVEL["info"], 'Relay Worker {0}...\t\t\t\033[1;32m Ready\033[0;0m'.format(self.key))
+		# Logger.log(LOG_LEVEL["info"], 'Relay Worker {0}...\t\t\t\033[1;32m Ready\033[0;0m'.format(self.key))
 		return
 
 	def run(self): 
