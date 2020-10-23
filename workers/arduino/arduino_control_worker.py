@@ -7,6 +7,9 @@ from nanpy import (SerialManager)
 from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
 from .worker import Worker
+from controls.arduino.button_control import (ButtonControl)
+from controls.arduino.switch_control import (SwitchControl)
+from controls.arduino.potentiometer_control import (PotentiometerControl)
 import sys
 sys.path.append('..')
 
@@ -35,7 +38,7 @@ class ArduinoControlWorker(Worker):
 		try:
 			for control in self.config['controls']:
 				if control.get('type', None) is not None:
-					#Get the control from the controls folder {control name}_control.{ControlName}Control
+					# Get the control from the controls folder {control name}_control.{ControlName}Control
 					control_type = 'controls.arduino.' + control.get('type').lower() + '_control.' + control.get('type').capitalize() + 'Control'
 					
 					analog_pin_mode = False if control.get('is_digital', False) else True
