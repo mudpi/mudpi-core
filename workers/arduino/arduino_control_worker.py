@@ -41,7 +41,7 @@ class ArduinoControlWorker(Worker):
 					# Get the control from the controls folder {control name}_control.{ControlName}Control
 					control_type = 'controls.arduino.' + control.get('type').lower() + '_control.' + control.get('type').capitalize() + 'Control'
 					
-					analog_pin_mode = False if control.get('is_digital', False) else True
+					analog_pin_mode = False if control.get('is_digital', True) else True
 
 					imported_control = self.dynamic_import(control_type)
 					
