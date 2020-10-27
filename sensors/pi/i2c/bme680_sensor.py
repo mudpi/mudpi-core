@@ -16,7 +16,7 @@ import variables
 
 class Bme680Sensor(Sensor):
 
-	def __init__(self, address = None, name='PressureSensor', key=None, redis_conn=None):
+	def __init__(self, address = None, name=None, key=None, redis_conn=None):
 		super().__init__(address, name=name, key=key, redis_conn=redis_conn)
 		return
 

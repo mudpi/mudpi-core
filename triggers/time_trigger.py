@@ -14,8 +14,8 @@ from logger.Logger import Logger, LOG_LEVEL
 
 class TimeTrigger(Trigger):
 
-	def __init__(self, main_thread_running, system_ready, name='TimeTrigger',key=None, trigger_active=None, actions=[], schedule=None, group=None):
-		super().__init__(main_thread_running, system_ready, name=name, key=key, trigger_active=trigger_active, actions=actions, trigger_interval=60, group=group)
+	def __init__(self, main_thread_running, system_ready, name='TimeTrigger',key=None, trigger_active=None, actions=[], schedule=None, group=None, sequences=[]):
+		super().__init__(main_thread_running, system_ready, name=name, key=key, trigger_active=trigger_active, actions=actions, trigger_interval=60, group=group, sequences=sequences)
 		self.schedule = schedule
 		return
 

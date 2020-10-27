@@ -31,7 +31,7 @@ class PiI2CWorker(Worker):
 
 				# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
 				sensor_kwargs = { 
-					'name' : sensor.get('name', sensor.get('type')),
+					'name' : sensor.get('name', None),
 					'address' : int(sensor.get('address', 00)),
 					'key'  : sensor.get('key', None)
 				}

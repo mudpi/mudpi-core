@@ -10,10 +10,19 @@ default_connection = SerialManager()
 # Base sensor class to extend all other arduino sensors from.
 class Control():
 
-	def __init__(self, pin, name='Control', connection=default_connection, analog_pin_mode=False, key=None, redis_conn=None):
+	def __init__(self, pin, name=None, connection=default_connection, analog_pin_mode=False, key=None, redis_conn=None):
 		self.pin = pin
-		self.name = name
-		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
+
+		if key is None:
+			raise Exception('No "key" Found in Control Config')
+		else:
+			self.key = key.replace(" ", "_").lower()
+
+		if name is None:
+			self.name = self.key.replace("_", " ").title()
+		else:
+			self.name = name
+			
 		self.analog_pin_mode = analog_pin_mode
 		self.connection = connection
 		self.api = ArduinoApi(connection)

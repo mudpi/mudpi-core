@@ -20,7 +20,7 @@ intervals = int((AirBounds - WaterBounds) / 3)
 
 class SoilSensor(Sensor):
 
-    def __init__(self, pin, mcp, name='SoilSensor', key=None, redis_conn=None):
+    def __init__(self, pin, mcp, name=None, key=None, redis_conn=None):
         super().__init__(pin, name=name, key=key, mcp=mcp, redis_conn=redis_conn)
         return
 

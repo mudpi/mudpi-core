@@ -6,16 +6,20 @@ import threading
 from .worker import Worker
 import sys
 sys.path.append('..')
+from triggers.time_trigger import TimeTrigger
 from triggers.trigger_group import TriggerGroup
+from triggers.sensor_trigger import SensorTrigger
+from triggers.control_trigger import ControlTrigger
 
 import variables
 import importlib
 from logger.Logger import Logger, LOG_LEVEL
 
 class TriggerWorker(Worker):
-	def __init__(self, config, main_thread_running, system_ready, actions):
+	def __init__(self, config, main_thread_running, system_ready, actions, sequences):
 		super().__init__(config, main_thread_running, system_ready)
 		self.actions = actions
+		self.sequences = sequences
 		self.triggers = []
 		self.trigger_threads = []
 		self.trigger_events = {}
@@ -39,14 +43,14 @@ class TriggerWorker(Worker):
 					new_trigger = self.init_trigger(trigger, trigger_index, group=new_trigger_group)
 					self.triggers.append(new_trigger)
 					new_trigger_group.add_trigger(new_trigger)
-					#Start the trigger thread
+					# Start the trigger thread
 					trigger_thread = new_trigger.run()
 					self.trigger_threads.append(trigger_thread)
 					trigger_index += 1
 			else:
 				new_trigger = self.init_trigger(trigger, trigger_index)
 				self.triggers.append(new_trigger)
-				#Start the trigger thread
+				# Start the trigger thread
 				trigger_thread = new_trigger.run()
 				self.trigger_threads.append(trigger_thread)
 				trigger_index += 1
@@ -55,20 +59,20 @@ class TriggerWorker(Worker):
 
 	def init_trigger(self, config, trigger_index, group=None):
 		if config.get('type', None) is not None:
-			#Get the trigger from the triggers folder {trigger name}_trigger.{SensorName}Sensor
+			# Get the trigger from the triggers folder triggers/{trigger type}_trigger.py
 			trigger_type = 'triggers.' + config.get('type').lower() + '_trigger.' + config.get('type').capitalize() + 'Trigger'
 
 			imported_trigger = self.dynamic_import(trigger_type)
 
 			trigger_state = {
-				"active": threading.Event() #Event to signal relay to open/close
+				"active": threading.Event() # Event to signal if trigger is active
 			}
 
 			self.trigger_events[config.get("key", trigger_index)] = trigger_state
 
 			# Define default kwargs for all trigger types, conditionally include optional variables below if they exist
 			trigger_kwargs = { 
-				'name' : config.get('name', config.get('type')),
+				'name' : config.get('name', None),
 				'key'  : config.get('key', None),
 				'trigger_active' : trigger_state["active"],
 				'main_thread_running' : self.main_thread_running,
@@ -81,6 +85,12 @@ class TriggerWorker(Worker):
 				for action in config.get("actions"):
 					trigger_actions.append(self.actions[action])
 				trigger_kwargs['actions'] = trigger_actions
+
+			if config.get('sequences'):
+				trigger_sequences = []
+				for sequence in config.get("sequences"):
+					trigger_sequences.append(self.sequences[sequence])
+				trigger_kwargs['sequences'] = trigger_sequences
 
 			if config.get('frequency'):
 				trigger_kwargs['frequency'] = config.get('frequency')

@@ -1,15 +1,14 @@
+import re
 import time
-import datetime
 import json
 import redis
-import threading
 import board
 import busio
+import datetime
+import threading
 import adafruit_character_lcd.character_lcd_rgb_i2c as character_rgb_lcd
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
 from .worker import Worker
-import sys
-sys.path.append('..')
 
 from logger.Logger import Logger, LOG_LEVEL
 
@@ -41,6 +40,7 @@ class LcdWorker(Worker):
 		self.cached_message = {'message':'', 'duration': self.default_duration}
 		self.need_new_message = True
 		self.message_queue = []
+		self.message_limit = int(self.config['message_limit']) if self.config.get('message_limit', None) is not None else 20
 
 		# Events
 		self.lcd_available = lcd_available
@@ -91,7 +91,7 @@ class LcdWorker(Worker):
 				if decoded_message['event'] == 'Message':
 					if decoded_message.get('data', None):
 						self.addMessageToQueue(decoded_message['data'].get('message', ''), int(decoded_message['data'].get('duration', self.default_duration)))
-						Logger.log(LOG_LEVEL["debug"], 'LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data'].get('message', '').replace("\\n", "\n")))
+						Logger.log(LOG_LEVEL["debug"], 'LCD Message Queued: \033[1;36m{0}\033[0;0m'.format(decoded_message['data'].get('message', '')))
 
 				elif decoded_message['event'] == 'Clear':
 					self.lcd.clear()
@@ -106,10 +106,28 @@ class LcdWorker(Worker):
 		#Add message to queue if LCD available
 		if self.lcd_available.is_set():
 
+			# Replace any codes such as [temperature] with a value found in redis
+			short_codes = re.findall(r'\[(.*?) *\]', message)
+
+			for code in short_codes:
+				data = self.r.get(code)
+				if data is None:
+					data = ''
+				else:
+					try:
+						data = data.decode('utf-8')
+					except:
+						data = ''
+				message = message.replace('['+code+']', str(data))
+
 			new_message = {
 				"message": message.replace("\\n", "\n"),
 				"duration": duration
 			}
+
+			if len(self.message_queue) == self.message_limit:
+				 self.message_queue.pop(0)
+
 			self.message_queue.append(new_message)
 
 			msg = { 'event':'MessageQueued', 'data': new_message }
@@ -122,6 +140,7 @@ class LcdWorker(Worker):
 			self.resetElapsedTime()
 			return self.message_queue.pop(0)
 		else:
+			time.sleep(3) # pause to reduce system load on message loop
 			return None
 
 	def work(self):
@@ -151,7 +170,7 @@ class LcdWorker(Worker):
 					Logger.log(LOG_LEVEL["error"], "LCD Worker \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
 					Logger.log(LOG_LEVEL["error"], "Exception: {0}".format(e)) 
 			else:
-				#System not ready
+				# System not ready
 				time.sleep(1)
 				self.resetElapsedTime()
 				

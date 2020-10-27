@@ -30,7 +30,7 @@ class PiSensorWorker(Worker):
 
 				# Define default kwargs for all sensor types, conditionally include optional variables below if they exist
 				sensor_kwargs = { 
-					'name' : sensor.get('name', sensor.get('type')),
+					'name' : sensor.get('name', None),
 					'pin' : int(sensor.get('pin', 0)),
 					'key'  : sensor.get('key', None)
 				}
@@ -65,25 +65,18 @@ class PiSensorWorker(Worker):
 				readings = {}
 				for sensor in self.sensors:
 					result = sensor.read()
-					readings[sensor.key] = result
-					self.r.set(sensor.key, json.dumps(result))
-					#print(sensor.name, result)
-
-					#Check for a critical water level from any float sensors
-					if sensor.type == 'float':
-						if sensor.critical:
-							if result:
-								pass
-								#self.pump_ready.set()
-							else:
-								pass
-								#self.pump_ready.clear()
-					
-				print(readings)
-				message['data'] = readings
-				self.r.publish(self.topic, json.dumps(message))
+					if result is not None:
+						readings[sensor.key] = result
+						self.r.set(sensor.key, json.dumps(result))
+						#print(sensor.name, result)
+				
+				if bool(readings):
+					print(readings)
+					message['data'] = readings
+					self.r.publish(self.topic, json.dumps(message))
 				time.sleep(self.sleep_duration)
 				
 			time.sleep(2)
-		#This is only ran after the main thread is shut down
+
+		# This is only ran after the main thread is shut down
 		Logger.log(LOG_LEVEL["info"], "Pi Sensor Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")

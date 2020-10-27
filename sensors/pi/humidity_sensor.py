@@ -14,7 +14,7 @@ from logger.Logger import Logger, LOG_LEVEL
 
 class HumiditySensor(Sensor):
 
-	def __init__(self, pin, name='HumdityTempSensor', key=None, model='11', redis_conn=None):
+	def __init__(self, pin, name=None, key=None, model='11', redis_conn=None):
 		super().__init__(pin, name=name, key=key, redis_conn=redis_conn)
 		self.type = model
 		return
@@ -43,7 +43,8 @@ class HumiditySensor(Sensor):
 			self.r.set(self.key, json.dumps(readings))
 			return readings
 		else:
-			Logger.log(LOG_LEVEL["error"], 'Failed to get DHT reading. Try again!')
+			Logger.log(LOG_LEVEL["error"], 'DHT Reading was Invalid. Trying again next cycle.')
+			return None
 
 
 	def readRaw(self):

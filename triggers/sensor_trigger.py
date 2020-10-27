@@ -9,8 +9,8 @@ from logger.Logger import Logger, LOG_LEVEL
 
 class SensorTrigger(Trigger):
 
-	def __init__(self, main_thread_running, system_ready, name='SensorTrigger',key=None, source=None, nested_source=None, thresholds=None, topic="sensors", trigger_active=None, frequency='once', actions=[], group=None, redis_conn=None):
-		super().__init__(main_thread_running, system_ready, name=name, key=key, source=source, thresholds=thresholds, trigger_active=trigger_active, frequency=frequency, actions=actions, trigger_interval=0.5, group=group)
+	def __init__(self, main_thread_running, system_ready, name='SensorTrigger',key=None, source=None, nested_source=None, thresholds=None, topic="sensors", trigger_active=None, frequency='once', actions=[], group=None, redis_conn=None, sequences=[]):
+		super().__init__(main_thread_running, system_ready, name=name, key=key, source=source, thresholds=thresholds, trigger_active=trigger_active, frequency=frequency, actions=actions, trigger_interval=0.5, group=group, sequences=sequences)
 		self.topic = topic.replace(" ", "_").lower() if topic is not None else "sensors"
 		self.nested_source = nested_source.lower() if nested_source is not None else nested_source
 		try:

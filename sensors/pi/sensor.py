@@ -7,10 +7,19 @@ import RPi.GPIO as GPIO
 
 class Sensor():
 
-	def __init__(self, pin, name='Sensor', key=None, redis_conn=None):
+	def __init__(self, pin, name=None, key=None, redis_conn=None):
 		self.pin = pin
-		self.name = name
-		self.key = key.replace(" ", "_").lower() if key is not None else self.name.replace(" ", "_").lower()
+
+		if key is None:
+			raise Exception('No "key" Found in Sensor Config')
+		else:
+			self.key = key.replace(" ", "_").lower()
+
+		if name is None:
+			self.name = self.key.replace("_", " ").title()
+		else:
+			self.name = name
+
 		self.gpio = GPIO
 		try:
 			self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)

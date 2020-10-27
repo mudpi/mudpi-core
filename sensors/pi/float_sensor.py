@@ -8,7 +8,7 @@ import RPi.GPIO as GPIO
 
 class FloatSensor(Sensor):
 
-	def __init__(self, pin, name='FloatSensor', key=None, redis_conn=None):
+	def __init__(self, pin, name=None, key=None, redis_conn=None):
 		super().__init__(pin, name=name, key=key, redis_conn=redis_conn)
 		return
 

@@ -19,7 +19,12 @@ class Logger:
         if "logging" in config.keys():
             logger_config = config["logging"]
         else:
-            raise Exception("No Logger configs were found!")
+            logger_config = {
+                "file_log_level": "warning",
+                "file": "mudpi.log",
+                "terminal_log_level": "info"
+            }
+            # raise Exception("No Logger configs were found!")
         
         self.__log = logging.getLogger(config['name']+"_stream")
         self.__file_log = logging.getLogger(config['name'])
@@ -81,9 +86,13 @@ class Logger:
             Logger.logger.log_this(log_level, msg)
 
     def log_this_file(self, log_level: int, msg: str):
+        msg = str(msg)
         msg = msg.replace("\x1b[1;32m", "")
-        msg = msg.replace("\x1b[0;0m", "")
         msg = msg.replace("\x1b[1;31m", "")
+        msg = msg.replace("\x1b[0;0m", "")
+        msg = msg.replace("\033[1;32m", "")
+        msg = msg.replace("\033[1;31m", "")
+        msg = msg.replace("\033[0;0m", "")
         self.__file_log.log(log_level, msg)
     
     def log_this(self, log_level: int, msg: str):

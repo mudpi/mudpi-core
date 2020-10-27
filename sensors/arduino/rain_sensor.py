@@ -21,7 +21,7 @@ DOWNPOUR_BOUNDS = 300 # and below
 
 class RainSensor(Sensor):
 
-	def __init__(self, pin, name='RainSensor', key=None, connection=default_connection, redis_conn=None):
+	def __init__(self, pin, name=None, key=None, connection=default_connection, redis_conn=None):
 		super().__init__(pin, name=name, key=key, connection=connection, redis_conn=redis_conn)
 		return
 
