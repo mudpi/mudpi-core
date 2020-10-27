@@ -37,7 +37,7 @@ class TriggerWorker(Worker):
 					for action in trigger.get("actions"):
 						trigger_actions.append(self.actions[action])
 
-				new_trigger_group = TriggerGroup(name=trigger.get("group"), actions=trigger_actions, frequency=trigger.get("frequency", "once"))
+				new_trigger_group = TriggerGroup(name=trigger.get("group"), key=trigger.get("key"), actions=trigger_actions, frequency=trigger.get("frequency", "once"))
 
 				for trigger in trigger.get("triggers"):
 					new_trigger = self.init_trigger(trigger, trigger_index, group=new_trigger_group)
