@@ -105,7 +105,7 @@ class ArduinoSensorWorker(Worker):
 							time.sleep(15)
 					else:
 						# Worker connected but sensors not initialized
-						self.init_sensors()
+						self.init()
 						self.sensors_ready = True
 				else:
 					#Node not connected, sensors not ready. Wait for reconnect
