@@ -3,21 +3,23 @@ import sys
 import threading
 import json
 import time
+import redis
 
 # from logger.Logger import Logger, LOG_LEVEL
 
-# A socket server prototype that was going to be used for devices to communicate.
-# Instead we are using nodejs to catch events in redis and emit them over a socket.
-# May update this in later version for device communications. Undetermined.
+# A socket server used to allow incoming wiresless connections. 
+# MudPi will listen on the socket server for clients to join and
+# send a message that should be broadcast on the event system.
 
 class MudpiServer(object):
 
-	def __init__(self, system_running, host='127.0.0.1', port=7007):
-		self.port = int(port)
-		self.host = host
+	def __init__(self, config, system_running):
+		self.port = int(config.get("port", 7007))
+		self.host = config.get("host", "127.0.0.1")
 		self.system_running = system_running
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.client_threads = []
+
 
 		try:
 			self.sock.bind((self.host, self.port))
@@ -25,18 +27,26 @@ class MudpiServer(object):
 			print('Failed to create socket. Error Code: ', str(msg[0]), ' , Error Message: ', msg[1])
 			sys.exit()
 
+		# PubSub
+		try:
+			self.r = config["redis"]
+		except KeyError:
+			self.r = redis.Redis(host='127.0.0.1', port=6379)
+
 	def listen(self):
 		self.sock.listen(0) # number of clients to listen for.
 		print('MudPi Server...\t\t\t\t\033[1;32m Online\033[0;0m ')
 		while self.system_running.is_set():
 			try:
 				client, address = self.sock.accept()
-				client.settimeout(60)
-				print('Client connected from ', address)
-				t = threading.Thread(target = self.listenToClient, args = (client, address))
+				client.settimeout(600)
+				ip, port = client.getpeername()
+				print('Socket \033[1;32mClient {0}\033[0;0m from \033[1;32m{1} Connected\033[0;0m'.format(port, ip))
+				t = threading.Thread(target = self.listenToClient, args = (client, address, ip))
 				self.client_threads.append(t)
 				t.start()
-			except:
+			except Exception as e:
+				print(e)
 				time.sleep(1)
 				pass
 		self.sock.close()
@@ -45,25 +55,30 @@ class MudpiServer(object):
 				client.join()
 		print('Server Shutdown...\t\t\t\033[1;32m Complete\033[0;0m')
 
-	def listenToClient(self, client, address):
+	def listenToClient(self, client, address, ip):
 		size = 1024
 		while self.system_running.is_set():
 			try:
 				data = client.recv(size)
 				if data:
 					data = self.decodeMessageData(data)
-					print(data)
-					response = {
-						"status": "OK",
-						"code": 200
-					}
-					client.send(json.dumps(response).encode('utf-8'))
+					if data.get("topic", None) is not None:
+						self.r.publish(data["topic"], json.dumps(data))
+						print("Socket Event \033[1;36m{event}\033[0;0m from \033[1;36m{source}\033[0;0m Dispatched".format(**data))
+
+						# response = {
+						# 	"status": "OK",
+						# 	"code": 200
+						# }
+						# client.send(json.dumps(response).encode('utf-8'))
+					else:
+						print("Socket Data Recieved. \033[1;31mDispatch Failed:\033[0;0m Missing Data 'Topic'")
+						print(data)
 				else:
 					pass
 					# raise error('Client Disconnected')
 			except Exception as e:
-				print(e)
-				print("Client Disconnected")
+				print("Socket Client \033[1;31m{0} Disconnected\033[0;0m".format(ip))
 				client.close()
 				return False
 		print('Closing Client Connection...\t\t\033[1;32m Complete\033[0;0m')
@@ -76,16 +91,18 @@ class MudpiServer(object):
 				temp = json.loads(message.decode('utf-8'))
 				return temp # print('Json Found')
 			except:
-				return {'event':'Unknown', 'data':message} # print('Json Error. Str Found')
+				return {'event':'Unknown', 'data':message.decode('utf-8')} # print('Json Error. Str Found')
 		else:
 			return {'event':'Unknown', 'data':message} # print('Failed to detect type')
 
 if __name__ == "__main__":
-	host = ''
-	port = 7007
+	config = {
+		"host": '',
+		"port": 7007
+	}
 	system_ready = threading.Event()
 	system_ready.set()
-	server = MudpiServer(system_ready, host, port)
+	server = MudpiServer(config, system_ready)
 	server.listen();
 	try:
 		while system_ready.is_set():

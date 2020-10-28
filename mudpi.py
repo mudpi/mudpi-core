@@ -248,16 +248,17 @@ try:
 	except KeyError as e:
 		Logger.log(LOG_LEVEL["info"], 'MudPi Node Workers...\t\t\t\033[1;31m Disabled\033[0;0m')
 
-	# try:
-	# 	if (CONFIGS['server'] is not None):
-	# 		Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
-	# 		time.sleep(1)
-	# 		server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
-	# 		s = threading.Thread(target=server_worker)  # TODO where is server_worker supposed to be initialized?
-	# 		threads.append(s)
-	# 		s.start()
-	# except KeyError:
-	# 	Logger.log(LOG_LEVEL["info"], 'MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
+	try:
+		if (CONFIGS['server'] is not None):
+			Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
+			time.sleep(1)
+			CONFIGS['server']['redis'] = r
+			server = MudpiServer(CONFIGS['server'], main_thread_running)
+			s = threading.Thread(target=server.listen)
+			threads.append(s)
+			s.start()
+	except KeyError:
+		Logger.log(LOG_LEVEL["info"], 'MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
 
 	Logger.log(LOG_LEVEL["info"], 'MudPi Garden Controls...\t\t\033[1;32m Initialized\033[0;0m')
 	Logger.log(LOG_LEVEL["info"], 'Engaging MudPi Workers...\t\t\033[1;32m \033[0;0m')
