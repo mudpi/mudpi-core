@@ -5,7 +5,7 @@ import json
 import time
 import redis
 
-# from logger.Logger import Logger, LOG_LEVEL
+from logger.Logger import Logger, LOG_LEVEL
 
 # A socket server used to allow incoming wiresless connections. 
 # MudPi will listen on the socket server for clients to join and
@@ -24,7 +24,7 @@ class MudpiServer(object):
 		try:
 			self.sock.bind((self.host, self.port))
 		except socket.error as msg:
-			print('Failed to create socket. Error Code: ', str(msg[0]), ' , Error Message: ', msg[1])
+			Logger.log(LOG_LEVEL['error'], 'Failed to create socket. Error Code: ', str(msg[0]), ' , Error Message: ', msg[1])
 			sys.exit()
 
 		# PubSub
@@ -35,25 +35,25 @@ class MudpiServer(object):
 
 	def listen(self):
 		self.sock.listen(0) # number of clients to listen for.
-		print('MudPi Server...\t\t\t\t\033[1;32m Online\033[0;0m ')
+		Logger.log(LOG_LEVEL['info'], 'MudPi Server...\t\t\t\t\033[1;32m Online\033[0;0m ')
 		while self.system_running.is_set():
 			try:
 				client, address = self.sock.accept()
 				client.settimeout(600)
 				ip, port = client.getpeername()
-				print('Socket \033[1;32mClient {0}\033[0;0m from \033[1;32m{1} Connected\033[0;0m'.format(port, ip))
+				Logger.log(LOG_LEVEL['info'], 'Socket \033[1;32mClient {0}\033[0;0m from \033[1;32m{1} Connected\033[0;0m'.format(port, ip))
 				t = threading.Thread(target = self.listenToClient, args = (client, address, ip))
 				self.client_threads.append(t)
 				t.start()
 			except Exception as e:
-				print(e)
+				Logger.log(LOG_LEVEL['error'], e)
 				time.sleep(1)
 				pass
 		self.sock.close()
 		if len(self.client_threads > 0):
 			for client in self.client_threads:
 				client.join()
-		print('Server Shutdown...\t\t\t\033[1;32m Complete\033[0;0m')
+		Logger.log(LOG_LEVEL['info'], 'Server Shutdown...\t\t\t\033[1;32m Complete\033[0;0m')
 
 	def listenToClient(self, client, address, ip):
 		size = 1024
@@ -64,7 +64,7 @@ class MudpiServer(object):
 					data = self.decodeMessageData(data)
 					if data.get("topic", None) is not None:
 						self.r.publish(data["topic"], json.dumps(data))
-						print("Socket Event \033[1;36m{event}\033[0;0m from \033[1;36m{source}\033[0;0m Dispatched".format(**data))
+						Logger.log(LOG_LEVEL['info'], "Socket Event \033[1;36m{event}\033[0;0m from \033[1;36m{source}\033[0;0m Dispatched".format(**data))
 
 						# response = {
 						# 	"status": "OK",
@@ -72,16 +72,16 @@ class MudpiServer(object):
 						# }
 						# client.send(json.dumps(response).encode('utf-8'))
 					else:
-						print("Socket Data Recieved. \033[1;31mDispatch Failed:\033[0;0m Missing Data 'Topic'")
-						print(data)
+						Logger.log(LOG_LEVEL['error'], "Socket Data Recieved. \033[1;31mDispatch Failed:\033[0;0m Missing Data 'Topic'")
+						Logger.log(LOG_LEVEL['debug'], data)
 				else:
 					pass
 					# raise error('Client Disconnected')
 			except Exception as e:
-				print("Socket Client \033[1;31m{0} Disconnected\033[0;0m".format(ip))
+				Logger.log(LOG_LEVEL['info'], "Socket Client \033[1;31m{0} Disconnected\033[0;0m".format(ip))
 				client.close()
 				return False
-		print('Closing Client Connection...\t\t\033[1;32m Complete\033[0;0m')
+		Logger.log(LOG_LEVEL['info'], 'Closing Client Connection...\t\t\033[1;32m Complete\033[0;0m')
 
 	def decodeMessageData(self, message):
 		if isinstance(message, dict):

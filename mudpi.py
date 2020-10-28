@@ -250,7 +250,7 @@ try:
 
 	try:
 		if (CONFIGS['server'] is not None):
-			Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
+			Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m')
 			time.sleep(1)
 			CONFIGS['server']['redis'] = r
 			server = MudpiServer(CONFIGS['server'], main_thread_running)
