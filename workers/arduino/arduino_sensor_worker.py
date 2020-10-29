@@ -95,7 +95,7 @@ class ArduinoSensorWorker(Worker):
 								readings[sensor.key] = result
 								#r.set(sensor.get('key', sensor.get('type')), value)
 								
-							Logger.log(LOG_LEVEL["debug"], "Node Readings: ", readings)
+							Logger.log(LOG_LEVEL["debug"], "Node Readings: {0}".format(readings))
 							message['data'] = readings
 							self.r.publish(self.topic, json.dumps(message))
 						except (SerialManagerError, SocketManagerError, BrokenPipeError, ConnectionResetError, OSError, socket.timeout) as e:
