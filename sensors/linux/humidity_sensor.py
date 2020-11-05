@@ -36,9 +36,10 @@ class HumiditySensor(Sensor):
         """Read the sensor(s), parse the data and store it in redis if redis is configured"""
 
         for i in range(15):            # read_retry() not implemented in new lib
+            dhtDevice = self.sensor(self.pin)
             try:
-                temperature_c = self.sensor(self.pin).temperature
-                humidity = self.sensor(self.pin).humidity
+                temperature_c = dhtDevice.temperature
+                humidity = dhtDevice.humidity
                 if humidity is not None and temperature_c is not None:
                     break
             except RuntimeError:
