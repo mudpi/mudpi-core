@@ -32,7 +32,7 @@ class PiSensorWorker(Worker):
                 # Define default kwargs for all sensor types, conditionally include optional variables below if they exist
                 sensor_kwargs = {
                     'name': sensor.get('name', None),
-                    'pin': int(sensor.get('pin', 0)),
+                    'pin': sensor.get('pin', None),
                     'key': sensor.get('key', None)
                 }
 

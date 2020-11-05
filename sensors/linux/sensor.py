@@ -4,6 +4,7 @@ import redis
 import digitalio
 import board
 import re
+from logger.Logger import Logger, LOG_LEVEL
 
 
 # PIN MODE : OUT | IN
@@ -11,7 +12,14 @@ import re
 class Sensor():
 
     def __init__(self, pin, name=None, key=None, redis_conn=None):
-        self.pin = pin
+        self.pin_obj = getattr(board, pin)
+
+        if re.match(r'D\d+$', pin):
+            self.is_digital = True
+        elif re.match(r'A\d+$', pin):
+            self.is_digital = False
+        else:
+            Logger.log(LOG_LEVEL["error"], "Cannot detect pin type (Digital or analog), should be Dxx or Axx for digital or analog. Please refer to https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board")
 
         if key is None:
             raise Exception('No "key" Found in Sensor Config')
@@ -48,15 +56,15 @@ class Sensor():
     def readPin(self):
         """Read the pin from the board.
 
-        pin value is a string starting with D for a digital input and A for an analog input, followed by the pin number.
+        pin value must be a blinka Pin. D for a digital input and A for an analog input, followed by the pin number.
         You check the board-specific pin mapping [here](https://github.com/adafruit/Adafruit_Blinka/blob/master/src/adafruit_blinka/board/).
 
         Examples:
-        readPin('D12')
-        readPin('A12')
+        readPin(board.D12)
+        readPin(board.A12)
         """
-        if re.match(r'D\d+$', self.pin):
-            data = self.gpio.DigitalInOut(self.pin).value
-        elif re.match(r'A\d+$', self.pin):
-            data = self.gpio.AnalogIn(self.pin).value
+        if self.is_digital:
+            data = self.gpio.DigitalInOut(self.pin_obj).value
+        else:
+            data = self.gpio.AnalogIn(self.pin_obj).value
         return data

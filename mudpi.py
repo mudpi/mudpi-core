@@ -10,14 +10,14 @@ sys.path.append('..')
 from action import Action
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
-from workers.pi.lcd_worker import LcdWorker
-from workers.pi.i2c_worker import PiI2CWorker
-from workers.pi.relay_worker import RelayWorker
-from workers.pi.camera_worker import CameraWorker
-from workers.pi.sensor_worker import PiSensorWorker
-from workers.pi.control_worker import PiControlWorker
-from workers.trigger_worker import TriggerWorker
-from workers.sequence_worker import SequenceWorker
+# from workers.pi.lcd_worker import LcdWorker
+# from workers.pi.i2c_worker import PiI2CWorker
+# from workers.pi.relay_worker import RelayWorker
+# from workers.pi.camera_worker import CameraWorker
+from workers.linux.sensor_worker import PiSensorWorker
+# from workers.pi.control_worker import PiControlWorker
+# from workers.trigger_worker import TriggerWorker
+# from workers.sequence_worker import SequenceWorker
 try:
     from workers.arduino.arduino_worker import ArduinoWorker
     NANPY_ENABLED = True
@@ -190,7 +190,7 @@ try:
                 actions[a.key] = a
             Logger.log(LOG_LEVEL["info"], '{0} Actions...\t\t\t\t\033[1;32m Initializing\033[0;0m'.format(len(CONFIGS['actions'])))
     except KeyError:
-        Logger.log(LOG_LEVEL["info"], 'Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
+        Logger.log(LOG_LEVEL["info"], 'Actions...\t\t\t\t\033[1;31m Disabled\033[0;0m')
 
     # Worker for Sequences
     try:
