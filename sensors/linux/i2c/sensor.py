@@ -3,7 +3,6 @@ import json
 import redis
 import board
 from busio import I2C
-import RPi.GPIO as GPIO
 
 
 # PIN MODE : OUT | IN
@@ -23,7 +22,6 @@ class Sensor():
         else:
             self.name = name
 
-        self.gpio = GPIO
         self.i2c = I2C(board.SCL, board.SDA)
         try:
             self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
@@ -46,7 +44,10 @@ class Sensor():
         """Read the sensor(s) but return the raw data, useful for debugging"""
         pass
 
+    # self.pin not defined and readPin() doesn't seemto be called. So I commented it
+    '''
     def readPin(self):
-        """Read the pin from the ardiuno. Can be analog or digital based on \"analog_pin_mode\""""
+        """Read the pin from the board. Can be analog or digital based on \"analog_pin_mode\""""
         data = self.gpio.input(self.pin)
         return data
+    '''
