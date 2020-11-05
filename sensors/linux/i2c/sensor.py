@@ -43,10 +43,10 @@ class Sensor():
         pass
 
     def readRaw(self):
-        # Read the sensor(s) but return the raw data, useful for debugging
+        """Read the sensor(s) but return the raw data, useful for debugging"""
         pass
 
     def readPin(self):
-        # Read the pin from the ardiuno. Can be analog or digital based on "analog_pin_mode"
+        """Read the pin from the ardiuno. Can be analog or digital based on \"analog_pin_mode\""""
         data = self.gpio.input(self.pin)
         return data
