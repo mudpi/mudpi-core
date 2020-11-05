@@ -6,7 +6,7 @@ import threading
 import sys
 sys.path.append('..')
 from .worker import Worker
-from sensors.pi.i2c.bme680_sensor import (Bme680Sensor)
+from sensors.linux.i2c.bme680_sensor import (Bme680Sensor)
 
 from logger.Logger import Logger, LOG_LEVEL
 
