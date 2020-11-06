@@ -39,13 +39,13 @@ class Control():
 
 	def read(self):
 		#Read the sensor(s), parse the data and store it in redis if redis is configured
-		return self.readPin()
+		return self.read_pin()
 
-	def readRaw(self):
+	def read_raw(self):
 		#Read the sensor(s) but return the raw data, useful for debugging
 		pass
 
-	def readPin(self):
+	def read_pin(self):
 		#Read the pin from the ardiuno. Can be analog or digital based on "analog_pin_mode"
 		data = self.api.analogRead(self.pin) if self.analog_pin_mode else self.api.digitalRead(self.pin)
 		return data

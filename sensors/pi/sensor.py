@@ -3,46 +3,56 @@ import json
 import redis
 import RPi.GPIO as GPIO
 
-#PIN MODE : OUT | IN
 
-class Sensor():
+# PIN MODE : OUT | IN
 
-	def __init__(self, pin, name=None, key=None, redis_conn=None):
-		self.pin = pin
+class Sensor:
 
-		if key is None:
-			raise Exception('No "key" Found in Sensor Config')
-		else:
-			self.key = key.replace(" ", "_").lower()
+    def __init__(self, pin, name=None, key=None, redis_conn=None):
+        self.pin = pin
 
-		if name is None:
-			self.name = self.key.replace("_", " ").title()
-		else:
-			self.name = name
+        if key is None:
+            raise Exception('No "key" Found in Sensor Config')
+        else:
+            self.key = key.replace(" ", "_").lower()
 
-		self.gpio = GPIO
-		try:
-			self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
-		except KeyError:
-			self.r = redis.Redis(host='127.0.0.1', port=6379)
-		return
+        if name is None:
+            self.name = self.key.replace("_", " ").title()
+        else:
+            self.name = name
 
-	def init_sensor(self):
-		#Initialize the sensor here (i.e. set pin mode, get addresses, etc)
-		#GPIO.setmode(GPIO.BCM)
-		#GPIO.setup(pin, GPIO.IN)
-		pass
+        self.gpio = GPIO
+        try:
+            self.r = redis_conn if redis_conn is not None else redis.Redis(
+                host='127.0.0.1', port=6379)
+        except KeyError:
+            self.r = redis.Redis(host='127.0.0.1', port=6379)
+        return
 
-	def read(self):
-		#Read the sensor(s), parse the data and store it in redis if redis is configured
-		#GPIO.input(pin)
-		pass
+    def init_sensor(self):
+        """
+        Initialize the sensor here (i.e. set pin mode, get addresses, etc)
+        """
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setup(pin, GPIO.IN)
+        pass
 
-	def readRaw(self):
-		#Read the sensor(s) but return the raw data, useful for debugging
-		pass
+    def read(self):
+        """
+        Read the sensor(s), parse the data and store it in redis if
+        redis is configured
+        """
+        # GPIO.input(pin)
+        pass
 
-	def readPin(self):
-		#Read the pin from the ardiuno. Can be analog or digital based on "analog_pin_mode"
-		data = self.gpio.input(self.pin)
-		return data
+    def read_raw(self):
+        # Read the sensor(s) but return the raw data, useful for debugging
+        pass
+
+    def read_pin(self):
+        """
+        Read the pin from the ardiuno. Can be analog or digital based
+        on "analog_pin_mode"
+        """
+        data = self.gpio.input(self.pin)
+        return data

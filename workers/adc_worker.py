@@ -41,7 +41,8 @@ class ADCMCP3008Worker:
         self.system_ready = system_ready
         self.node_ready = False
         try:
-            self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
+            self.r = redis_conn if redis_conn is not None else redis.Redis(
+                host='127.0.0.1', port=6379)
         except KeyError:
             self.r = redis.Redis(host='127.0.0.1', port=6379)
 
@@ -71,28 +72,45 @@ class ADCMCP3008Worker:
         for sensor in self.config['sensors']:
 
             if sensor.get('type', None) is not None:
-                # Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
-                sensor_type = 'sensors.MCP3xxx.' + sensor.get('type').lower() + '_sensor.' + sensor.get(
+                # Get the sensor from the sensors folder
+                # {sensor name}_sensor.{SensorName}Sensor
+                sensor_type = 'sensors.mcp3xxx.' + sensor.get(
+                    'type').lower() + '_sensor.' + sensor.get(
                     'type').capitalize() + 'Sensor'
                 # analog_pin_mode = False if sensor.get('is_digital', False) else True
                 imported_sensor = self.dynamic_sensor_import(sensor_type)
                 new_sensor = imported_sensor(int(sensor.get('pin')),
-                                             name=sensor.get('name', sensor.get('type')),
+                                             name=sensor.get('name',
+                                                             sensor.get(
+                                                                 'type')),
                                              key=sensor.get('key', None),
                                              mcp=self.mcp)
                 new_sensor.init_sensor()
                 self.sensors.append(new_sensor)
-                Logger.log(LOG_LEVEL["info"], '{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**sensor))
+                Logger.log(
+                    LOG_LEVEL["info"],
+                    '{type} Sensor {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(
+                        **sensor)
+                )
 
     def run(self):
+
         if self.node_ready:
             t = threading.Thread(target=self.work, args=())
             t.start()
-            Logger.log(LOG_LEVEL["info"], str(self.config['name']) + ' Node Worker [' + str(
-                len(self.config['sensors'])) + ' Sensors]...\t\033[1;32m Online\033[0;0m')
+            Logger.log(
+                LOG_LEVEL["info"],
+                str(self.config['name']) + ' Node Worker [' + str(
+                    len(self.config[
+                            'sensors'])) + ' Sensors]...\t\033[1;32m Online\033[0;0m'
+            )
             return t
+
         else:
-            Logger.log(LOG_LEVEL["warning"], "Node Connection...\t\t\t\033[1;31m Failed\033[0;0m")
+            Logger.log(
+                LOG_LEVEL["warning"],
+                "Node Connection...\t\t\t\033[1;31m Failed\033[0;0m"
+            )
             return None
 
     def work(self):
@@ -112,5 +130,8 @@ class ADCMCP3008Worker:
 
             time.sleep(15)
         # This is only ran after the main thread is shut down
-        Logger.log(LOG_LEVEL["info"], "{name} Node Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(
-            **self.config))
+        Logger.log(
+            LOG_LEVEL["info"],
+            "{name} Node Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m".format(
+                **self.config)
+        )
