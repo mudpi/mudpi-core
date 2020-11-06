@@ -1,9 +1,10 @@
 import adafruit_mcp3xxx.mcp3008 as MCP
-import redis
-
 
 # Base sensor class to extend all other mcp3xxx sensors from.
-class Sensor:
+from sensors.base_sensor import BaseSensor
+
+
+class Sensor(BaseSensor):
     PINS = {
         0: MCP.P0,
         1: MCP.P1,
@@ -16,49 +17,14 @@ class Sensor:
     }
 
     def __init__(self, pin: int, mcp, name=None, key=None, redis_conn=None):
-        self.pin = pin
+        super().__init__(
+            pin=pin,
+            name=name,
+            key=key,
+            redis_conn=redis_conn
+        )
         self.mcp = mcp
         self.topic = None
-
-        if key is None:
-            raise Exception('No "key" Found in Sensor Config')
-        else:
-            self.key = key.replace(" ", "_").lower()
-
-        if name is None:
-            self.name = self.key.replace("_", " ").title()
-        else:
-            self.name = name
-
-        try:
-            self.r = redis_conn if redis_conn is not None else redis.Redis(
-                host='127.0.0.1', port=6379)
-        except KeyError:
-            self.r = redis.Redis(host='127.0.0.1', port=6379)
-
-    def init_sensor(self):
-        """
-        Initialize the sensor here (i.e. set pin mode, get addresses, etc)
-
-        Returns:
-
-        Raises:
-            NotImplementedError
-        """
-        raise NotImplementedError
-
-    def read(self):
-        """
-        Read the sensor(s), parse the data and store it in redis if redis is
-        configured
-
-        Returns:
-            None
-
-        Raises:
-            NotImplementedError
-        """
-        raise NotImplementedError
 
     def read_raw(self):
         """

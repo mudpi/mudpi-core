@@ -1,14 +1,9 @@
-import sys
-
 from nanpy import (SerialManager)
 
 from sensors.arduino.sensor import Sensor
 
-
 default_connection = SerialManager(device='/dev/ttyUSB0')
 
-
-# r = redis.Redis(host='127.0.0.1', port=6379)
 
 class FloatSensor(Sensor):
 
