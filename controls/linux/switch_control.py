@@ -5,7 +5,9 @@ import redis
 from .control import Control
 import RPi.GPIO as GPIO
 
+
 r = redis.Redis(host='127.0.0.1', port=6379)
+
 
 class SwitchControl(Control):
 
