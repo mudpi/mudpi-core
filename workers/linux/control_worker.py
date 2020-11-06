@@ -7,8 +7,8 @@ from .worker import Worker
 import sys
 
 sys.path.append('..')
-from controls.pi.button_control import (ButtonControl)
-from controls.pi.switch_control import (SwitchControl)
+from controls.linux.button_control import (ButtonControl)
+from controls.linux.switch_control import (SwitchControl)
 
 from logger.Logger import Logger, LOG_LEVEL
 
