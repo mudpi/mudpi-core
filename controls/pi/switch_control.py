@@ -37,6 +37,6 @@ class SwitchControl(Control):
 		self.previous_state = state
 		return state
 
-	def readRaw(self):
+	def read_raw(self):
 		return super().read()
 

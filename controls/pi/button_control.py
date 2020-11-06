@@ -25,6 +25,6 @@ class ButtonControl(Control):
 			super().emitEvent(1)
 		return state
 
-	def readRaw(self):
+	def read_raw(self):
 		return super().read()
 

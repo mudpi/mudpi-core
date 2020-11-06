@@ -40,13 +40,13 @@ class Sensor():
         # GPIO.input(pin)
         pass
 
-    def readRaw(self):
+    def read_raw(self):
         """Read the sensor(s) but return the raw data, useful for debugging"""
         pass
 
-    # self.pin not defined and readPin() doesn't seemto be called. So I commented it
+    # self.pin not defined and read_pin() doesn't seemto be called. So I commented it
     '''
-    def readPin(self):
+    def read_pin(self):
         """Read the pin from the board. Can be analog or digital based on \"analog_pin_mode\""""
         data = self.gpio.input(self.pin)
         return data

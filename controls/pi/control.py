@@ -60,13 +60,13 @@ class Control():
 	def read(self):
 		#Read the sensor(s), parse the data and store it in redis if redis is configured
 		#If edge detection is being used return the detection event instead
-		return self.readPin() if self.edge_detection is None else GPIO.event_detected(self.pin)
+		return self.read_pin() if self.edge_detection is None else GPIO.event_detected(self.pin)
 
-	def readRaw(self):
+	def read_raw(self):
 		#Read the sensor(s) but return the raw data, useful for debugging
 		pass
 
-	def readPin(self):
+	def read_pin(self):
 		#Read the pin from the pi digital reads only
 		data = self.gpio.input(self.pin)
 		return data

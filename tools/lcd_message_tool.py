@@ -3,7 +3,7 @@ import threading
 import json
 import time
 
-def timedMessage(message, delay=3):
+def timed_message(message, delay=3):
 	for s in range(1,delay):
 		remainingTime = delay - s
 		print(message + '...{0}s \r'.format(remainingTime), end="", flush=True)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 						'data': 1
 					}
 				else:
-					timedMessage('Option not recognized')
+					timed_message('Option not recognized')
 					print(chr(27) + "[2J")
 					continue
 
@@ -81,9 +81,9 @@ if __name__ == "__main__":
 					#Publish the message
 					publisher.publish(topic, json.dumps(message))
 					print(message)
-					timedMessage('Message Successfully Queued!')
+					timed_message('Message Successfully Queued!')
 				else:
-					timedMessage('Topic Input Invalid')
+					timed_message('Topic Input Invalid')
 					time.sleep(2)
 
 		print('Exit')
