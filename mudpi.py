@@ -12,7 +12,7 @@ from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
 # from workers.pi.lcd_worker import LcdWorker
 from workers.linux.i2c_worker import PiI2CWorker
-# from workers.pi.relay_worker import RelayWorker
+from workers.linux.relay_worker import RelayWorker
 # from workers.pi.camera_worker import CameraWorker
 from workers.linux.sensor_worker import PiSensorWorker
 # from workers.pi.control_worker import PiControlWorker
