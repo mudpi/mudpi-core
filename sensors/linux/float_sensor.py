@@ -25,6 +25,6 @@ class FloatSensor(Sensor):
         value = self.gpio_pin.value
         return value
 
-    def readRaw(self):
+    def read_raw(self):
         """Read the sensor(s) but return the raw data, useful for debugging"""
         return self.read()

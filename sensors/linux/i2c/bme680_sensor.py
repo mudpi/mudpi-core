@@ -1,17 +1,12 @@
-import time
 import json
-import redis
-from .sensor import Sensor
-import board
-from busio import I2C
+import sys
+
 import adafruit_bme680
 
 from logger.Logger import Logger, LOG_LEVEL
+from sensors.linux.i2c.sensor import Sensor
 
-import sys
 sys.path.append('..')
-
-import variables
 
 
 class Bme680Sensor(Sensor):
@@ -21,7 +16,9 @@ class Bme680Sensor(Sensor):
         return
 
     def init_sensor(self):
-        self.sensor = adafruit_bme680.Adafruit_BME680_I2C(self.i2c, debug=False)
+        self.sensor = adafruit_bme680.Adafruit_BME680_I2C(
+            self.i2c, debug=False
+        )
         # change this to match the location's pressure (hPa) at sea level
         self.sensor.sea_level_pressure = 1013.25
         return
@@ -39,13 +36,22 @@ class Bme680Sensor(Sensor):
             self.r.set(self.key + '_gas', gas)
             self.r.set(self.key + '_pressure', pressure)
             self.r.set(self.key + '_altitude', altitude)
-            readings = {'temperature': temperature, 'humidity': humidity, 'pressure': pressure, 'gas': gas, 'altitude': altitude}
+            readings = {
+                'temperature': temperature,
+                'humidity': humidity,
+                'pressure': pressure,
+                'gas': gas,
+                'altitude': altitude
+            }
             self.r.set(self.key, json.dumps(readings))
             # print('BME680:', readings)
             return readings
         else:
-            Logger.log(LOG_LEVEL["error"], 'Failed to get reading [BME680]. Try again!')
+            Logger.log(
+                LOG_LEVEL["error"],
+                'Failed to get reading [BME680]. Try again!'
+            )
 
-    def readRaw(self):
+    def read_raw(self):
         """Read the sensor(s) but return the raw data, useful for debugging"""
         return self.read()
