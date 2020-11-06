@@ -1,8 +1,11 @@
 import time
 import json
 import redis
-import RPi.GPIO as GPIO
 import sys
+import board
+import digitalio
+
+
 sys.path.append('..')
 
 
@@ -10,7 +13,7 @@ sys.path.append('..')
 class Control():
 
     def __init__(self, pin, name=None, key=None, resistor=None, edge_detection=None, debounce=None, redis_conn=None):
-        self.pin = pin
+        self.pin_obj = getattr(board, pin)
 
         if key is None:
             raise Exception('No "key" Found in Control Config')
@@ -22,7 +25,7 @@ class Control():
         else:
             self.name = name
 
-        self.gpio = GPIO
+        self.gpio = digitalio
         self.debounce = debounce if debounce is not None else None
         try:
             self.r = redis_conn if redis_conn is not None else redis.Redis(host='127.0.0.1', port=6379)
@@ -30,10 +33,10 @@ class Control():
             self.r = redis.Redis(host='127.0.0.1', port=6379)
 
         if resistor is not None:
-            if resistor == "up" or resistor == GPIO.PUD_UP:
-                self.resistor = GPIO.PUD_UP
-            elif resistor == "down" or resistor == GPIO.PUD_DOWN:
-                self.resistor = GPIO.PUD_DOWN
+            if resistor == "up" or resistor == digitalio.Pull.UP:
+                self.resistor = digitalio.Pull.UP
+            elif resistor == "down" or resistor == digitalio.Pull.DOWN:
+                self.resistor = digitalio.Pull.DOWN
         else:
             self.resistor = resistor
 
@@ -52,7 +55,8 @@ class Control():
     def init_control(self):
         """Initialize the control here (i.e. set pin mode, get addresses, etc)
         Set the Pin for the button with the internal pull up resistor"""
-        self.gpio.setup(self.pin, GPIO.IN, pull_up_down=self.resistor)
+        control_pin = self.gpio.DigitalInOut(self.pin_obj)
+        control_pin.switch_to_input(pull=self.resistor)
         # If edge detection has been configured lets take advantage of that
         if self.edge_detection is not None:
             GPIO.add_event_detect(self.pin, self.edge_detection, bouncetime=self.debounce)
