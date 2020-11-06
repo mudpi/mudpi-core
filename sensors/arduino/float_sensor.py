@@ -1,14 +1,9 @@
-import time
-import datetime
-import json
-import redis
-from .sensor import Sensor
-from nanpy import (ArduinoApi, SerialManager)
 import sys
 
-sys.path.append('..')
+from nanpy import (SerialManager)
 
-import variables
+from sensors.arduino.sensor import Sensor
+
 
 default_connection = SerialManager(device='/dev/ttyUSB0')
 
@@ -21,7 +16,6 @@ class FloatSensor(Sensor):
                  redis_conn=None):
         super().__init__(pin, name=name, key=key, connection=connection,
                          redis_conn=redis_conn)
-        return
 
     def init_sensor(self):
         # read data using pin specified pin

@@ -39,24 +39,41 @@ class Sensor:
     def init_sensor(self):
         """
         Initialize the sensor here (i.e. set pin mode, get addresses, etc)
-        :return:
+
+        Returns:
+
+        Raises:
+            NotImplementedError
         """
         raise NotImplementedError
 
     def read(self):
         """
-        Read the sensor(s), parse the data and store it in redis if redis is configured
-        :return:
+        Read the sensor(s), parse the data and store it in redis if redis is
+        configured
+
+        Returns:
+            None
+
+        Raises:
+            NotImplementedError
         """
         raise NotImplementedError
 
     def read_raw(self):
         """
         Read the sensor(s) but return the raw voltage, useful for debugging
-        :return:
+
+        Returns:
+
         """
         return self.topic.voltage
 
     def read_pin(self):
-        """ Read the pin from the mcp3xxx as unaltered digital value"""
+        """
+        Read the pin from the mcp3xxx as unaltered digital value
+
+        Returns:
+
+        """
         return self.topic.value
