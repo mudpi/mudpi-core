@@ -21,25 +21,21 @@ sys.path.append('..')
 from action import Action
 from config_load import load_config_json
 from server.mudpi_server import MudpiServer
-from workers.pi.lcd_worker import LcdWorker
-from workers.pi.i2c_worker import PiI2CWorker
-from workers.pi.relay_worker import RelayWorker
-from workers.pi.camera_worker import CameraWorker
-from workers.pi.sensor_worker import PiSensorWorker
-from workers.pi.control_worker import PiControlWorker
-from workers.trigger_worker import TriggerWorker
-from workers.sequence_worker import SequenceWorker
-
+# from workers.pi.lcd_worker import LcdWorker
+from workers.linux.i2c_worker import PiI2CWorker
+from workers.linux.relay_worker import RelayWorker
+# from workers.pi.camera_worker import CameraWorker
+from workers.linux.sensor_worker import PiSensorWorker
+# from workers.pi.control_worker import PiControlWorker
+# from workers.trigger_worker import TriggerWorker
+# from workers.sequence_worker import SequenceWorker
 try:
     from workers.arduino.arduino_worker import ArduinoWorker
-
     NANPY_ENABLED = True
 except ImportError:
     NANPY_ENABLED = False
-
 try:
     from workers.adc_worker import ADCMCP3008Worker
-
     MCP_ENABLED = True
 except ImportError:
     MCP_ENABLED = False
@@ -75,12 +71,12 @@ print('Loading MudPi Configs...\t\033[1;32m Complete\033[0;0m')
 print(chr(27) + "[2J")
 # Print a display logo for startup
 print("\033[1;32m")
-print(' __  __           _ _____ _ ')
-print('|  \/  |         | |  __ (_)')
-print('| \  / |_   _  __| | |__) | ')
-print('| |\/| | | | |/ _` |  ___/ | ')
-print('| |  | | |_| | (_| | |   | | ')
-print('|_|  |_|\__,_|\__,_|_|   |_| ')
+print(r' __  __           _ _____ _ ')
+print(r'|  \/  |         | |  __ (_)')
+print(r'| \  / |_   _  __| | |__) | ')
+print(r'| |\/| | | | |/ _` |  ___/ | ')
+print(r'| |  | | |_| | (_| | |   | | ')
+print(r'|_|  |_|\__,_|\__,_|_|   |_| ')
 print('_________________________________________________')
 print('')
 print('Eric Davisson @theDavisson')
@@ -420,7 +416,6 @@ try:
         t = worker.run()
         threads.append(t)
         time.sleep(.5)
-
     for node in nodes:
         t = node.run()
         threads.append(t)
@@ -457,7 +452,7 @@ finally:
 
     try:
         server.sock.shutdown(socket.SHUT_RDWR)
-    except:
+    except Exception:
         pass
 
     # Clear main running event to signal threads to close
