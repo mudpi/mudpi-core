@@ -4,7 +4,8 @@ import json
 import redis
 import threading
 import sys
-import RPi.GPIO as GPIO
+import board
+import digitalio
 from .worker import Worker
 sys.path.append('..')
 
@@ -25,7 +26,7 @@ class RelayWorker(Worker):
         else:
             self.name = self.config['name']
 
-        self.config['pin'] = int(self.config['pin'])  # parse possbile strings to avoid errors
+        self.pin_obj = getattr(board, self.config['pin'])
 
         # Events
         self.relay_available = relay_available
@@ -34,8 +35,8 @@ class RelayWorker(Worker):
         # Dynamic Properties based on config
         self.active = False
         self.topic = self.config.get('topic', '').replace(" ", "/").lower() if self.config.get('topic', None) is not None else 'mudpi/relays/' + self.key
-        self.pin_state_off = GPIO.HIGH if self.config['normally_open'] is not None and self.config['normally_open'] else GPIO.LOW
-        self.pin_state_on = GPIO.LOW if self.config['normally_open'] is not None and self.config['normally_open'] else GPIO.HIGH
+        self.pin_state_off = True if self.config['normally_open'] is not None and self.config['normally_open'] else False
+        self.pin_state_on = False if self.config['normally_open'] is not None and self.config['normally_open'] else True
 
         # Pubsub Listeners
         self.pubsub = self.r.pubsub()
@@ -46,15 +47,16 @@ class RelayWorker(Worker):
 
     def init(self):
         Logger.log(LOG_LEVEL["info"], 'Relay Worker {0}...\t\t\t\033[1;32m Initializing\033[0;0m'.format(self.key))
-        GPIO.setup(self.config['pin'], GPIO.OUT)
+        self.gpio_pin = digitalio.DigitalInOut(self.pin_obj)
+        self.gpio_pin.switch_to_output()
         # Close the relay by default, we use the pin state we determined based on the config at init
-        GPIO.output(self.config['pin'], self.pin_state_off)
+        self.gpio_pin.value = self.pin_state_off
         time.sleep(0.1)
 
         # Feature to restore relay state in case of crash  or unexpected shutdown. This will check for last state stored in redis and set relay accordingly
         if(self.config.get('restore_last_known_state', None) is not None and self.config.get('restore_last_known_state', False) is True):
             if(self.r.get(self.key+'_state')):
-                GPIO.output(self.config['pin'], self.pin_state_on)
+                self.gpio_pin.value = self.pin_state_on
                 Logger.log(LOG_LEVEL["info"], 'Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.key))
 
         # Logger.log(LOG_LEVEL["info"], 'Relay Worker {0}...\t\t\t\033[1;32m Ready\033[0;0m'.format(self.key))
@@ -89,7 +91,7 @@ class RelayWorker(Worker):
         # Turn on relay if its available
         if self.relay_available.is_set():
             if not self.active:
-                GPIO.output(self.config['pin'], self.pin_state_on)
+                self.gpio_pin.value = self.pin_state_on
                 message = {'event': 'StateChanged', 'data': 1}
                 self.r.set(self.key+'_state', 1)
                 self.r.publish(self.topic, json.dumps(message))
@@ -101,7 +103,7 @@ class RelayWorker(Worker):
         # Turn off volkeye to flip off relay
         if self.relay_available.is_set():
             if self.active:
-                GPIO.output(self.config['pin'], self.pin_state_off)
+                self.gpio_pin.value = self.pin_state_off
                 message = {'event': 'StateChanged', 'data': 0}
                 self.r.delete(self.key+'_state')
                 self.r.publish(self.topic, json.dumps(message))
