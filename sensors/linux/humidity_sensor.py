@@ -69,14 +69,6 @@ class HumiditySensor(Sensor):
                 time.sleep(2)
                 continue
 
-            except Exception as error:
-                dhtDevice.exit()
-                Logger.log(
-                    LOG_LEVEL["error"],
-                    f'DHT Reading was Invalid. Trying again next cycle. Details: {error.args[0]}'
-                )
-                return None
-
         if humidity is not None and temperature_c is not None:
             self.r.set(
                 self.key + '_temperature',
