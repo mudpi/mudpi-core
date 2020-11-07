@@ -17,6 +17,10 @@ class T9602Sensor(Sensor):
         return
 
     def init_sensor(self):
+        '''This is the bus number : the 1 in "/dev/i2c-1"
+        I enforced it to 1 because there is only one on Raspberry Pi.
+        We might want to add this parameter in i2c sensor config in the future.
+        We might encounter boards with several buses.'''
         self.bus = smbus.SMBus(1)
         return
 
@@ -25,6 +29,9 @@ class T9602Sensor(Sensor):
 
         humidity = (((data[0] & 0x3F) << 8) + data[1]) / 16384.0 * 100.0
         temperature_c = ((data[2] * 64) + (data[3] >> 2)) / 16384.0 * 165.0 - 40.0
+
+        humidity = round(humidity, 2)
+        temperature_c = round(temperature_c, 2)
 
         if humidity is not None and temperature_c is not None:
             self.r.set(self.key + '_temperature', temperature_c)
