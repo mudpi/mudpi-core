@@ -60,6 +60,7 @@ class HumiditySensor(Sensor):
                 temperature_c = dhtDevice.temperature
                 humidity = dhtDevice.humidity
                 if humidity is not None and temperature_c is not None:
+                    dhtDevice.exit()
                     break
 
             except RuntimeError:
@@ -69,7 +70,7 @@ class HumiditySensor(Sensor):
                 continue
 
             except Exception as error:
-                self.sensor(self.pin_obj).exit()
+                dhtDevice.exit()
                 Logger.log(
                     LOG_LEVEL["error"],
                     f'DHT Reading was Invalid. Trying again next cycle. Details: {error.args[0]}'
