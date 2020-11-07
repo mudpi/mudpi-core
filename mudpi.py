@@ -281,7 +281,7 @@ try:
                     len(CONFIGS['actions'])))
     except KeyError:
         Logger.log(LOG_LEVEL["info"],
-                   'Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
+                   'Actions...\t\t\t\t\033[1;31m Disabled\033[0;0m')
 
     # Worker for Sequences
     try:
