@@ -7,6 +7,7 @@ import sys
 sys.path.append('..')
 from .worker import Worker
 from sensors.linux.i2c.bme680_sensor import (Bme680Sensor)
+from sensors.linux.i2c.t9602_sensor import (T9602Sensor)
 
 from logger.Logger import Logger, LOG_LEVEL
 
@@ -25,7 +26,7 @@ class PiI2CWorker(Worker):
         for sensor in self.config['sensors']:
             if sensor.get('type', None) is not None:
                 # Get the sensor from the sensors folder {sensor name}_sensor.{SensorName}Sensor
-                sensor_type = 'sensors.pi.i2c.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
+                sensor_type = 'sensors.linux.i2c.' + sensor.get('type').lower() + '_sensor.' + sensor.get('type').capitalize() + 'Sensor'
 
                 imported_sensor = self.dynamic_import(sensor_type)
 
