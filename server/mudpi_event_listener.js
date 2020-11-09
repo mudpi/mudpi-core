@@ -12,13 +12,13 @@ const axios = require('axios')
 const address = 'test.php'
 const channel = '*';
 let axiosConfig = {
-      	headers: {
+          headers: {
           'Content-Type': 'application/json;charset=UTF-8',
           "Access-Control-Allow-Origin": "*",
-      	},
-		baseURL: 'http://192.168.2.230/',
-		timeout: 1000,
-		responseType: 'json'
+          },
+        baseURL: 'http://192.168.2.230/',
+        timeout: 1000,
+        responseType: 'json'
     };
 //------------------------------
 
@@ -81,22 +81,22 @@ plistener.on('pmessage', (pattern, channel, message) => {
     console.log(`\x1b[36mPattern Message Received on \x1b[1m${channel}\x1b[0m`);
     let eventPromise = relayEvent(message)
     eventPromise.then((response) => {
-    	try {
-    		console.log(`\x1b[32mEvent Successfully Relayed. RESPONSE: %s\x1b[0m`,  response.status)
+        try {
+            console.log(`\x1b[32mEvent Successfully Relayed. RESPONSE: %s\x1b[0m`,  response.status)
 
-    		if(typeof response !== 'undefined' ) {
-			  	if (response != null && response.hasOwnProperty('data')) {
-				    console.log('\x1b[32mResponse Data Received: \x1b[0m', response.data)
-		  		}
-		  	}
-    	}
-    	catch(error) {
-    		console.log('\x1b[32mEvent Successfully Relayed.\x1b[0m \x1b[31mRESPONSE: Error Decoding Response\x1b[0m')
-    	}
+            if(typeof response !== 'undefined' ) {
+                  if (response != null && response.hasOwnProperty('data')) {
+                    console.log('\x1b[32mResponse Data Received: \x1b[0m', response.data)
+                  }
+              }
+        }
+        catch(error) {
+            console.log('\x1b[32mEvent Successfully Relayed.\x1b[0m \x1b[31mRESPONSE: Error Decoding Response\x1b[0m')
+        }
     })
     .catch((error) => {
-		console.log('\x1b[31mRelaying Event FAILED:\x1b[0m')
-    	console.log(error)
+        console.log('\x1b[31mRelaying Event FAILED:\x1b[0m')
+        console.log(error)
     })
     //console.log(data)
     console.log('\x1b[33mAttempting to Relay Event: \x1b[1m', message, '\x1b[0m')
@@ -104,35 +104,35 @@ plistener.on('pmessage', (pattern, channel, message) => {
 
 
 async function relayEvent(event=null) {
-  	let relayedEvent = null
+      let relayedEvent = null
 
-  	try {
-		relayedEvent = await axios.post(address, event, axiosConfig)
-	}
-	catch(e) {
-		if(e.code == 'ENETUNREACH') {
-			let retries = 3
-			while(retries > 1 ) {
+      try {
+        relayedEvent = await axios.post(address, event, axiosConfig)
+    }
+    catch(e) {
+        if(e.code == 'ENETUNREACH') {
+            let retries = 3
+            while(retries > 1 ) {
 
-				try {
-					console.log('\x1b[31mRelaying the Event Failed [', e.code, ']\x1b[0m')
-					await sleep(5000)
-					console.log('\x1b[33mRetrying Relaying the Event...\x1b[0m')
-					relayedEvent = await axios.post(address, event, axiosConfig)
-				}
-				catch(e) {
-					console.log('\x1b[31mProblem Resending the Event [', e.code, ']\x1b[0m')
-				}
+                try {
+                    console.log('\x1b[31mRelaying the Event Failed [', e.code, ']\x1b[0m')
+                    await sleep(5000)
+                    console.log('\x1b[33mRetrying Relaying the Event...\x1b[0m')
+                    relayedEvent = await axios.post(address, event, axiosConfig)
+                }
+                catch(e) {
+                    console.log('\x1b[31mProblem Resending the Event [', e.code, ']\x1b[0m')
+                }
 
-				retries--
-			}
-		}
-		else {
-			console.log('\x1b[31mProblem Relaying the Event:\x1b[0m')
-			console.error(e)
-		}
-	}
-	
-  	return relayedEvent
+                retries--
+            }
+        }
+        else {
+            console.log('\x1b[31mProblem Relaying the Event:\x1b[0m')
+            console.error(e)
+        }
+    }
+    
+      return relayedEvent
 }
 

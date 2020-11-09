@@ -164,7 +164,7 @@ try:
             'Pi Camera...\t\t\t\t\033[1;31m Disabled\033[0;0m'
         )
 
-    # Workers for pi (Sensors, Controls, Relays, I2C)
+    # Workers for board (Sensors, Controls, Relays, I2C)
     try:
         if len(CONFIGS["workers"]) > 0:
 
@@ -236,7 +236,7 @@ try:
         )
         print(e)
 
-    # Worker for relays attached to pi
+    # Worker for relays attached to board
     try:
         if len(CONFIGS["relays"]) > 0:
             for relay in CONFIGS['relays']:
@@ -342,7 +342,7 @@ try:
             'Triggers...\t\t\t\t\033[1;31m Disabled\033[0;0m'
         )
 
-    # Worker for nodes attached to pi via serial or wifi[esp8266, esp32]
+    # Worker for nodes attached to board via serial or wifi[esp8266, esp32]
     # Supported nodes: arduinos, esp8266, ADC-mcp3xxx, probably others
     # (esp32 with custom nanpy fork)
     try:
@@ -393,15 +393,15 @@ try:
         )
 
     # try:
-    # 	if (CONFIGS['server'] is not None):
-    # 		Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
-    # 		time.sleep(1)
-    # 		server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
-    # 		s = threading.Thread(target=server_worker)  # TODO where is server_worker supposed to be initialized?
-    # 		threads.append(s)
-    # 		s.start()
+    #     if (CONFIGS['server'] is not None):
+    #         Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
+    #         time.sleep(1)
+    #         server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
+    #         s = threading.Thread(target=server_worker)  # TODO where is server_worker supposed to be initialized?
+    #         threads.append(s)
+    #         s.start()
     # except KeyError:
-    # 	Logger.log(LOG_LEVEL["info"], 'MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
+    #     Logger.log(LOG_LEVEL["info"], 'MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
 
     Logger.log(
         LOG_LEVEL["info"],

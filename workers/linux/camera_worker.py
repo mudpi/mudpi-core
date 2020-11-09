@@ -175,8 +175,8 @@ class CameraWorker(Worker):
                         )
                         self.wait()
                 # except:
-                # 	print("Camera Worker \t\033[1;31m Unexpected Error\033[0;0m")
-                # 	time.sleep(30)
+                #     print("Camera Worker \t\033[1;31m Unexpected Error\033[0;0m")
+                #     time.sleep(30)
                 else:
                     time.sleep(1)
                     self.resetelapsed_time()

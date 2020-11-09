@@ -17,7 +17,7 @@ class Action():
                                                    "_").lower() if config.get(
             "key") is not None else self.name.replace(" ", "_").lower()
         # Actions will be either objects to publish for events
-		# or a command string to execute
+        # or a command string to execute
         self.action = config.get("action")
 
         try:

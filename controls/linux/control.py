@@ -72,7 +72,7 @@ class Control():
         pass
 
     def read_pin(self):
-        """Read the pin from the pi digital reads only"""
+        """Read the pin from the board digital reads only"""
         data = self.gpio.input(self.pin)
         return data
 
