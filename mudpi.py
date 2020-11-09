@@ -26,7 +26,7 @@ from workers.linux.i2c_worker import PiI2CWorker
 from workers.linux.relay_worker import RelayWorker
 from workers.linux.camera_worker import CameraWorker
 from workers.linux.sensor_worker import PiSensorWorker
-# from workers.pi.control_worker import PiControlWorker
+from workers.linux.control_worker import PiControlWorker
 from workers.trigger_worker import TriggerWorker
 from workers.sequence_worker import SequenceWorker
 try:
