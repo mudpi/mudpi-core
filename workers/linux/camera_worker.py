@@ -8,7 +8,7 @@ libcamera developers plan to privide Python bindings: https://www.raspberrypi.or
 
 Not available at time of writing: 9 Nov 2020
 
-Once available, we should look forward to migrate to this library, as it would allowour worker to support multiple boards and devices.
+Once available, we should look forward migrating to this library, as it would allow our worker to support multiple boards and devices.
 '''
 
 import time
