@@ -28,7 +28,7 @@ class PiControlWorker(Worker):
             if control.get('type', None) is not None:
                 # Get the control from the controls folder
                 # {control name}_control.{ControlName}Control
-                control_type = 'controls.pi.' + control.get(
+                control_type = 'controls.linux.' + control.get(
                     'type').lower() + '_control.' + control.get(
                     'type').capitalize() + 'Control'
 
