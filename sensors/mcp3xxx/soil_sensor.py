@@ -27,8 +27,10 @@ class SoilSensor(Sensor):
 
     def read(self):
         resistance = self.read_pin()
-        moistpercent = ((resistance - WaterBounds) / (
-                    AirBounds - WaterBounds)) * 100
+        moistpercent = (
+                               (resistance - WaterBounds) / (
+                               AirBounds - WaterBounds)
+                       ) * 100
         if moistpercent > 80:
             moisture = 'Very Dry - ' + str(int(moistpercent))
         elif 80 >= moistpercent > 45:

@@ -1,9 +1,7 @@
-import time
-import json
-import redis
-from .sensor import Sensor
-import digitalio
 import board
+import digitalio
+
+from .sensor import Sensor
 
 
 # PIN MODE : OUT | IN
@@ -16,12 +14,16 @@ class FloatSensor(Sensor):
         return
 
     def init_sensor(self):
-        """Initialize the sensor here (i.e. set pin mode, get addresses, etc) this gets called by the worker"""
-        self.gpio_pin = digitalio.DigitalInOut(self.pin_obj)  # Default to input : https://github.com/adafruit/Adafruit_Blinka/blob/master/src/digitalio.py#L111
+        """Initialize the sensor here (i.e. set pin mode, get addresses, etc)
+        this gets called by the worker"""
+        # Default to input :
+        # https://github.com/adafruit/Adafruit_Blinka/blob/master/src/digitalio.py#L111
+        self.gpio_pin = digitalio.DigitalInOut(self.pin_obj)
         return
 
     def read(self):
-        """Read the sensor(s), parse the data and store it in redis if redis is configured"""
+        """Read the sensor(s), parse the data and store it in redis if redis
+        is configured"""
         value = self.gpio_pin.value
         return value
 

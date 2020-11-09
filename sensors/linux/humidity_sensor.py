@@ -71,7 +71,8 @@ class HumiditySensor(Sensor):
                 self.sensor(self.pin).exit()
                 Logger.log(
                     LOG_LEVEL["error"],
-                    f'DHT Reading was Invalid. Trying again next cycle. Details: {error.args[0]}'
+                    f'DHT Reading was Invalid. Trying again next cycle. '
+                    f'Details: {error.args[0]}'
                 )
                 return None
 
