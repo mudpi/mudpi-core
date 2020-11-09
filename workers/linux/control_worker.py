@@ -7,8 +7,8 @@ from .worker import Worker
 import sys
 
 sys.path.append('..')
-from controls.pi.button_control import (ButtonControl)
-from controls.pi.switch_control import (SwitchControl)
+from controls.linux.button_control import (ButtonControl)
+from controls.linux.switch_control import (SwitchControl)
 
 from logger.Logger import Logger, LOG_LEVEL
 
@@ -28,7 +28,7 @@ class PiControlWorker(Worker):
             if control.get('type', None) is not None:
                 # Get the control from the controls folder
                 # {control name}_control.{ControlName}Control
-                control_type = 'controls.pi.' + control.get(
+                control_type = 'controls.linux.' + control.get(
                     'type').lower() + '_control.' + control.get(
                     'type').capitalize() + 'Control'
 
@@ -56,8 +56,8 @@ class PiControlWorker(Worker):
                 self.controls.append(new_control)
                 Logger.log(
                     LOG_LEVEL["info"],
-                           '{type} Control {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(
-                               **control)
+                    '{type} Control {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(
+                     **control)
                 )
         return
 
@@ -78,5 +78,5 @@ class PiControlWorker(Worker):
         # This is only ran after the main thread is shut down
         Logger.log(
             LOG_LEVEL["info"],
-                   "Pi Control Worker Shutting Down...\t\033[1;32m Complete\033[0;0m"
+            "Pi Control Worker Shutting Down...\t\033[1;32m Complete\033[0;0m"
         )

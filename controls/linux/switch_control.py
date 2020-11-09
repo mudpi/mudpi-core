@@ -3,16 +3,18 @@ import datetime
 import json
 import redis
 from .control import Control
-from nanpy import (ArduinoApi, SerialManager)
+import RPi.GPIO as GPIO
 
-default_connection = SerialManager(device='/dev/ttyUSB0')
-# r = redis.Redis(host='127.0.0.1', port=6379)
+
+r = redis.Redis(host='127.0.0.1', port=6379)
+
 
 class SwitchControl(Control):
 
-    def __init__(self, pin, name=None, key=None, connection=default_connection, analog_pin_mode=False, topic=None, redis_conn=None):
-        super().__init__(pin, name=name, key=key, connection=connection, analog_pin_mode=analog_pin_mode, redis_conn=redis_conn)
+    def __init__(self, pin, name=None, key=None, resistor=None, edge_detection=None, debounce=None, topic=None, redis_conn=None):
+        super().__init__(pin, name=name, key=key, resistor=resistor, edge_detection=edge_detection, debounce=debounce, redis_conn=redis_conn)
         self.topic = topic.replace(" ", "/").lower() if topic is not None else 'mudpi/controls/'+self.key
+        # Keep counter 1 above delay to avoid event on boot
         self.state_counter = 3
         self.previous_state = 0
         self.trigger_delay = 2
@@ -20,7 +22,7 @@ class SwitchControl(Control):
 
     def init_control(self):
         super().init_control()
-        # Set initial state to prevent event on boot
+        # Get current state on boot
         self.previous_state = super().read()
 
     def read(self):
@@ -31,6 +33,7 @@ class SwitchControl(Control):
                 clean_state = 1 if state else 0
                 super().emitEvent(clean_state)
         else:
+            # Button State Changed
             self.state_counter = 1
 
         self.previous_state = state

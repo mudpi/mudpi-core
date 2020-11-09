@@ -1,3 +1,16 @@
+'''
+This is (for instance) a Raspberry Pi only worker!
+
+
+The libcamera project (in development), aims to offer an open source stack for cameras for Linux, ChromeOS and Android.
+It will be able to detect and manage all of the exposed camera on the system. Connected via USB or CSI (Rasperry pi camera).
+libcamera developers plan to privide Python bindings: https://www.raspberrypi.org/blog/an-open-source-camera-stack-for-raspberry-pi-using-libcamera/#comment-1528789
+
+Not available at time of writing: 9 Nov 2020
+
+Once available, we should look forward migrating to this library, as it would allow our worker to support multiple boards and devices.
+'''
+
 import time
 import datetime
 import json
@@ -53,7 +66,7 @@ class CameraWorker(Worker):
             g = self.camera.awb_gains
             self.camera.awb_mode = 'off'
             self.camera.awb_gains = g
-        except:
+        except Exception:
             self.camera = PiCamera()
 
         # Pubsub Listeners
@@ -83,7 +96,7 @@ class CameraWorker(Worker):
             self.next_time = (datetime.datetime.now() + datetime.timedelta(
                 hours=self.hours, minutes=self.minutes,
                 seconds=self.seconds)).replace(microsecond=0)
-        except:
+        except Exception:
             # Default every hour
             self.next_time = (
                     datetime.datetime.now() + datetime.timedelta(hours=1)
@@ -106,7 +119,7 @@ class CameraWorker(Worker):
                                    "Camera Signaled for Reset")
                         self.camera_available.clear()
                         self.pending_reset = True
-            except:
+            except Exception:
                 Logger.log(LOG_LEVEL["error"],
                            'Error Handling Event for Camera')
 
@@ -147,12 +160,12 @@ class CameraWorker(Worker):
                                         filename
                                     )
                                     self.pending_reset = False
-                                except:
+                                except Exception:
                                     Logger.log(
                                         LOG_LEVEL["error"],
                                         "Error During Camera Reset Cleanup"
                                     )
-                            break;
+                            break
                         message = {'event': 'StateChanged', 'data': filename}
                         self.r.set('last_camera_image', filename)
                         self.r.publish(self.topic, json.dumps(message))
@@ -162,8 +175,8 @@ class CameraWorker(Worker):
                         )
                         self.wait()
                 # except:
-                # 	print("Camera Worker \t\033[1;31m Unexpected Error\033[0;0m")
-                # 	time.sleep(30)
+                #     print("Camera Worker \t\033[1;31m Unexpected Error\033[0;0m")
+                #     time.sleep(30)
                 else:
                     time.sleep(1)
                     self.resetelapsed_time()

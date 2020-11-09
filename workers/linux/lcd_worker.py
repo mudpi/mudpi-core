@@ -161,7 +161,7 @@ class LcdWorker(Worker):
                     self.message_queue = []
                     Logger.log(LOG_LEVEL["debug"],
                                'Cleared the LCD Message Queue')
-            except:
+            except Exception:
                 Logger.log(LOG_LEVEL["error"],
                            'Error Decoding Message for LCD')
 
@@ -182,7 +182,7 @@ class LcdWorker(Worker):
                 else:
                     try:
                         data = data.decode('utf-8')
-                    except:
+                    except Exception:
                         data = ''
                 message = message.replace('[' + code + ']', str(data))
 
@@ -219,16 +219,14 @@ class LcdWorker(Worker):
                     self.pubsub.get_message()
                     if self.lcd_available.is_set():
                         if self.cached_message and not self.need_new_message:
-                            if self.current_message != self.cached_message[
-                                'message']:
+                            if self.current_message != self.cached_message['message']:
                                 self.lcd.clear()
                                 time.sleep(0.01)
                                 self.lcd.message = self.cached_message[
                                     'message']
                                 self.current_message = self.cached_message[
                                     'message']  # store message to only display once and prevent flickers
-                            if self.elapsed_time() > self.cached_message[
-                                'duration'] + 1:
+                            if self.elapsed_time() > self.cached_message['duration'] + 1:
                                 self.need_new_message = True
 
                         else:

@@ -1,7 +1,7 @@
 import json
 import sys
 import time
-
+import board
 import adafruit_dht
 
 from sensors.linux.sensor import Sensor
@@ -18,6 +18,7 @@ class HumiditySensor(Sensor):
 
     def __init__(self, pin, name=None, key=None, model='11', redis_conn=None):
         super().__init__(pin, name=name, key=key, redis_conn=redis_conn)
+        self.pin_obj = getattr(board, pin)
         self.type = model
         return
 
@@ -53,12 +54,13 @@ class HumiditySensor(Sensor):
 
         # read_retry() not implemented in new lib
         for i in range(15):
-            dhtDevice = self.sensor(self.pin)
+            dhtDevice = self.sensor(self.pin_obj)
 
             try:
                 temperature_c = dhtDevice.temperature
                 humidity = dhtDevice.humidity
                 if humidity is not None and temperature_c is not None:
+                    dhtDevice.exit()
                     break
 
             except RuntimeError:
@@ -66,15 +68,6 @@ class HumiditySensor(Sensor):
                 # just keep going:
                 time.sleep(2)
                 continue
-
-            except Exception as error:
-                self.sensor(self.pin).exit()
-                Logger.log(
-                    LOG_LEVEL["error"],
-                    f'DHT Reading was Invalid. Trying again next cycle. '
-                    f'Details: {error.args[0]}'
-                )
-                return None
 
         if humidity is not None and temperature_c is not None:
             self.r.set(

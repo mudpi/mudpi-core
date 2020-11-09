@@ -5,7 +5,9 @@ import redis
 from .control import Control
 import RPi.GPIO as GPIO
 
+
 r = redis.Redis(host='127.0.0.1', port=6379)
+
 
 class ButtonControl(Control):
 
@@ -20,11 +22,10 @@ class ButtonControl(Control):
     def read(self):
         state = super().read()
         if state:
-            #Button Pressed
-            #eventually add multipress tracking
+            # Button Pressed
+            # eventually add multipress tracking
             super().emitEvent(1)
         return state
 
     def read_raw(self):
         return super().read()
-

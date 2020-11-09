@@ -16,27 +16,27 @@
     },
     "relays": [
         {
-            "pin": 13,
+            "pin": "D13",
             "normally_open": true,
             "group": "1",
             "name": "Relay Name",
-            "topic": "garden/pi/relays/1",
+            "topic": "garden/linux/relays/1",
             "key": "relay_1"
         },
         {
-            "pin": 12,
+            "pin": "D12",
             "normally_open": true,
             "group": "2",
             "name": "Relay Name 2",
-            "topic": "garden/pi/relays/2",
+            "topic": "garden/linux/relays/2",
             "key": "relay_2"
         },
         {
-            "pin": 20,
+            "pin": "D20",
             "normally_open": true,
             "group": "2",
             "name": "Relay Name 3",
-            "topic": "garden/pi/relays/3",
+            "topic": "garden/linux/relays/3",
             "key": "relay_3"
         }
     ],
@@ -47,11 +47,11 @@
             "channel":"controls",
             "controls": [
                 {
-                    "pin":18,
+                    "pin":"D18",
                     "type":"button",
                     "name":"Button 1",
                     "key": "button_1",
-                    "topic": "garden/pi/relays/1",
+                    "topic": "garden/linux/relays/1",
                     "action":"Toggle",
                     "resistor":"up",
                     "edge_detection":"falling",
@@ -68,7 +68,7 @@
             "use_wifi":true,
             "sensors": [
                 {
-                    "pin": 2,
+                    "pin": "D2",
                     "is_digital": false,
                     "type": "Humidity",
                     "name": "Weather"
@@ -76,18 +76,18 @@
             ],
             "controls": [
                 {
-                    "pin":16,
+                    "pin": 16,
                     "type":"button",
                     "name":"Button 1",
                     "key": "button_1",
-                    "topic": "garden/pi/relays/1"
+                    "topic": "garden/linux/relays/1"
                 },
                 {
                     "pin":5,
                     "type":"switch",
                     "name":"Switch 1",
                     "key": "switch_1",
-                    "topic": "garden/pi/relays/1"
+                    "topic": "garden/linux/relays/1"
                 },
                 {
                     "pin":0,
@@ -153,7 +153,7 @@
             "name": "Turn on Lights",
             "key": "turn_on_lights_1",
             "action": {"event":"Toggle"},
-            "topic": "garden/pi/relays/2"
+            "topic": "garden/linux/relays/2"
         }
     ]
 }

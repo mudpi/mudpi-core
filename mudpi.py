@@ -21,14 +21,14 @@ sys.path.append('..')
 from action import Action
 from config_load import load_config_json
 from server.mudpi_server import MudpiServer
-# from workers.pi.lcd_worker import LcdWorker
+from workers.linux.lcd_worker import LcdWorker
 from workers.linux.i2c_worker import PiI2CWorker
 from workers.linux.relay_worker import RelayWorker
-# from workers.pi.camera_worker import CameraWorker
+from workers.linux.camera_worker import CameraWorker
 from workers.linux.sensor_worker import PiSensorWorker
 # from workers.pi.control_worker import PiControlWorker
-# from workers.trigger_worker import TriggerWorker
-# from workers.sequence_worker import SequenceWorker
+from workers.trigger_worker import TriggerWorker
+from workers.sequence_worker import SequenceWorker
 try:
     from workers.arduino.arduino_worker import ArduinoWorker
     NANPY_ENABLED = True
@@ -164,7 +164,7 @@ try:
             'Pi Camera...\t\t\t\t\033[1;31m Disabled\033[0;0m'
         )
 
-    # Workers for pi (Sensors, Controls, Relays, I2C)
+    # Workers for board (Sensors, Controls, Relays, I2C)
     try:
         if len(CONFIGS["workers"]) > 0:
 
@@ -236,7 +236,7 @@ try:
         )
         print(e)
 
-    # Worker for relays attached to pi
+    # Worker for relays attached to board
     try:
         if len(CONFIGS["relays"]) > 0:
             for relay in CONFIGS['relays']:
@@ -281,7 +281,7 @@ try:
                     len(CONFIGS['actions'])))
     except KeyError:
         Logger.log(LOG_LEVEL["info"],
-                   'Actions...\t\t\t\033[1;31m Disabled\033[0;0m')
+                   'Actions...\t\t\t\t\033[1;31m Disabled\033[0;0m')
 
     # Worker for Sequences
     try:
@@ -342,7 +342,7 @@ try:
             'Triggers...\t\t\t\t\033[1;31m Disabled\033[0;0m'
         )
 
-    # Worker for nodes attached to pi via serial or wifi[esp8266, esp32]
+    # Worker for nodes attached to board via serial or wifi[esp8266, esp32]
     # Supported nodes: arduinos, esp8266, ADC-mcp3xxx, probably others
     # (esp32 with custom nanpy fork)
     try:
@@ -393,15 +393,15 @@ try:
         )
 
     # try:
-    # 	if (CONFIGS['server'] is not None):
-    # 		Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
-    # 		time.sleep(1)
-    # 		server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
-    # 		s = threading.Thread(target=server_worker)  # TODO where is server_worker supposed to be initialized?
-    # 		threads.append(s)
-    # 		s.start()
+    #     if (CONFIGS['server'] is not None):
+    #         Logger.log(LOG_LEVEL["info"], 'MudPi Server...\t\t\t\t\033[1;33m Starting\033[0;0m', end='\r', flush=True)
+    #         time.sleep(1)
+    #         server = MudpiServer(main_thread_running, CONFIGS['server']['host'], CONFIGS['server']['port'])
+    #         s = threading.Thread(target=server_worker)  # TODO where is server_worker supposed to be initialized?
+    #         threads.append(s)
+    #         s.start()
     # except KeyError:
-    # 	Logger.log(LOG_LEVEL["info"], 'MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
+    #     Logger.log(LOG_LEVEL["info"], 'MudPi Socket Server...\t\t\t\033[1;31m Disabled\033[0;0m')
 
     Logger.log(
         LOG_LEVEL["info"],

@@ -20,6 +20,7 @@ class PiI2CWorker(Worker):
 
     def init(self):
         for sensor in self.config['sensors']:
+
             if sensor.get('type', None) is not None:
                 # Get the sensor from the sensors folder
                 # {sensor name}_sensor.{SensorName}Sensor
