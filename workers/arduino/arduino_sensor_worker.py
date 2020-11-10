@@ -15,7 +15,7 @@ from sensors.arduino.humidity_sensor import (HumiditySensor)
 from sensors.arduino.temperature_sensor import (TemperatureSensor)
 import sys
 
-sys.path.append('..')
+
 
 import importlib
 from logger.Logger import Logger, LOG_LEVEL

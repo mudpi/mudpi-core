@@ -1,0 +1,5 @@
+PREVIOUS_LINE = "\x1b[1F"
+RED_BACK = "\x1b[41;37m"
+GREEN_BACK = "\x1b[42;30m"
+YELLOW_BACK = "\x1b[43;30m"
+RESET = "\x1b[0m"

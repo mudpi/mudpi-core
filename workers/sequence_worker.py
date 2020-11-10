@@ -6,9 +6,9 @@ import threading
 from .worker import Worker
 import sys
 
-sys.path.append('..')
 
-import variables
+
+import constants
 import importlib
 
 from logger.Logger import Logger, LOG_LEVEL

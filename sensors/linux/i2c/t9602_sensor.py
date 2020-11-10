@@ -6,7 +6,7 @@ import smbus
 from logger.Logger import Logger, LOG_LEVEL
 from sensors.linux.i2c.sensor import Sensor
 
-sys.path.append('..')
+
 
 
 class T9602Sensor(Sensor):

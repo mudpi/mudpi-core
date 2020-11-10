@@ -3,7 +3,7 @@ import json
 import redis
 from nanpy import (ArduinoApi, SerialManager)
 import sys
-sys.path.append('..')
+
 
 default_connection = SerialManager()
 

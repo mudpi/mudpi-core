@@ -1,28 +1,33 @@
-'''
+"""
 This is (for instance) a Raspberry Pi only worker!
 
 
-The libcamera project (in development), aims to offer an open source stack for cameras for Linux, ChromeOS and Android.
-It will be able to detect and manage all of the exposed camera on the system. Connected via USB or CSI (Rasperry pi camera).
-libcamera developers plan to privide Python bindings: https://www.raspberrypi.org/blog/an-open-source-camera-stack-for-raspberry-pi-using-libcamera/#comment-1528789
+The libcamera project (in development), aims to offer an open source stack for
+cameras for Linux, ChromeOS and Android.
+It will be able to detect and manage all of the exposed camera on the system.
+Connected via USB or CSI (Rasperry pi camera).
+libcamera developers plan to privide Python bindings:
+https://www.raspberrypi.org/blog/an-open-source-camera-stack-for-raspberry-pi-using-libcamera/#comment-1528789
 
 Not available at time of writing: 9 Nov 2020
 
-Once available, we should look forward migrating to this library, as it would allow our worker to support multiple boards and devices.
-'''
+Once available, we should look forward migrating to this library, as it would
+allow our worker to support multiple boards and devices.
+"""
 
-import time
 import datetime
 import json
-import redis
-import threading
-import sys
 import os
-import RPi.GPIO as GPIO
-from picamera import PiCamera
-from .worker import Worker
+import sys
+import threading
+import time
 
-sys.path.append('..')
+from picamera import PiCamera
+from utils import get_config_item
+
+from workers.linux.worker import Worker
+
+
 
 from logger.Logger import Logger, LOG_LEVEL
 
@@ -37,10 +42,11 @@ class CameraWorker(Worker):
         self.camera_available = camera_available
 
         # Dynamic Properties based on config
-        self.path = self.config['path'].replace(" ", "-") if self.config[
-                                                                 'path'] is not None else '/etc/mudpi/img/'
-        self.topic = self.config['topic'].replace(" ", "/").lower() if \
-            self.config['topic'] is not None else 'mudpi/camera/'
+        self.path = get_config_item(self.config, 'path', '/etc/mudpi/img/')
+        self.topic = get_config_item(
+            self.config, 'topic', 'mudpi/camera/', replace_char="/"
+        )
+
         if self.config['resolution'] is not None:
             self.resolutionX = int(self.config['resolution'].get('x', 1920))
             self.resolutionY = int(self.config['resolution'].get('y', 1080))
@@ -107,16 +113,21 @@ class CameraWorker(Worker):
     def handle_event(self, message):
         data = message['data']
         decoded_message = None
+
         if data is not None:
+
             try:
                 if isinstance(data, dict):
                     decoded_message = data
+
                 elif isinstance(data.decode('utf-8'), str):
                     temp = json.loads(data.decode('utf-8'))
                     decoded_message = temp
                     if decoded_message['event'] == 'Timelapse':
-                        Logger.log(LOG_LEVEL["info"],
-                                   "Camera Signaled for Reset")
+                        Logger.log(
+                            LOG_LEVEL["info"],
+                            "Camera Signaled for Reset"
+                        )
                         self.camera_available.clear()
                         self.pending_reset = True
             except Exception:
@@ -141,7 +152,7 @@ class CameraWorker(Worker):
         return
 
     def work(self):
-        self.resetelapsed_time()
+        self.reset_elapsed_time()
 
         while self.main_thread_running.is_set():
             if self.system_ready.is_set():
@@ -179,11 +190,11 @@ class CameraWorker(Worker):
                 #     time.sleep(30)
                 else:
                     time.sleep(1)
-                    self.resetelapsed_time()
+                    self.reset_elapsed_time()
             else:
                 # System not ready camera should be off
                 time.sleep(1)
-                self.resetelapsed_time()
+                self.reset_elapsed_time()
 
             time.sleep(0.1)
 

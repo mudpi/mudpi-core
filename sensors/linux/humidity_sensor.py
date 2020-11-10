@@ -6,7 +6,7 @@ import adafruit_dht
 
 from sensors.linux.sensor import Sensor
 
-sys.path.append('..')
+
 
 from logger.Logger import Logger, LOG_LEVEL
 

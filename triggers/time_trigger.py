@@ -10,7 +10,7 @@ try:
     CRON_ENABLED = True
 except ImportError:
     CRON_ENABLED = False
-sys.path.append('..')
+
 
 from logger.Logger import Logger, LOG_LEVEL
 

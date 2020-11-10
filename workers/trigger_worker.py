@@ -6,13 +6,13 @@ import threading
 from .worker import Worker
 import sys
 
-sys.path.append('..')
+
 from triggers.time_trigger import TimeTrigger
 from triggers.trigger_group import TriggerGroup
 from triggers.sensor_trigger import SensorTrigger
 from triggers.control_trigger import ControlTrigger
 
-import variables
+import constants
 import importlib
 from logger.Logger import Logger, LOG_LEVEL
 

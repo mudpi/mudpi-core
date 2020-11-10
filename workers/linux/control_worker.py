@@ -1,14 +1,10 @@
-import time
-import datetime
-import json
-import redis
-import threading
-from .worker import Worker
 import sys
+import time
 
-sys.path.append('..')
-from controls.linux.button_control import (ButtonControl)
-from controls.linux.switch_control import (SwitchControl)
+from utils import get_config_item
+from workers.linux.worker import Worker
+
+
 
 from logger.Logger import Logger, LOG_LEVEL
 
@@ -16,7 +12,7 @@ from logger.Logger import Logger, LOG_LEVEL
 class PiControlWorker(Worker):
     def __init__(self, config, main_thread_running, system_ready):
         super().__init__(config, main_thread_running, system_ready)
-        self.topic = config.get('topic', 'controls').replace(" ", "_").lower()
+        self.topic = get_config_item(self.config, 'topic', 'controls')
         self.sleep_duration = config.get('sleep_duration', 0.5)
 
         self.controls = []
@@ -28,12 +24,12 @@ class PiControlWorker(Worker):
             if control.get('type', None) is not None:
                 # Get the control from the controls folder
                 # {control name}_control.{ControlName}Control
-                control_type = 'controls.linux.' + control.get(
-                    'type').lower() + '_control.' + control.get(
-                    'type').capitalize() + 'Control'
+                control_type = 'controls.linux.'
+                control_type += control.get('type').lower()
+                control_type += '_control.'
+                control_type += control.get('type').capitalize() + 'Control'
 
                 imported_control = self.dynamic_import(control_type)
-                # new_control = imported_control(control.get('pin'), name=control.get('name', control.get('type')), connection=self.connection, key=control.get('key', None))
 
                 # Define default kwargs for all control types,
                 # conditionally include optional variables below if they exist
@@ -57,14 +53,17 @@ class PiControlWorker(Worker):
                 Logger.log(
                     LOG_LEVEL["info"],
                     '{type} Control {pin}...\t\t\t\033[1;32m Ready\033[0;0m'.format(
-                     **control)
+                        **control)
                 )
         return
 
     def run(self):
-        Logger.log(LOG_LEVEL["info"], 'Pi Control Worker [' + str(len(
-            self.config[
-                'controls'])) + ' Controls]...\t\033[1;32m Online\033[0;0m')
+        Logger.log(
+            LOG_LEVEL["info"],
+            'Pi Control Worker [' + str(
+                len(self.config['controls'])
+            ) + ' Controls]...\t\033[1;32m Online\033[0;0m'
+        )
         return super().run()
 
     def work(self):

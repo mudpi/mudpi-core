@@ -6,9 +6,9 @@ from .sensor import Sensor
 from nanpy import (ArduinoApi, SerialManager)
 import sys
 
-sys.path.append('..')
 
-import variables
+
+import constants
 
 default_connection = SerialManager(device='/dev/ttyUSB0')
 

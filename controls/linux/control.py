@@ -7,7 +7,7 @@ import digitalio
 from adafruit_debouncer import Debouncer
 
 
-sys.path.append('..')
+
 
 
 # Base sensor class to extend all other arduino sensors from.

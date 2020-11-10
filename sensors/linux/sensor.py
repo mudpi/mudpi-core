@@ -28,7 +28,8 @@ class Sensor(BaseSensor):
         else:
             Logger.log(
                 LOG_LEVEL["error"],
-                "Cannot detect pin type (Digital or analog), should be Dxx or Axx for digital or analog. "
+                "Cannot detect pin type (Digital or analog), "
+                "should be Dxx or Axx for digital or analog. "
                 "Please refer to "
                 "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
             )

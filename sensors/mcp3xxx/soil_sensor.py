@@ -5,7 +5,7 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 from logger.Logger import Logger, LOG_LEVEL
 from sensors.mcp3xxx.sensor import Sensor
 
-sys.path.append('..')
+
 
 #  Tested using Sun3Drucker Model SX239
 # Wet Water = 287
@@ -27,8 +27,10 @@ class SoilSensor(Sensor):
 
     def read(self):
         resistance = self.read_pin()
-        moistpercent = ((resistance - WaterBounds) / (
-                    AirBounds - WaterBounds)) * 100
+        moistpercent = (
+                               (resistance - WaterBounds) / (
+                               AirBounds - WaterBounds)
+                       ) * 100
         if moistpercent > 80:
             moisture = 'Very Dry - ' + str(int(moistpercent))
         elif 80 >= moistpercent > 45:

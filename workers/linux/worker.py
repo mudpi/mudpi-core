@@ -1,18 +1,21 @@
-import time
-import datetime
 import json
-import redis
-import threading
 import sys
-sys.path.append('..')
+import threading
+import time
 
-import variables
+import redis
+
+
+
 from logger.Logger import Logger, LOG_LEVEL
 
 
-# Base Worker Class
-# A worker is responsible for handling its set of operations and running on a thread
-class Worker():
+class Worker:
+    """
+    Base Worker Class responsible for handling its set of operations
+    and running on a thread
+
+    """
     def __init__(self, config, main_thread_running, system_ready):
         self.config = config
         try:
@@ -32,30 +35,34 @@ class Worker():
 
     def init(self):
         # print('Worker...\t\t\t\033[1;32m Initializing\033[0;0m'.format(**control))
-        return
+        pass
 
     def run(self):
-        t = threading.Thread(target=self.work, args=())
-        t.start()
-        return t
+        thread = threading.Thread(target=self.work, args=())
+        thread.start()
+        return thread
 
     def work(self):
         while self.main_thread_running.is_set():
             if self.system_ready.is_set():
                 time.sleep(self.sleep_duration)
         # This is only ran after the main thread is shut down
-        Logger.log(LOG_LEVEL["info"], "Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
+        Logger.log(
+            LOG_LEVEL["info"],
+            "Worker Shutting Down...\t\033[1;32m Complete\033[0;0m"
+        )
 
-    def elapsedTime(self):
+    def elapsed_time(self):
         self.time_elapsed = time.perf_counter() - self.time_start
         return self.time_elapsed
 
-    def resetElapsedTime(self):
+    def reset_elapsed_time(self):
         self.time_start = time.perf_counter()
         pass
 
     def dynamic_import(self, name):
-        # Split path of the class folder structure: {sensor name}_sensor . {SensorName}Sensor
+        # Split path of the class folder structure:
+        # {sensor name}_sensor . {SensorName}Sensor
         components = name.split('.')
         # Dynamically import root of component path
         module = __import__(components[0])
@@ -64,15 +71,18 @@ class Worker():
             module = getattr(module, component)
         return module
 
-    def decodeMessageData(self, message):
+    def decode_message_data(self, message):
+
         if isinstance(message, dict):
             # print('Dict Found')
             return message
+
         elif isinstance(message.decode('utf-8'), str):
             try:
                 temp = json.loads(message.decode('utf-8'))
                 # print('Json Found')
                 return temp
+
             except Exception:
                 # print('Json Error. Str Found')
                 return {'event': 'Unknown', 'data': message}
