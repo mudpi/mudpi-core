@@ -21,6 +21,7 @@ def get_config_item(config, item, default=None, replace_char='_'):
         config:
         item:
         default:
+        replace_char:
 
     Returns:
         Configuration item

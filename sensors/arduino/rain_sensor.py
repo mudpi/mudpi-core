@@ -8,7 +8,7 @@ import sys
 
 
 
-import variables
+import constants
 
 default_connection = SerialManager(device='/dev/ttyUSB0')
 # r = redis.Redis(host='127.0.0.1', port=6379)

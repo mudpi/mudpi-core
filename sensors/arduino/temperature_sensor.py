@@ -10,7 +10,7 @@ from logger.Logger import Logger, LOG_LEVEL
 
 
 
-import variables
+import constants
 
 default_connection = SerialManager(device='/dev/ttyUSB0')
 

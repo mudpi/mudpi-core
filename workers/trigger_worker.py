@@ -12,7 +12,7 @@ from triggers.trigger_group import TriggerGroup
 from triggers.sensor_trigger import SensorTrigger
 from triggers.control_trigger import ControlTrigger
 
-import variables
+import constants
 import importlib
 from logger.Logger import Logger, LOG_LEVEL
 

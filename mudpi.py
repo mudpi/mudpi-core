@@ -7,41 +7,44 @@ and manage devices using a Raspberry Pi on an event based system
 using redis.
 """
 
-import RPi.GPIO as GPIO
-import threading
 import datetime
-import socket
-import redis
-import time
 import json
-import sys
+import socket
+# import RPi.GPIO as GPIO
+import threading
+import time
 
+import redis
+
+import constants
 from action import Action
-from utils import load_config_json
 from server.mudpi_server import MudpiServer
-from workers.linux.lcd_worker import LcdWorker
-from workers.linux.i2c_worker import PiI2CWorker
-from workers.linux.relay_worker import RelayWorker
+from utils import load_config_json
 from workers.linux.camera_worker import CameraWorker
-from workers.linux.sensor_worker import PiSensorWorker
 from workers.linux.control_worker import PiControlWorker
-from workers.trigger_worker import TriggerWorker
+from workers.linux.i2c_worker import PiI2CWorker
+from workers.linux.lcd_worker import LcdWorker
+from workers.linux.relay_worker import RelayWorker
+from workers.linux.sensor_worker import PiSensorWorker
 from workers.sequence_worker import SequenceWorker
+from workers.trigger_worker import TriggerWorker
 
 try:
     from workers.arduino.arduino_worker import ArduinoWorker
+
     NANPY_ENABLED = True
 except ImportError:
     NANPY_ENABLED = False
 
 try:
     from workers.adc_worker import ADCMCP3008Worker
+
     MCP_ENABLED = True
-except ImportError:
+except (ImportError, AttributeError):
     MCP_ENABLED = False
 
 from logger.Logger import Logger, LOG_LEVEL
-import variables
+
 
 PROGRAM_RUNNING = True
 threads = []
@@ -57,7 +60,16 @@ nodes = []
 
 print(chr(27) + "[2J")
 print('Loading MudPi Configs...\r', end="", flush=True)
-CONFIGS = load_config_json()
+
+try:
+    CONFIGS = load_config_json()
+except FileNotFoundError:
+    print(
+        f'{constants.RED_BACK}There is no configuration file present on the '
+        f'filesystem{constants.RESET}\n\r'
+    )
+    exit(1)
+
 # Singleton redis to prevent connection conflicts
 try:
     r = redis.Redis(host=CONFIGS['redis'].get('host', '127.0.0.1'),
@@ -111,10 +123,6 @@ except Exception as e:
 
 try:
     print('Initializing Garden Control \r', end="", flush=True)
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
-    GPIO.cleanup()
-    # Pause for GPIO to finish
     time.sleep(0.1)
     Logger.log(
         LOG_LEVEL["info"],

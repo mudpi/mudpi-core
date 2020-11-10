@@ -8,7 +8,7 @@ import sys
 
 
 
-import variables
+import constants
 
 default_connection = SerialManager(device='/dev/ttyUSB0')
 

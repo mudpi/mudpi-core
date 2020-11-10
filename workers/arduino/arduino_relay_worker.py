@@ -12,7 +12,7 @@ from .worker import Worker
 
 
 
-import variables
+import constants
 from logger.Logger import Logger, LOG_LEVEL
 
 
