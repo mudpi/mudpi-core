@@ -5,7 +5,7 @@ import redis
 import threading
 import sys
 
-sys.path.append('..')
+
 
 import variables
 from logger.Logger import Logger, LOG_LEVEL

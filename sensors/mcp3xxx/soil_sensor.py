@@ -5,7 +5,7 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 from logger.Logger import Logger, LOG_LEVEL
 from sensors.mcp3xxx.sensor import Sensor
 
-sys.path.append('..')
+
 
 #  Tested using Sun3Drucker Model SX239
 # Wet Water = 287

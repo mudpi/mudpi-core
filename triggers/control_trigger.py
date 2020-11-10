@@ -4,7 +4,7 @@ import redis
 import sys
 from .trigger import Trigger
 
-sys.path.append('..')
+
 
 from logger.Logger import Logger, LOG_LEVEL
 

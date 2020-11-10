@@ -4,7 +4,7 @@ import time
 
 from .worker import Worker
 
-sys.path.append('..')
+
 from logger.Logger import Logger, LOG_LEVEL
 
 

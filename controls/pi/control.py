@@ -3,7 +3,7 @@ import json
 import redis
 import RPi.GPIO as GPIO
 import sys
-sys.path.append('..')
+
 
 # Base sensor class to extend all other arduino sensors from.
 class Control():

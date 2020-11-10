@@ -6,7 +6,7 @@ import adafruit_bme680
 from logger.Logger import Logger, LOG_LEVEL
 from sensors.linux.i2c.sensor import Sensor
 
-sys.path.append('..')
+
 
 
 class Bme680Sensor(Sensor):

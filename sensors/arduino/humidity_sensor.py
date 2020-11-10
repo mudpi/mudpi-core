@@ -6,7 +6,7 @@ from .sensor import Sensor
 from nanpy import (ArduinoApi, SerialManager, DHT)
 import sys
 
-sys.path.append('..')
+
 
 import variables
 

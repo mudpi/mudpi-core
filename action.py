@@ -4,7 +4,7 @@ import sys
 
 import redis
 
-sys.path.append('..')
+
 
 
 class Action():

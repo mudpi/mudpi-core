@@ -7,7 +7,7 @@ import digitalio
 
 from .worker import Worker
 
-sys.path.append('..')
+
 
 from logger.Logger import Logger, LOG_LEVEL
 
@@ -142,7 +142,7 @@ class RelayWorker(Worker):
                 self.active = True
                 # This is handled by the redis listener now
                 # self.relay_active.set()
-                self.resetelapsed_time()
+                self.reset_elapsed_time()
 
     def turn_off(self):
         # Turn off volkeye to flip off relay
@@ -155,10 +155,10 @@ class RelayWorker(Worker):
                 #  This is handled by the redis listener now
                 # self.relay_active.clear()
                 self.active = False
-                self.resetelapsed_time()
+                self.reset_elapsed_time()
 
     def work(self):
-        self.resetelapsed_time()
+        self.reset_elapsed_time()
         while self.main_thread_running.is_set():
             if self.system_ready.is_set():
 
@@ -183,7 +183,7 @@ class RelayWorker(Worker):
                 # System not ready relay should be off
                 self.turn_off()
                 time.sleep(1)
-                self.resetelapsed_time()
+                self.reset_elapsed_time()
 
             time.sleep(0.1)
 

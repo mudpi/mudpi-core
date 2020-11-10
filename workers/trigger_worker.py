@@ -6,7 +6,7 @@ import threading
 from .worker import Worker
 import sys
 
-sys.path.append('..')
+
 from triggers.time_trigger import TimeTrigger
 from triggers.trigger_group import TriggerGroup
 from triggers.sensor_trigger import SensorTrigger

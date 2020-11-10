@@ -16,24 +16,24 @@ import time
 import json
 import sys
 
-# TODO: This might not be needed and could be deleted
-sys.path.append('..')
 from action import Action
-from config_load import load_config_json
+from utils import load_config_json
 from server.mudpi_server import MudpiServer
 from workers.linux.lcd_worker import LcdWorker
 from workers.linux.i2c_worker import PiI2CWorker
 from workers.linux.relay_worker import RelayWorker
 from workers.linux.camera_worker import CameraWorker
 from workers.linux.sensor_worker import PiSensorWorker
-# from workers.pi.control_worker import PiControlWorker
+from workers.linux.control_worker import PiControlWorker
 from workers.trigger_worker import TriggerWorker
 from workers.sequence_worker import SequenceWorker
+
 try:
     from workers.arduino.arduino_worker import ArduinoWorker
     NANPY_ENABLED = True
 except ImportError:
     NANPY_ENABLED = False
+
 try:
     from workers.adc_worker import ADCMCP3008Worker
     MCP_ENABLED = True
@@ -43,7 +43,6 @@ except ImportError:
 from logger.Logger import Logger, LOG_LEVEL
 import variables
 
-CONFIGS = {}
 PROGRAM_RUNNING = True
 threads = []
 actions = {}
@@ -278,10 +277,13 @@ try:
             Logger.log(
                 LOG_LEVEL["info"],
                 '{0} Actions...\t\t\t\t\033[1;32m Initializing\033[0;0m'.format(
-                    len(CONFIGS['actions'])))
+                    len(CONFIGS['actions']))
+            )
     except KeyError:
-        Logger.log(LOG_LEVEL["info"],
-                   'Actions...\t\t\t\t\033[1;31m Disabled\033[0;0m')
+        Logger.log(
+            LOG_LEVEL["info"],
+            'Actions...\t\t\t\t\033[1;31m Disabled\033[0;0m'
+        )
 
     # Worker for Sequences
     try:

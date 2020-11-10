@@ -12,7 +12,7 @@ from controls.arduino.switch_control import (SwitchControl)
 from controls.arduino.potentiometer_control import (PotentiometerControl)
 import sys
 
-sys.path.append('..')
+
 
 import variables
 import importlib

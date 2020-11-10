@@ -6,7 +6,7 @@ import board
 import digitalio
 
 
-sys.path.append('..')
+
 
 
 # Base sensor class to extend all other arduino sensors from.

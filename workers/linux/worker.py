@@ -5,7 +5,7 @@ import time
 
 import redis
 
-sys.path.append('..')
+
 
 from logger.Logger import Logger, LOG_LEVEL
 
@@ -56,7 +56,7 @@ class Worker:
         self.time_elapsed = time.perf_counter() - self.time_start
         return self.time_elapsed
 
-    def resetelapsed_time(self):
+    def reset_elapsed_time(self):
         self.time_start = time.perf_counter()
         pass
 

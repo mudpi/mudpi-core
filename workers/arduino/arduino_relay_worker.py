@@ -10,7 +10,7 @@ from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
 from .worker import Worker
 
-sys.path.append('..')
+
 
 import variables
 from logger.Logger import Logger, LOG_LEVEL
@@ -142,7 +142,7 @@ class ArduinoRelayWorker(Worker):
         self.time_elapsed = time.perf_counter() - self.time_start
         return self.time_elapsed
 
-    def resetelapsed_time(self):
+    def reset_elapsed_time(self):
         self.time_start = time.perf_counter()
         pass
 
@@ -156,7 +156,7 @@ class ArduinoRelayWorker(Worker):
                 self.r.publish(self.topic, json.dumps(message))
                 self.active = True
                 # self.relay_active.set() This is handled by the redis listener now
-                self.resetelapsed_time()
+                self.reset_elapsed_time()
 
     def turn_off(self):
         # Turn off volkeye to flip off relay
@@ -168,10 +168,10 @@ class ArduinoRelayWorker(Worker):
                 self.r.publish(self.topic, json.dumps(message))
                 # self.relay_active.clear() This is handled by the redis listener now
                 self.active = False
-                self.resetelapsed_time()
+                self.reset_elapsed_time()
 
     def work(self):
-        self.resetelapsed_time()
+        self.reset_elapsed_time()
         while self.main_thread_running.is_set():
             if self.system_ready.is_set():
                 if self.node_connected.is_set():
@@ -203,7 +203,7 @@ class ArduinoRelayWorker(Worker):
                 # System not ready relay should be off
                 self.turn_off()
                 time.sleep(1)
-                self.resetelapsed_time()
+                self.reset_elapsed_time()
 
             time.sleep(0.1)
 

@@ -2,7 +2,7 @@ import json
 import sys
 import time
 
-sys.path.append('..')
+
 from .worker import Worker
 
 from logger.Logger import Logger, LOG_LEVEL

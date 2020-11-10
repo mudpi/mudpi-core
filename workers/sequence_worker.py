@@ -6,7 +6,7 @@ import threading
 from .worker import Worker
 import sys
 
-sys.path.append('..')
+
 
 import variables
 import importlib

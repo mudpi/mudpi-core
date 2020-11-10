@@ -12,7 +12,7 @@ from workers.arduino.arduino_relay_worker import ArduinoRelayWorker
 from .worker import Worker
 import sys
 
-sys.path.append('..')
+
 
 import importlib
 from logger.Logger import Logger, LOG_LEVEL

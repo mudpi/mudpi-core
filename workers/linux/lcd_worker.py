@@ -203,14 +203,14 @@ class LcdWorker(Worker):
     def next_message_from_queue(self):
         if len(self.message_queue) > 0:
             self.need_new_message = False
-            self.resetelapsed_time()
+            self.reset_elapsed_time()
             return self.message_queue.pop(0)
         else:
             time.sleep(3)  # pause to reduce system load on message loop
             return None
 
     def work(self):
-        self.resetelapsed_time()
+        self.reset_elapsed_time()
         self.lcd.clear()
         self.need_new_message = True
         while self.main_thread_running.is_set():
@@ -246,7 +246,7 @@ class LcdWorker(Worker):
             else:
                 # System not ready
                 time.sleep(1)
-                self.resetelapsed_time()
+                self.reset_elapsed_time()
 
             time.sleep(0.1)
 
