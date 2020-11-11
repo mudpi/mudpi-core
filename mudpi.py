@@ -1,12 +1,11 @@
-import RPi.GPIO as GPIO
-import threading
-import datetime
-import socket
-import redis
-import time
-import json
 import sys
-sys.path.append('..')
+import json
+import time
+import redis
+import socket
+import datetime
+import threading
+import RPi.GPIO as GPIO
 from action import Action
 from config_load import loadConfigJson
 from server.mudpi_server import MudpiServer
