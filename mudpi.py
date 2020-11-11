@@ -50,6 +50,7 @@ detector = Detector()
 if detector.board.any_raspberry_pi:
     from workers.linux.camera_worker import CameraWorker
 
+
 PROGRAM_RUNNING = True
 threads = []
 actions = {}
