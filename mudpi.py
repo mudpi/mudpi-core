@@ -10,9 +10,11 @@ using redis.
 import datetime
 import json
 import socket
-# import RPi.GPIO as GPIO
 import threading
 import time
+
+from adafruit_platformdetect import Detector
+
 
 import redis
 
@@ -20,7 +22,6 @@ import constants
 from action import Action
 from server.mudpi_server import MudpiServer
 from utils import load_config_json
-from workers.linux.camera_worker import CameraWorker
 from workers.linux.control_worker import PiControlWorker
 from workers.linux.i2c_worker import PiI2CWorker
 from workers.linux.lcd_worker import LcdWorker
@@ -45,6 +46,9 @@ except (ImportError, AttributeError):
 
 from logger.Logger import Logger, LOG_LEVEL
 
+detector = Detector()
+if detector.board.any_raspberry_pi:
+    from workers.linux.camera_worker import CameraWorker
 
 PROGRAM_RUNNING = True
 threads = []
