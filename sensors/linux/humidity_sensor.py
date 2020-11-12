@@ -34,6 +34,7 @@ class HumiditySensor(Sensor):
                 'Sensor Model Error: Defaulting to DHT11'
             )
             self.sensor = adafruit_dht.DHT11
+            self.dht_device = self.sensor(self.pin_obj)
         return
 
     def read(self):
@@ -46,22 +47,20 @@ class HumiditySensor(Sensor):
         humidity = None
         temperature_c = None
 
-        # read_retry() not implemented in new lib
-        for i in range(15):
-            dhtDevice = self.sensor(self.pin_obj)
-
-            try:
-                temperature_c = dhtDevice.temperature
-                humidity = dhtDevice.humidity
-                if humidity is not None and temperature_c is not None:
-                    dhtDevice.exit()
-                    break
-
-            except RuntimeError:
-                # Errors happen fairly often, DHT's are hard to read,
-                # just keep going:
-                time.sleep(2)
-                continue
+        try:
+            # Calling temperature or humidity triggers measure()
+            temperature_c = self.dht_device.temperature 
+            humidity = self.dht_device.humidity
+        except RuntimeError:
+            # Errors happen fairly often, DHT's are hard to read
+            time.sleep(2)
+            continue
+        except Exception as error:
+            Logger.log(
+                LOG_LEVEL["error"],
+                'DHT Device Encountered an Error.'
+            )
+            self.dht_device.exit()
 
         if humidity is not None and temperature_c is not None:
             self.r.set(
