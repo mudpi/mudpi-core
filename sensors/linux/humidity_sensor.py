@@ -34,7 +34,8 @@ class HumiditySensor(Sensor):
                 'Sensor Model Error: Defaulting to DHT11'
             )
             self.sensor = adafruit_dht.DHT11
-            self.dht_device = self.sensor(self.pin_obj)
+        
+        self.dht_device = self.sensor(self.pin_obj)
         return
 
     def read(self):
