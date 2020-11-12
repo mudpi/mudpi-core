@@ -9,6 +9,7 @@ from sensors.linux.sensor import Sensor
 
 
 class HumiditySensor(Sensor):
+    sensor = adafruit_dht.DHT11
 
     def __init__(self, pin, name=None, key=None, model='11', redis_conn=None):
         super().__init__(pin, name=name, key=key, redis_conn=redis_conn)
@@ -26,14 +27,16 @@ class HumiditySensor(Sensor):
             '22': adafruit_dht.DHT22,
             '2302': adafruit_dht.DHT22
         }  # AM2302 = DHT22
+
         if self.type in sensor_types:
             self.sensor = sensor_types[self.type]
+
         else:
             Logger.log(
                 LOG_LEVEL["warning"],
                 'Sensor Model Error: Defaulting to DHT11'
             )
-            self.sensor = adafruit_dht.DHT11
+
         return
 
     def read(self):
@@ -46,24 +49,25 @@ class HumiditySensor(Sensor):
         humidity = None
         temperature_c = None
 
-        dht_device = self.sensor(self.pin_obj)
-
         # read_retry() not implemented in new lib
         for i in range(15):
+            dht_device = self.sensor(self.pin_obj)
+            time.sleep(2)
 
             try:
                 dht_device.measure()
                 temperature_c = dht_device.temperature
                 humidity = dht_device.humidity
                 if humidity is not None and temperature_c is not None:
-                    dht_device.exit()
                     break
 
             except RuntimeError:
                 # Errors happen fairly often, DHT's are hard to read,
                 # just keep going:
-                time.sleep(2)
                 continue
+
+            finally:
+                dht_device.exit()
 
         if humidity is not None and temperature_c is not None:
             self.r.set(
@@ -78,8 +82,6 @@ class HumiditySensor(Sensor):
                 'humidity': round(humidity, 2)
             }
             self.r.set(self.key, json.dumps(readings))
-            dht_device.exit()
-
             return readings
 
         else:
