@@ -4,6 +4,8 @@ import time
 
 from .worker import Worker
 
+from sensors.linux.float_sensor import (FloatSensor)
+from sensors.linux.humidity_sensor import (HumiditySensor)
 
 from logger.Logger import Logger, LOG_LEVEL
 
