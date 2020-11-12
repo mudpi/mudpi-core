@@ -2,13 +2,14 @@ import json
 import sys
 import time
 
-
 from .worker import Worker
+from sensors.linux.i2c.bme680_sensor import (BME680Sensor)
+from sensors.linux.i2c.t9602_sensor import (T9602Sensor)
 
 from logger.Logger import Logger, LOG_LEVEL
 
 
-class PiI2CWorker(Worker):
+class LinuxI2CWorker(Worker):
     def __init__(self, config, main_thread_running, system_ready):
         super().__init__(config, main_thread_running, system_ready)
         self.topic = config.get('topic', 'i2c').replace(" ", "_").lower()

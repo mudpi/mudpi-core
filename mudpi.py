@@ -15,7 +15,6 @@ import time
 
 from adafruit_platformdetect import Detector
 
-
 import redis
 
 import constants
@@ -23,10 +22,10 @@ from action import Action
 from server.mudpi_server import MudpiServer
 from utils import load_config_json
 from workers.linux.control_worker import PiControlWorker
-from workers.linux.i2c_worker import PiI2CWorker
+from workers.linux.i2c_worker import LinuxI2CWorker
 from workers.linux.lcd_worker import LcdWorker
 from workers.linux.relay_worker import RelayWorker
-from workers.linux.sensor_worker import PiSensorWorker
+from workers.linux.sensor_worker import LinuxSensorWorker
 from workers.sequence_worker import SequenceWorker
 from workers.trigger_worker import TriggerWorker
 
