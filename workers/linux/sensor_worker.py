@@ -4,11 +4,13 @@ import time
 
 from .worker import Worker
 
+from sensors.linux.float_sensor import (FloatSensor)
+from sensors.linux.humidity_sensor import (HumiditySensor)
 
 from logger.Logger import Logger, LOG_LEVEL
 
 
-class PiSensorWorker(Worker):
+class LinuxSensorWorker(Worker):
     def __init__(self, config, main_thread_running, system_ready):
         super().__init__(config, main_thread_running, system_ready)
         self.topic = config.get('topic', 'sensors').replace(" ", "_").lower()

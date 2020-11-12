@@ -10,9 +10,10 @@ using redis.
 import datetime
 import json
 import socket
-# import RPi.GPIO as GPIO
 import threading
 import time
+
+from adafruit_platformdetect import Detector
 
 import redis
 
@@ -20,12 +21,11 @@ import constants
 from action import Action
 from server.mudpi_server import MudpiServer
 from utils import load_config_json
-from workers.linux.camera_worker import CameraWorker
-from workers.linux.control_worker import PiControlWorker
-from workers.linux.i2c_worker import PiI2CWorker
+from workers.linux.control_worker import LinuxControlWorker
+from workers.linux.i2c_worker import LinuxI2CWorker
 from workers.linux.lcd_worker import LcdWorker
 from workers.linux.relay_worker import RelayWorker
-from workers.linux.sensor_worker import PiSensorWorker
+from workers.linux.sensor_worker import LinuxSensorWorker
 from workers.sequence_worker import SequenceWorker
 from workers.trigger_worker import TriggerWorker
 
@@ -44,6 +44,10 @@ except (ImportError, AttributeError):
     MCP_ENABLED = False
 
 from logger.Logger import Logger, LOG_LEVEL
+
+detector = Detector()
+if detector.board.any_raspberry_pi:
+    from workers.linux.camera_worker import CameraWorker
 
 
 PROGRAM_RUNNING = True
@@ -180,7 +184,7 @@ try:
                 worker["redis"] = r
 
                 if worker['type'] == "sensor":
-                    pw = PiSensorWorker(
+                    pw = LinuxSensorWorker(
                         worker,
                         main_thread_running,
                         system_ready
@@ -191,7 +195,7 @@ try:
                     )
 
                 elif worker['type'] == "control":
-                    pw = PiControlWorker(
+                    pw = LinuxControlWorker(
                         worker,
                         main_thread_running,
                         system_ready
@@ -202,7 +206,7 @@ try:
                     )
 
                 elif worker['type'] == "i2c":
-                    pw = PiI2CWorker(worker, main_thread_running, system_ready)
+                    pw = LinuxI2CWorker(worker, main_thread_running, system_ready)
                     Logger.log(
                         LOG_LEVEL["info"],
                         'I2C Comms...\t\t\t\t\033[1;32m Initializing\033[0;0m'

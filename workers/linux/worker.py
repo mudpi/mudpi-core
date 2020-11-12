@@ -5,10 +5,7 @@ import time
 
 import redis
 
-
-
 from logger.Logger import Logger, LOG_LEVEL
-
 
 class Worker:
     """
