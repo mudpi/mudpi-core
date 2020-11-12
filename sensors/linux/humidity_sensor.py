@@ -1,12 +1,12 @@
 import json
-import sys
 import time
-import board
-import adafruit_dht
 
-from sensors.linux.sensor import Sensor
+import adafruit_dht
+import board
 
 from logger.Logger import Logger, LOG_LEVEL
+from sensors.linux.sensor import Sensor
+
 
 class HumiditySensor(Sensor):
 
@@ -46,15 +46,17 @@ class HumiditySensor(Sensor):
         humidity = None
         temperature_c = None
 
+        dht_device = self.sensor(self.pin_obj)
+
         # read_retry() not implemented in new lib
         for i in range(15):
-            dhtDevice = self.sensor(self.pin_obj)
 
             try:
-                temperature_c = dhtDevice.temperature
-                humidity = dhtDevice.humidity
+                dht_device.measure()
+                temperature_c = dht_device.temperature
+                humidity = dht_device.humidity
                 if humidity is not None and temperature_c is not None:
-                    dhtDevice.exit()
+                    dht_device.exit()
                     break
 
             except RuntimeError:
@@ -76,7 +78,10 @@ class HumiditySensor(Sensor):
                 'humidity': round(humidity, 2)
             }
             self.r.set(self.key, json.dumps(readings))
+            dht_device.exit()
+
             return readings
+
         else:
             Logger.log(
                 LOG_LEVEL["error"],
