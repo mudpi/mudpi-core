@@ -54,7 +54,6 @@ class HumiditySensor(Sensor):
         except RuntimeError:
             # Errors happen fairly often, DHT's are hard to read
             time.sleep(2)
-            continue
         except Exception as error:
             Logger.log(
                 LOG_LEVEL["error"],
