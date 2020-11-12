@@ -24,7 +24,7 @@ class PiI2CWorker(Worker):
             if sensor.get('type', None) is not None:
                 # Get the sensor from the sensors folder
                 # {sensor name}_sensor.{SensorName}Sensor
-                sensor_type = 'sensors.pi.i2c.'
+                sensor_type = 'sensors.linux.i2c.'
                 sensor_type += sensor.get('type').lower()
                 sensor_type += '_sensor.'
                 sensor_type += sensor.get('type').capitalize() + 'Sensor'

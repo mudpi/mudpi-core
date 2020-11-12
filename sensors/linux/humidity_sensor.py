@@ -6,13 +6,7 @@ import adafruit_dht
 
 from sensors.linux.sensor import Sensor
 
-
-
 from logger.Logger import Logger, LOG_LEVEL
-
-
-# PIN MODE : OUT | IN
-
 
 class HumiditySensor(Sensor):
 
