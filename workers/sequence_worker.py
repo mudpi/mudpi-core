@@ -4,9 +4,6 @@ import json
 import redis
 import threading
 from .worker import Worker
-import sys
-
-
 
 import constants
 import importlib
@@ -296,7 +293,7 @@ class SequenceWorker(Worker):
                     self.pubsub.get_message()
                     if self.sequence_available.is_set():
                         if self.sequence_active.is_set():
-                            while not self.step_complete:
+                            while not self.step_complete and self.main_thread_running.is_set():
                                 if not self.delay_complete:
                                     if self.sequence[self.current_step].get(
                                             'delay', None) is not None:
