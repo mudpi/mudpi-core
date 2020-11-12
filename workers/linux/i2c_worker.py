@@ -3,7 +3,7 @@ import sys
 import time
 
 from .worker import Worker
-from sensors.linux.i2c.bme680_sensor import (BME680Sensor)
+from sensors.linux.i2c.bme680_sensor import (Bme680Sensor)
 from sensors.linux.i2c.t9602_sensor import (T9602Sensor)
 
 from logger.Logger import Logger, LOG_LEVEL
