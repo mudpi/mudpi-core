@@ -9,7 +9,7 @@ from workers.linux.worker import Worker
 from logger.Logger import Logger, LOG_LEVEL
 
 
-class PiControlWorker(Worker):
+class LinuxControlWorker(Worker):
     def __init__(self, config, main_thread_running, system_ready):
         super().__init__(config, main_thread_running, system_ready)
         self.topic = get_config_item(self.config, 'topic', 'controls')

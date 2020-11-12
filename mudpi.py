@@ -21,7 +21,7 @@ import constants
 from action import Action
 from server.mudpi_server import MudpiServer
 from utils import load_config_json
-from workers.linux.control_worker import PiControlWorker
+from workers.linux.control_worker import LinuxControlWorker
 from workers.linux.i2c_worker import LinuxI2CWorker
 from workers.linux.lcd_worker import LcdWorker
 from workers.linux.relay_worker import RelayWorker
@@ -184,7 +184,7 @@ try:
                 worker["redis"] = r
 
                 if worker['type'] == "sensor":
-                    pw = PiSensorWorker(
+                    pw = LinuxSensorWorker(
                         worker,
                         main_thread_running,
                         system_ready
@@ -195,7 +195,7 @@ try:
                     )
 
                 elif worker['type'] == "control":
-                    pw = PiControlWorker(
+                    pw = LinuxControlWorker(
                         worker,
                         main_thread_running,
                         system_ready
@@ -206,7 +206,7 @@ try:
                     )
 
                 elif worker['type'] == "i2c":
-                    pw = PiI2CWorker(worker, main_thread_running, system_ready)
+                    pw = LinuxI2CWorker(worker, main_thread_running, system_ready)
                     Logger.log(
                         LOG_LEVEL["info"],
                         'I2C Comms...\t\t\t\t\033[1;32m Initializing\033[0;0m'
