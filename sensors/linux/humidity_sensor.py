@@ -92,7 +92,6 @@ class HumiditySensor(Sensor):
                 LOG_LEVEL["error"],
                 'DHT Reading was Invalid. Trying again next cycle.'
             )
-            self.dht_device.exit()
             return None
 
     def read_raw(self):
