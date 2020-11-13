@@ -34,6 +34,18 @@ class HumiditySensor(Sensor):
                 'Sensor Model Error: Defaulting to DHT11'
             )
             self.sensor = adafruit_dht.DHT11
+
+        try:
+            self.dht_device = self.sensor(self.pin_obj)
+            Logger.log(
+                LOG_LEVEL["debug"],
+                'Sensor Initializing: DHT'
+            )
+        except Exception as error:
+            Logger.log(
+                LOG_LEVEL["error"],
+                'Sensor Initialize Error: DHT Failed to Init'
+            )
         return
 
     def read(self):
@@ -47,21 +59,12 @@ class HumiditySensor(Sensor):
         temperature_c = None
 
         try:
-            self.dht_device = self.sensor(self.pin_obj)
-        except Exception as error:
-            Logger.log(
-                LOG_LEVEL["error"],
-                'Sensor Initialize Error: DHT Failed to Init'
-            )
-            self.dht_device.exit()
-
-        try:
             # Calling temperature or humidity triggers measure()
             temperature_c = self.dht_device.temperature 
             humidity = self.dht_device.humidity
-            self.dht_device.exit()
-        except RuntimeError:
+        except RuntimeError as error:
             # Errors happen fairly often, DHT's are hard to read
+            Logger.log(LOG_LEVEL["error"], error)
             time.sleep(2)
         except Exception as error:
             Logger.log(
@@ -89,6 +92,7 @@ class HumiditySensor(Sensor):
                 LOG_LEVEL["error"],
                 'DHT Reading was Invalid. Trying again next cycle.'
             )
+            self.dht_device.exit()
             return None
 
     def read_raw(self):
