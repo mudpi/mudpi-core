@@ -36,7 +36,7 @@ class LinuxControlWorker(Worker):
                 # conditionally include optional variables below if they exist
                 control_kwargs = {
                     'name': control.get('name', None),
-                    'pin': int(control.get('pin')),
+                    'pin': control.get('pin'),
                     'key': control.get('key', None),
                     'topic': control.get('topic', None),
                     'resistor': control.get('resistor', None),

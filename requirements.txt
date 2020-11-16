@@ -1,10 +1,11 @@
 pycron
 redis
-picamera
+picamera; platform_machine=='armv7l' or platform_machine=='armv6l'
 Adafruit-Blinka
 adafruit-circuitpython-dht
 adafruit-circuitpython-mcp3xxx
 adafruit-circuitpython-bme680
+adafruit-circuitpython-debouncer>=1.3.7
 smbus
 https://github.com/olixr/nanpy/archive/master.zip
 git+https://github.com/olixr/Adafruit_CircuitPython_CharLCD.git#egg=adafruit-circuitpython-charlcd
