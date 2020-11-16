@@ -36,7 +36,6 @@ class HumiditySensor(Sensor):
                 LOG_LEVEL["warning"],
                 'Sensor Model Error: Defaulting to DHT11'
             )
-
         return
 
     def read(self):
