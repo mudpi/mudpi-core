@@ -4,7 +4,8 @@ import time
 from utils import get_config_item
 from workers.linux.worker import Worker
 
-
+from controls.linux.button_control import (ButtonControl)
+from controls.linux.switch_control import (SwitchControl)
 
 from logger.Logger import Logger, LOG_LEVEL
 
