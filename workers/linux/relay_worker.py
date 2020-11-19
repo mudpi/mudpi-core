@@ -8,7 +8,6 @@ import digitalio
 from .worker import Worker
 
 
-
 from logger.Logger import Logger, LOG_LEVEL
 
 
