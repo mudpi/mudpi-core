@@ -34,15 +34,21 @@ class RelayWorker(Worker):
 
         # Dynamic Properties based on config
         self.active = False
-        self.topic = self.config.get('topic', '').replace(" ",
-                                                          "/").lower() if self.config.get(
-            'topic', None) is not None else 'mudpi/relays/' + self.key
-        self.pin_state_off = True if self.config[
-                                         'normally_open'] is not None and \
-                                     self.config['normally_open'] else False
-        self.pin_state_on = False if self.config[
-                                         'normally_open'] is not None and \
-                                     self.config['normally_open'] else True
+        self.topic = (
+            self.config.get('topic', '').replace(" ", "/").lower()
+            if self.config.get('topic', None) is not None
+            else 'mudpi/relays/' + self.key
+            )
+        self.pin_state_off = (
+            True if self.config['normally_open'] is not None
+            and self.config['normally_open']
+            else False
+            )
+        self.pin_state_on = (
+            False if self.config['normally_open'] is not None
+            and self.config['normally_open']
+            else True
+            )
 
         # Pubsub Listeners
         self.pubsub = self.r.pubsub()
@@ -67,9 +73,10 @@ class RelayWorker(Worker):
         # Feature to restore relay state in case of crash
         # or unexpected shutdown. This will check for last state
         # stored in redis and set relay accordingly
-        if (self.config.get('restore_last_known_state',
-                            None) is not None and self.config.get(
-            'restore_last_known_state', False) is True):
+        if (
+            self.config.get('restore_last_known_state', None) is not None
+            and self.config.get('restore_last_known_state', False) is True
+        ):
             if self.r.get(self.key + '_state'):
                 self.gpio_pin.value = self.pin_state_on
                 Logger.log(
@@ -80,7 +87,8 @@ class RelayWorker(Worker):
 
         # Logger.log(
         #     LOG_LEVEL["info"],
-        #     'Relay Worker {0}...\t\t\t\033[1;32m Ready\033[0;0m'.format(self.key)
+        #     'Relay Worker {0}...\t\t\t\033[1;32m Ready\033[0;0m'.format(
+        #         self.key)
         # )
         return
 
@@ -106,7 +114,8 @@ class RelayWorker(Worker):
                         self.relay_active.clear()
                     Logger.log(
                         LOG_LEVEL["info"],
-                        'Switch Relay \033[1;36m{0}\033[0;0m state to \033[1;36m{1}\033[0;0m'.format(
+                        'Switch Relay \033[1;36m{0}\033[0;0m state \
+                        to \033[1;36m{1}\033[0;0m'.format(
                             self.key, decoded_message['data'])
                     )
 
@@ -174,8 +183,8 @@ class RelayWorker(Worker):
                 except Exception:
                     Logger.log(
                         LOG_LEVEL["error"],
-                        "Relay Worker \033[1;36m{0}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(
-                            self.key)
+                        "Relay Worker \033[1;36m{0}\033[0;0m \t\033[1;31m \
+                        Unexpected Error\033[0;0m".format(self.key)
                     )
 
             else:
@@ -191,6 +200,6 @@ class RelayWorker(Worker):
         self.pubsub.close()
         Logger.log(
             LOG_LEVEL["info"],
-            "Relay Worker {0} Shutting Down...\t\033[1;32m Complete\033[0;0m".format(
-                self.key)
+            "Relay Worker {0} Shutting Down...\t\033[1;32m \
+            Complete\033[0;0m".format(self.key)
         )
