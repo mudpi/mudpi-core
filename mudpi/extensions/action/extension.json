@@ -1,0 +1,9 @@
+{
+	"name": "Action",
+	"namespace": "action",
+	"details": {
+		"description": "Provides responses to events or user input in MudPi.",
+		"documentation": "https://mudpi.app/docs/actions"
+	},
+	"requirements": ["redis"]
+}

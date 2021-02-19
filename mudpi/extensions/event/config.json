@@ -1,0 +1,9 @@
+{
+	"name": "Event",
+	"namespace": "event",
+	"details": {
+		"description": "Provides access to events in MudPi."
+	},
+	"requirements": ["redis"],
+	"dependencies": []
+}

@@ -1,10 +1,11 @@
-pycron
 redis
+smbus
+pyyaml
+pycron
 picamera
 Adafruit-Blinka
 adafruit-circuitpython-dht
 adafruit-circuitpython-mcp3xxx
 adafruit-circuitpython-bme680
-smbus
 https://github.com/olixr/nanpy/archive/master.zip
 git+https://github.com/olixr/Adafruit_CircuitPython_CharLCD.git#egg=adafruit-circuitpython-charlcd

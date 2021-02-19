@@ -1,6 +1,6 @@
-<p align="center"><img alt="MudPi Smart Garden" title="MudPi Smart Garden" src="https://mudpi.app/img/mudPI_LOGO_small_grad.png" width="200px"></p>
+<p align="center"><img alt="MudPi Smart Automation for the Garden & Home" title="MudPi Smart Automation for the Garden & Home" src="https://mudpi.app/img/mudPI_LOGO_small_grad.png" width="200px"></p>
 
-# MudPi Smart Garden
+# MudPi Smart Automation for the Garden & Home
 > A python library to gather sensor readings, trigger components, control solenoids and more in an event based system that can be run on a linux SBC, including Raspberry Pi.
 
 
