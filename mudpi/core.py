@@ -68,26 +68,12 @@ class MudPi:
         """ Return if MudPi is stopping. """
         return self.state in (CoreState.stopping,)
 
-    @property
-    def component_count(self):
-        """ Return number of registered components. """
-        return self.components.length
-
-    @property
-    def extension_count(self):
-        """ Return number of registered extensions. """
-        return len(self.extensions.all())
-
-    @property
-    def worker_count(self):
-        """ Return number of registered workers. """
-        return len(self.worker_registry)
-
 
     """ Methods """
     def load_config(self, config_path=None):
         """ Load MudPi Configurations """
         if self.state == CoreState.preparing:
+            """ Already loading """
             return
 
         self.state = CoreState.preparing
@@ -130,18 +116,14 @@ class MudPi:
         self.state = CoreState.loading
 
         self.states = StateManager()
-        # print(dir(self.config))
-        # print(self.config)
-        # print(self.config.get('mudpi'))
-        # print(self.config.config.get('mudpi'))
-        # self.events = EventSystem(self.config.get('mudpi', {}).get('events', {}))
-        # self.events.connect()
+        self.events = EventSystem(self.config.get('mudpi', {}).get('events', {}))
+        self.events.connect()
         self.actions.register('turn_on', self.start, 'mudpi')
         self.actions.register('turn_off', self.stop, namespace='mudpi')
         self.actions.register('shutdown', self.shutdown, namespace='mudpi')
 
         self.state = CoreState.loaded
-        # self.events.publish('core', {'event': 'CoreLoaded'})
+        self.events.publish('core', {'event': 'CoreLoaded'})
         return True
 
     def start(self, data=None):

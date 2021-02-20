@@ -10,10 +10,12 @@ import time
 import argparse
 import threading
 from mudpi import utils, boot, importer
-from .constants import __version__, PATH_CONFIG, DEFAULT_CONFIG_FILE, FONT_RESET_CURSOR, FONT_RESET, YELLOW_BACK, GREEN_BACK, FONT_GREEN, FONT_RED, FONT_YELLOW, FONT_PADDING
-from .exceptions import ConfigNotFoundError, ConfigFormatError
-from .core import MudPi
-from .logger.Logger import Logger, LOG_LEVEL
+from mudpi.constants import __version__, PATH_CONFIG, DEFAULT_CONFIG_FILE, \
+    FONT_RESET_CURSOR, FONT_RESET, YELLOW_BACK, GREEN_BACK, FONT_GREEN, FONT_RED, FONT_YELLOW, FONT_PADDING
+from mudpi.exceptions import ConfigNotFoundError, ConfigFormatError
+from mudpi.core import MudPi
+from mudpi.config import Config
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 
 def main(args=None):
@@ -28,11 +30,10 @@ def main(args=None):
     if arguments.make_config:
         config_location = os.path.join(os.getcwd(), arguments.config)
         print(f"Generating a default config file at {config_location}")
-        mudpi = MudPi()
         if os.path.exists(config_location) and not arguments.overwrite:
             print(f'{FONT_RED}{"File already exists and `--overwrite` was not set."}{FONT_RESET}')
             return
-        mudpi.config.save_to_file(config_location)
+        Config().save_to_file(config_path)
         return
 
 
@@ -103,7 +104,6 @@ def main(args=None):
         LOG_LEVEL["warning"],
         "Booting MudPi ", 'Complete', 'success'
     )
-
 
     #########################
     ### Start All Systems ###

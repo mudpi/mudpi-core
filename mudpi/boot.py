@@ -159,35 +159,6 @@ def init_extensions(mudpi, extensions, config):
             continue
     return True
 
-
-def load_redis(config: dict):
-    """ 
-    Load Singleton redis to prevent connection conflicts 
-    Will be moved to the state machine eventually
-    """
-    try:
-        loaded_redis = redis.Redis(host=config['redis'].get('host', '127.0.0.1'),
-                        port=int(config['redis'].get('port', 6379)))
-    except KeyError:
-        loaded_redis = redis.Redis(host='127.0.0.1', port=6379)
-    # Waiting for redis and services to be running
-    time.sleep(5)
-
-    return loaded_redis
-
-
-
-def validate_config(config_path):
-    """ Validate that config path was provided and a file """
-    if not os.path.exists(config_path):
-        raise ConfigNotFoundError(f"Config File Doesn't Exist at {config_path}")
-        return False
-    else: 
-        # No config file provided just a path
-        pass
-
-    return True
-
 def import_config_dir(mudpi):
     """ Add config dir to sys path so we can import extensions """
     if mudpi.config_path is None:
@@ -204,4 +175,15 @@ def load_mudpi_core(mudpi):
     """ Load the Core systems for MudPi """
     mudpi.load_core()
     time.sleep(0.1)
+    return True
+
+def validate_config(config_path):
+    """ Validate that config path was provided and a file """
+    if not os.path.exists(config_path):
+        raise ConfigNotFoundError(f"Config File Doesn't Exist at {config_path}")
+        return False
+    else: 
+        # No config file provided just a path
+        pass
+
     return True

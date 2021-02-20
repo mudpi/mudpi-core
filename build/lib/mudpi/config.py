@@ -12,7 +12,7 @@ class Config(object):
     """
     def __init__(self, config={}, config_path=None):
         self.config = config
-        self.config_path = os.path.abspath(os.path.join(os.getcwd(), config_path)) if config_path is not None else os.path.abspath(os.path.join(os.getcwd(), PATH_CONFIG))
+        self.config_path = config_path or os.path.abspath(os.path.join(os.getcwd(), PATH_CONFIG))
         self.set_defaults()
 
     def __getattr__(self, key):

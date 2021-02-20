@@ -1,4 +1,5 @@
 import redis
+import json
 from . import Adaptor
 
 
@@ -21,7 +22,7 @@ class RedisAdaptor(Adaptor):
 
 	def subscribe(self, topic, callback):
 		""" Listen on a topic and pass event data to callback """
-		return self.pubsub.subscribe(topic=callback)
+		return self.pubsub.subscribe(**{topic: callback})
 
 	def unsubscribe(self, topic):
 		""" Stop listening for events on a topic """
@@ -30,6 +31,10 @@ class RedisAdaptor(Adaptor):
 	def publish(self, topic, data=None):
 		""" Publish an event on the topic """
 		if data:
-			return self.connection.publish(topic, data)
+			return self.connection.publish(topic, json.dumps(data))
 
 		return self.connection.publish(topic)
+
+	def get_message(self):
+		""" Check for new messages waiting """
+		return self.pubsub.get_message()

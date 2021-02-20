@@ -63,6 +63,12 @@ class EventSystem():
             adaptor.subscribe_once(topic, callback)
         return True
 
+    def get_message(self):
+        """ Request any new messages because some protocols 
+            require a poll for data """
+        for key, adaptor in self.adaptors.items():
+            adaptor.get_message()
+
     def events(self):
         """ Return all the events subscribed to [List] """
         return self.topics

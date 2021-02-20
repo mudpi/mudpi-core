@@ -45,6 +45,10 @@ class Adaptor:
 
         return self.subscribe(topic, handle_once)
 
+    def get_message(self):
+    	""" Some protocols need to initate a poll for new messages """
+    	pass
+    	
 # Import adaptors
 from . import redis
 
