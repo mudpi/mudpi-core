@@ -7,6 +7,7 @@
     Default: redis
 """
 from mudpi.events import adaptors
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 
 class EventSystem():
@@ -29,7 +30,15 @@ class EventSystem():
     def connect(self):
         connection_data = {}
         for key, adaptor in self.adaptors.items():
+            Logger.log_formatted(
+                LOG_LEVEL["debug"],
+                f"Setting up events on {key} ", 'Pending', 'notice'
+            )
             connection_data[key] = adaptor.connect()
+            Logger.log_formatted(
+                LOG_LEVEL["info"],
+                f"Event system ready on {key}  ", 'Connected', 'success'
+            )
         return connection_data
 
     def disconnect(self):
