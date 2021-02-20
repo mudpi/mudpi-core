@@ -7,6 +7,7 @@ from . import Adaptor
 
 
 class MQTTAdaptor(Adaptor):
+    """ Provide pubsub events over MQTT """
     key = 'mqtt'
 
     connected = False

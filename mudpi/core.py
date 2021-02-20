@@ -49,6 +49,11 @@ class MudPi:
 
     """ Properties """
     @property
+    def is_prepared(self):
+        """ Return if MudPi is prepared """
+        return self.mudpi.thread_events['mudpi_running'].is_set()
+
+    @property
     def is_loaded(self):
         """ Return if MudPi is loaded or previously was. """
         return self.state in (CoreState.loaded, CoreState.stopped, CoreState.running)

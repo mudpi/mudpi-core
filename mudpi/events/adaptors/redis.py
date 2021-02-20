@@ -4,6 +4,7 @@ from . import Adaptor
 
 
 class RedisAdaptor(Adaptor):
+	""" Allow MudPi events on Pubsub through Redis """
 	key = 'redis'
 
 	def connect(self):

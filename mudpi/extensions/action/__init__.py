@@ -40,9 +40,6 @@ class Extension(BaseExtension):
                 raise ConfigError("Missing `key` in configs.")
         return config
 
-    def add_components(self, components):
-        pass
-
 
 """ Action Templates """ 
 class Action:

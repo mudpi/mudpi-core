@@ -13,8 +13,8 @@ class Worker:
     A worker is responsible for managing components,
     updating component state, configurations ,etc.
     
-    A worker runs on a thread with a sleep interaval 
-    between update cycles. 
+    A worker runs on a thread with an interruptable sleep 
+    interaval between update cycles. 
     """
     registered_workers = {}
 
@@ -70,8 +70,8 @@ class Worker:
             polling sensors, or listening to events. 
             Worker should sleep based on `update_interval`
         """
-        while self.mudpi.thread_events['mudpi_running'].is_set():
-            if self.mudpi.thread_events['core_running'].is_set():
+        while self.mudpi.is_prepared:
+            if self.mudpi.is_running:
                 if callable(func):
                     func()
                 for component in self.components:
