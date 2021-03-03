@@ -1,0 +1,9 @@
+{
+	"name": "T9602 I2C Environment Sensor",
+	"namespace": "t9602",
+	"details": {
+		"description": "Provides interface for T9602 sensors to take environment readings.",
+		"documentation": "https://mudpi.app/docs/sensors/T9602"
+	},
+	"requirements": ["smbus"]
+}

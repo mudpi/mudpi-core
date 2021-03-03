@@ -16,12 +16,6 @@ class Worker:
     A worker runs on a thread with an interruptable sleep 
     interaval between update cycles. 
     """
-    registered_workers = {}
-
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        cls.registered_workers[cls.__name__] = cls
-
     def __init__(self, mudpi, config):
         self.mudpi = mudpi
         self.config = config
@@ -31,11 +25,17 @@ class Worker:
             self.config['key'] = f'{self.__class__.__name__}-{uuid4()}'
 
         self._worker_available = threading.Event()
+        self._thread = None
+        self.mudpi.workers.register(self.key, self)
 
     """ Properties """
     @property
     def key(self):
         return self.config.get('key')
+
+    @property
+    def update_interval(self):
+        return self.config.get('update_interval', constants.DEFAULT_UPDATE_INTERVAL)
     
     @property
     def is_available(self):
@@ -49,23 +49,17 @@ class Worker:
             self._worker_available.clear()
     
     """ Methods """
-    def init(self):
-        """ Initalize the Worker, Finish setup tasks """
-        self.register()
-        return
+    def run(self, func=None):
+        if not self._thread:
+            self._thread = threading.Thread(target=self.work, args=(func,))
+            Logger.log_formatted(LOG_LEVEL["debug"],
+                   f"Worker {self.key} ", "Starting", "notice")
+            self._thread.start()
+            Logger.log_formatted(LOG_LEVEL["info"],
+                   f"Worker {self.key} ", "Started", "success")
+        return self._thread
 
-    def run(self, func=lambda: None):
-        thread = threading.Thread(target=self.work, args=(func))
-        thread.start()
-        return thread
-
-    def register(self, mudpi=None):
-        """ Register a Worker to MudPi """
-        mudpi = mudpi or self.mudpi
-        mudpi.register_worker(self, self.key)
-        return True
-
-    def work(self, func=lambda: None):
+    def work(self, func=None):
         """ Perform work each cycle like checking devices,
             polling sensors, or listening to events. 
             Worker should sleep based on `update_interval`
@@ -74,22 +68,27 @@ class Worker:
             if self.mudpi.is_running:
                 if callable(func):
                     func()
-                for component in self.components:
+                for key, component in self.components.items():
                     if component.should_update:
                         component.update()
+                        component.store_state()
 
-                self.wait(self.update_interval)
+                self._wait(self.update_interval)
         # MudPi Shutting Down, Perform Cleanup Below
-        Logger.log(LOG_LEVEL["info"],
-                   f'{"Worker Shutting Down...":.<{constants.FONT_PADDING}}{constants.FONT_GREEN}Complete{constants.FONT_RESET}')
+        Logger.log_formatted(LOG_LEVEL["debug"],
+                   f"Worker {self.key} ", "Stopping", "notice")
+        for key, component in self.components.items():
+            component.unload()
+        Logger.log_formatted(LOG_LEVEL["info"],
+                   f"Worker {self.key} ", "Offline", "error")
 
-    def wait(self, duration=0):
+    def _wait(self, duration=0):
         """ Sleeps for a given duration 
             This allows the worker to be interupted 
             while waiting. 
         """
         time_remaining = duration
-        while time_remaining > 0 and self.mudpi.thread_events["mudpi_running"].is_set():
+        while time_remaining > 0 and self.mudpi.is_prepared:
             time.sleep(1)
             time_remaining -= 1
 

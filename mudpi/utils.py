@@ -2,7 +2,7 @@ import sys
 import socket
 import inspect
 import subprocess
-from mudpi.extensions import Component, BaseExtension
+from mudpi.extensions import Component, BaseExtension, BaseInterface
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -75,6 +75,18 @@ def is_extension(cls):
         else:
             return False
     return issubclass(cls, BaseExtension)
+
+
+def is_interface(cls):
+    """ Check if a class is a MudPi Extension.
+        Accepts class or instance of class 
+    """
+    if not inspect.isclass(cls):
+        if hasattr(cls, '__class__'):
+            cls = cls.__class__
+        else:
+            return False
+    return issubclass(cls, BaseInterface)
 
 
 def is_component(cls):

@@ -50,5 +50,5 @@ class Adaptor:
     	pass
     	
 # Import adaptors
-from . import redis
+from . import redis, mqtt
 

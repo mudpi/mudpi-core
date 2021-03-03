@@ -11,8 +11,8 @@ import json
 import pkgutil
 import importlib
 from mudpi import utils
-from mudpi.exceptions import MudPiError, ConfigError, ExtensionNotFound, RecursiveDependency
 from mudpi.logger.Logger import Logger, LOG_LEVEL
+from mudpi.exceptions import MudPiError, ConfigError, ExtensionNotFound, RecursiveDependency
 from mudpi.constants import __version__, PATH_CONFIG, DEFAULT_CONFIG_FILE, FONT_RESET_CURSOR, FONT_RESET, YELLOW_BACK, GREEN_BACK, \
                     FONT_GREEN, FONT_RED, FONT_YELLOW, RED_BACK, FONT_PADDING
 
@@ -37,6 +37,12 @@ def get_extension_importer(mudpi, extension, install_requirements=False):
         Set install_requirements to True to also have all requirements 
         checked through pip.
     """
+
+    # First we check if the namespace is disabled. Could be due to errors or configs
+    disabled_cache = mudpi.cache.setdefault("disabled_namespaces", {})
+    if extension in disabled_cache:
+        raise MudPiError(f"Extension is {extension} is disabled.")
+
     if install_requirements:
         extension_importer = _extension_with_requirements_installed(mudpi, extension)
         if extension_importer is not None:
@@ -63,27 +69,24 @@ def get_extension_importer(mudpi, extension, install_requirements=False):
     # Component not found look in internal extensions
     from mudpi import extensions
 
-    Logger.log_formatted(
-        LOG_LEVEL["debug"], f'Initializing Importer for Extension {extension}', 
-        'Pending', 'notice'
-    )
     extension_importer = ExtensionImporter.create(mudpi, extension, extensions)
 
     if extension_importer is not None:
         importer_cache[extension] = extension_importer
         Logger.log_formatted(
-            LOG_LEVEL["info"], f'Initializing Importer for Extension {extension_importer.namespace}', 
-            'Success', 'success'
+            LOG_LEVEL["info"], f'{extension_importer.namespace.title()} Ready for Import', 
+            'Ready', 'success'
         )
     else:
-        Logger.log(
-                LOG_LEVEL["debug"],
-                f'{FONT_YELLOW}Extension `{extension}` was not found.{FONT_RESET}'
-            )
         Logger.log_formatted(
-            "error", f'Initializing Importer for Extension {extension}', 
+            "error", f'Import Preperations for {extension.title()}', 
             'Failed', 'error'
         )
+        Logger.log(
+                LOG_LEVEL["debug"],
+                f'{FONT_YELLOW}`{extension.title()}` was not found.{FONT_RESET}'
+            )
+        disabled_cache[extension] = 'Not Found'
         raise ExtensionNotFound(extension)
 
     return extension_importer
@@ -131,6 +134,10 @@ class ExtensionImporter:
         self.extension_path = extension_path
         self.file_path = file_path
 
+        self.extension = None
+        self.module = None
+        self.interfaces = {}
+        
         if self.has_dependencies:
             self.loaded_dependencies = None
             self.dependencies_ready = None
@@ -142,9 +149,6 @@ class ExtensionImporter:
             self.requirements_installed = None
         else:
             self.requirements_installed = True
-
-        self.extension = None
-        self.module = None
 
     """ Properties """
     @property
@@ -221,11 +225,15 @@ class ExtensionImporter:
         return cache[self.namespace]
 
 
-    def prepare_interface_for_import(interface_name):
+    def prepare_interface_and_import(self, interface_name):
         """ 
         Loads all the interface dependencies and installs
         all the requirements before we import the interface.
         """
+
+        disabled_cache = self.mudpi.cache.setdefault("disabled_namespaces", {})
+        if interface_name in disabled_cache:
+            raise MudPiError(f"Interface is in disabled namespace: {interface_name}.")
 
         interface_path = f'{self.namespace}.{interface_name}'
 
@@ -237,10 +245,6 @@ class ExtensionImporter:
             interface_importer = get_extension_importer(self.mudpi, interface_name)
             interface_importer.prepare_for_import()
         except ExtensionNotFound as error:
-            Logger.log(
-                LOG_LEVEL["error"],
-                f'Extension {FONT_YELLOW}{interface_name}{FONT_RESET} not found.'
-            )
             return False
         except Exception as error:
             Logger.log(
@@ -250,7 +254,7 @@ class ExtensionImporter:
             return False
 
         try:
-            interface = interface_importer.get_interface(self.mudpi, self.namespace)
+            interface = interface_importer.get_or_load_interface(self.namespace)
         except ImportError as error:
             Logger.log(
                 LOG_LEVEL["error"],
@@ -258,27 +262,27 @@ class ExtensionImporter:
             )
             return False
 
-        if self.mudpi.extensions.exists(interface_importer.namespace):
-            # Extension for interface not setup yet and needs to be
+        if not self.mudpi.extensions.exists(interface_importer.namespace):
+            # Extension for interface not setup yet and needs to call `init()`
             try:
-                extension = interface_importer.extension.get_module()
+                # Import and init() extension for interface
+                extension = interface_importer.import_extension(self.mudpi.config.config)
             except ImportError as error:
                 Logger.log(
                     LOG_LEVEL["error"],
                     f'Extension {interface_name} was unable to be imported.'
                 )
-                return False  
+                return False
+            if not extension:
+                Logger.log(
+                    LOG_LEVEL["error"],
+                    f'Problem importing extension {interface_name} for interface.'
+                )
+                return False
+        else:
+            extension = self.mudpi.extensions.get(interface_name)
 
-            # Check if extension needs be initialized
-            if hasattr(extension, 'init'):
-                if not interface_importer.extension.init(config):
-                    Logger.log(
-                        LOG_LEVEL["error"],
-                        f'Extension {interface_importer.namespace} `init()` failed or did not return a value'
-                    )
-                    return False
-
-        return interface
+        return (interface, extension)
 
 
     def import_extension(self, config):
@@ -295,7 +299,7 @@ class ExtensionImporter:
 
         # Import the actual package now that requirements and dependencies are done
         try:
-            self.extension = self.get_extension()
+            self.extension = self.get_or_load_extension()
             # Call extension post import hook
             self.extension.extension_imported(importer=self)
         except ImportError as error:
@@ -324,43 +328,44 @@ class ExtensionImporter:
 
         ### Init ###
         # Call the extension init with the validated configs
-        if self.module.Extension.init == self.module.Extension.__bases__[0].init:
+        if self.extension.__class__.init == self.extension.__class__.__bases__[0].init:
             Logger.log(
                 LOG_LEVEL["debug"], f"Extension {self.namespace} did not define an `init()` method."
             )
 
         Logger.log_formatted(
-            LOG_LEVEL["warning"], f"Extension {self.namespace}", "Initializing", 'notice'
+            LOG_LEVEL["debug"], f"Initializing {self.namespace.title()}", "Pending", 'notice'
         )
         init_result = self.extension.init(validated_config)
 
         if init_result:
             Logger.log_formatted(
-                LOG_LEVEL["warning"], f"Extension {self.namespace}", "Initialized", 'success'
+                LOG_LEVEL["warning"], f"Initialized {self.namespace.title()}", "Success", 'success'
             )
             # Call extension post init hook
             self.extension.extension_initialized(importer=self, validated_config=validated_config)
         else:
             Logger.log_formatted(
-                LOG_LEVEL["error"], f"Extension {self.namespace} `init()` failed to return True", 'Failed', 'error'
+                LOG_LEVEL["error"], f"{self.namespace.title()} `init()` failed to return True", 'Failed', 'error'
             )
             return False
 
         self.mudpi.extensions.register(self.namespace, self.extension)
+        self.mudpi.events.publish('core', {'event': 'ExtensionRegistered', 'namespace': self.namespace})
         # Call extension post registry hook
         self.extension.extension_registered(importer=self, validated_config=validated_config)
-        return True
+        return self.extension
 
 
     def validate_config(self, config):
         """ Validate configs for an extension 
-            Returns Fasle or the validated configs
+            Returns False or the validated configs
         """
 
         if not self.namespace:
             Logger.log(
                 LOG_LEVEL["error"],
-                f'Extension {FONT_YELLOW}{self.namespace}{FONT_RESET} is missing a namespace in `extension.json`'
+                f'{FONT_YELLOW}{self.namespace.title()}{FONT_RESET} is missing a namespace in `extension.json`'
             )
             return False
 
@@ -369,7 +374,7 @@ class ExtensionImporter:
         if self.extension is None:
             Logger.log(
                 LOG_LEVEL["error"],
-                f'Extension {FONT_YELLOW}{namespace}{FONT_RESET} is not imported. Call `import_extension()` first!'
+                f'{FONT_YELLOW}{namespace.title()}{FONT_RESET} is not imported. Call `import_extension()` first!'
             )
             return False
 
@@ -377,55 +382,61 @@ class ExtensionImporter:
         if config is None:
             Logger.log(
                 LOG_LEVEL["error"],
-                f'Extension {FONT_YELLOW}{namespace}{FONT_RESET} config is None and unable to validate.'
+                f'{FONT_YELLOW}{namespace.title()}{FONT_RESET} config is None and unable to validate.'
             )
             return False
 
 
-        # Check for overrided validate_config() function to determine if custom validation is set
-        if self.module.Extension.validate_config != self.module.Extension.__bases__[0].validate_config:
-            Logger.log_formatted(
-                LOG_LEVEL["warning"],
-                f'Checking Extension {namespace} Configuration',
-                "Validating", 'notice'
-            )
+        # Check for overrided validate() function to determine if custom validation is set
+        validated_config = config
+        if self.module.Extension.validate != self.module.Extension.__bases__[0].validate:
+            # Logger.log_formatted(
+            #     LOG_LEVEL["debug"],
+            #     f'Checking Extension {namespace} Configuration',
+            #     "Validating", 'notice'
+            # )
             try:
-                validated_config = self.extension.validate_config(config)
+                validated_config = self.extension.validate(config)
                 Logger.log_formatted(
-                    LOG_LEVEL["warning"],
-                    f'Extension {namespace} Configuration',
+                    LOG_LEVEL["debug"],
+                    f'{namespace.title()} Configuration',
                     "Validated", 'success'
                 )
             except (ConfigError, MudPiError) as error:
                 Logger.log_formatted(
                     LOG_LEVEL["error"],
-                    f'Extension {namespace} Configuration Validation',
+                    f'{namespace.title()} Configuration Validation',
                     "Failed", 'error'
                 )
                 Logger.log(
                     LOG_LEVEL["error"],
-                    f'Extension {namespace} validation error: {error}'
+                    f'{namespace.title()} validation error: {error}'
                 )
                 return False
             except Exception as error:
                 Logger.log(
                     LOG_LEVEL["error"],
-                    f'Extension {namespace} Validator encountered unknown error. \n{error}'
+                    f'{namespace.title()} Validator encountered unknown error. \n{error}'
                 )
                 return False
 
             return validated_config
 
         # Custom validator not set proceed with default validation
-        # Todo: Change this to a regex match to prevent false matches (i.e. action matches action_other)
+        # Todo: Change this to a regex match to prevent false matches 
+        # (i.e. action matches action_other)
         conf_keys = [ key 
             for key in config.keys() 
             if namespace in key ]
-        Logger.log_formatted(
-                LOG_LEVEL["warning"],
-                f'Checking Extension {namespace} Configuration',
-                "Validating", 'notice'
-            )
+        # Logger.log_formatted(
+        #         LOG_LEVEL["debug"],
+        #         f'Checking Extension {namespace} Configuration',
+        #         "Validating", 'notice'
+        #     )
+        
+        interfaces = []
+
+        disabled_cache = self.mudpi.cache.setdefault("disabled_namespaces", {})
 
         for conf_key in conf_keys:
             for interface_config in config[conf_key]:
@@ -441,73 +452,85 @@ class ExtensionImporter:
                 for entry in interface_config:
                     try:
                         # Search for interface property
-                        interface = entry.get("interface")
+                        interface_name = entry.get("interface")
                     except AttributeError as error:
-                        interface = None
+                        interface_name = None
 
                 # No interface to load which is ok. Not all extensions 
-                # support interfaces. i.e. triggers.
-                if interface is None:
+                # support interfaces. i.e. triggers, actions
+                if interface_name is None:
                     interfaces.append(interface_config)
                     continue
 
+                if interface_name in disabled_cache:
+                    # raise MudPiError(f"Interface is in disabled namespace: {interface}.")
+                    Logger.log_formatted(
+                            LOG_LEVEL["warning"],
+                            f'Interface {interface_name} is in disabled namespace',
+                            "Disabled", 'error'
+                        )
+                    continue
                 # Interface found, attempt to load in order to validate config
                 try:
-                    interface_importer = get_extension_importer(self.mudpi, interface, install_requirements=True)
+                    interface_importer = get_extension_importer(self.mudpi, interface_name, install_requirements=True)
                 except Exception as error:
-                    Logger.log(
-                        LOG_LEVEL["error"],
-                        f'Extension {FONT_YELLOW}{namespace}{FONT_RESET} interface {interface} error. \n{error}'
-                    )
                     continue
 
+                interface = None
                 try:
-                    interface = interface_importer.get_interface(namespace)
+                    interface_module = interface_importer.get_or_load_interface(namespace)
+                    if not hasattr(interface_module, 'Interface'):
+                        raise MudPiError(f'No `Interface()` class to load for {namespace}:{interface_name}.')
+                    if utils.is_interface(interface_module.Interface):
+                        interface = self.interfaces[interface_name] = interface_module.Interface(self.mudpi, namespace, interface_name)
+                    else:
+                        raise MudPiError(f'Interface {namespace}:{interface} does not extend BaseInterface.')
+                except MudPiError as error:
+                    Logger.log(LOG_LEVEL["error"], error)
+                    continue
                 except Exception as error:
-                    Logger.log(
+                    Logger.log_formatted(
                         LOG_LEVEL["error"],
-                        f'Extension interface {namespace} error. \n{error}'
+                        f'Interface {interface_name}:{namespace} error during validation ',
+                        "Errors", 'error'
                     )
+                    Logger.log(LOG_LEVEL["debug"], error)
+                    disabled_cache[interface_name] = error
                     continue
 
                 validated_interface_config = interface_config
 
                 # TODO: change to interface class
-                if hasattr(interface, 'validate'):
-                    Logger.log_formatted(
-                        LOG_LEVEL["warning"],
-                        f'Checking Extension  {interface_importer.namespace}:{namespace} Configuration',
-                        "Validating", 'notice'
-                    )
+                if interface:
                     try:
-                        validated_interface_config = interface.validate(self.mudpi, interface_config)
+                        validated_interface_config = interface.validate(interface_config)
                         Logger.log_formatted(
-                            LOG_LEVEL["warning"],
-                            f'Successfully Validated Extension {interface_importer.namespace}:{namespace} Configuration',
+                            LOG_LEVEL["debug"],
+                            f'Configuration for {interface_importer.namespace}:{namespace}',
                             "Validated", 'success'
                         )
                     except (ConfigError, MudPiError) as error:
                         Logger.log_formatted(
                             LOG_LEVEL["error"],
-                            f'Extension {interface_importer.namespace}:{namespace} Configuration Validation',
+                            f'{interface_importer.namespace}:{namespace} Configuration Validation',
                             "Failed", 'error'
                         )
                         Logger.log(
                             LOG_LEVEL["error"],
-                            f'Extension {namespace} validation error: {error}'
+                            f'{namespace.title()} validation error: {error}'
                         )
                         continue
                     except Exception as error:
                         Logger.log(
                             LOG_LEVEL["error"],
-                            f'Extension {interface_importer.namepsace}:validator encountered unknown error. \n{error}'
+                            f'{interface_importer.namespace.title()} `validate()` encountered unknown error. \n{error}'
                         )
                         continue
 
                 interfaces.append(validated_interface_config)
         Logger.log_formatted(
-            LOG_LEVEL["warning"],
-            f'Extension {namespace} Configuration',
+            LOG_LEVEL["debug"],
+            f'{namespace.title()} Configuration',
             "Validated", 'success'
         )
         # Copy old config and replace old data with validated
@@ -519,16 +542,19 @@ class ExtensionImporter:
         return validated_config
 
 
-    def get_extension(self):
+    def get_or_load_extension(self):
         """ Get the extension base module, import if not """
         module_cache = self.mudpi.cache.setdefault('extension_modules', {})
         if self.namespace not in module_cache:
             Logger.log_formatted(
-                LOG_LEVEL["info"], f'Extension {self.namespace}', 
-                'Importing', 'notice'
+                LOG_LEVEL["debug"], f'Importing {self.namespace.title()}', 
+                'Pending', 'notice'
             )
             self.module = module_cache[self.namespace] = importlib.import_module(self.extension_path)
-
+            Logger.log_formatted(
+                LOG_LEVEL["info"], f'Imported {self.namespace.title()}', 
+                'Success', 'success'
+            )
         extension_cache = self.mudpi.cache.setdefault("extensions", {})
         if self.namespace not in extension_cache:
             if not hasattr(self.module, 'Extension'):
@@ -539,18 +565,22 @@ class ExtensionImporter:
         return extension_cache[self.namespace]
 
 
-    def get_interface(self, interface_name):
+    def get_or_load_interface(self, interface_name):
         """ Get a interface from the extension, import it if not in cache"""
-        extension_cache = self.mudpi.cache.setdefault("interfaces", {})
+        cache = self.mudpi.cache.setdefault("interface_modules", {})
         component_fullname = f'{self.namespace}.{interface_name}'
-        if component_fullname not in extension_cache:
+        if component_fullname not in cache:
             Logger.log_formatted(
-                LOG_LEVEL["info"], f'Extension {self.namespace} Interface:{interface_name}', 
-                'Importing', 'notice'
+                LOG_LEVEL["debug"], f'Importing {self.namespace}:{interface_name}', 
+                'Pending', 'notice'
             )
-            extension_cache[component_fullname] = \
+            cache[component_fullname] = \
                 importlib.import_module(f'{self.extension_path}.{interface_name}')
-        return extension_cache[component_fullname]
+            Logger.log_formatted(
+                LOG_LEVEL["info"], f'Imported {self.namespace}:{interface_name}', 
+                'Success', 'success'
+            )
+        return cache[component_fullname]
 
     def import_dependencies(self):
         """ Import the other extensions this one depends on first to avoid errors """
@@ -709,13 +739,13 @@ def _install_extension_requirements(mudpi, extension):
         if not utils.is_package_installed(requirement):
             Logger.log_formatted(
                 LOG_LEVEL["info"],
-                f'Extension {FONT_YELLOW}{extension.namespace}{FONT_RESET} requirements', 
+                f'{FONT_YELLOW}{extension.namespace.title()}{FONT_RESET} requirements', 
                 'Installing', 'notice'
             )
             if not utils.install_package(requirement):
                 Logger.log(
                     LOG_LEVEL["error"],
-                    f'Error installing extension <{extension}> requirement: {FONT_YELLOW}{requirement}{FONT_RESET}'
+                    f'Error installing <{extension.title()}> requirement: {FONT_YELLOW}{requirement}{FONT_RESET}'
                 )
                 return False
     # extension.requirements_installed = True

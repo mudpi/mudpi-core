@@ -8,9 +8,9 @@ from mudpi.config import Config
 from mudpi.events import EventSystem
 from mudpi.constants import DEFAULT_CONFIG_FILE
 from mudpi.logger.Logger import Logger, LOG_LEVEL
-from mudpi.registry import Registry, ActionRegistry
 from mudpi.managers.state_manager import StateManager
 from mudpi.exceptions import ConfigNotFoundError, ConfigFormatError
+from mudpi.registry import Registry, ActionRegistry, ComponentRegistry
 
 class MudPi:
     """ 
@@ -38,7 +38,7 @@ class MudPi:
         }
 
         # Setup the registries
-        self.components = Registry(self, 'components')
+        self.components = ComponentRegistry(self, 'components')
         self.extensions = Registry(self, 'extensions')
         self.workers = Registry(self, 'workers')
         self.actions = ActionRegistry(self, 'actions')
@@ -51,7 +51,7 @@ class MudPi:
     @property
     def is_prepared(self):
         """ Return if MudPi is prepared """
-        return self.mudpi.thread_events['mudpi_running'].is_set()
+        return self.thread_events['mudpi_running'].is_set()
 
     @property
     def is_loaded(self):
@@ -100,7 +100,7 @@ class MudPi:
             - Load the State Machine
             - Prepare Event Bus (Drivers)
             - Prepare the Threads / Managers
-            - Register Actions
+            - Register Core Actions
         """
         if self.config is None:
             # Error Config not loaded call `load_config()` first
@@ -120,15 +120,17 @@ class MudPi:
 
         self.state = CoreState.loading
 
-        self.states = StateManager()
+        self.states = StateManager(self, self.config.get('mudpi', {}).get('events', {}).get('redis'))
+        
         self.events = EventSystem(self.config.get('mudpi', {}).get('events', {}))
         self.events.connect()
+
         self.actions.register('turn_on', self.start, 'mudpi')
         self.actions.register('turn_off', self.stop, namespace='mudpi')
         self.actions.register('shutdown', self.shutdown, namespace='mudpi')
 
         self.state = CoreState.loaded
-        self.events.publish('core', {'event': 'CoreLoaded'})
+        self.events.publish('core', {'event': 'Loaded'})
         return True
 
     def start(self, data=None):
@@ -145,44 +147,53 @@ class MudPi:
             # Error core not loaded call `load_core()` first
             return
 
+
+        self.events.publish('core', {'event': 'Starting'})
         self.state = CoreState.starting
         self.thread_events['core_running'].set()
         self.state = CoreState.running
+        self.events.publish('core', {'event': 'Started'})
         return True
 
     def stop(self, data=None):
         """ Signal MudPi to Stop but Not UnLoad """
+        self.events.publish('core', {'event': 'Stopping'})
         self.state = CoreState.stopping
         self.thread_events['core_running'].clear()
         self.state = CoreState.stopped
+        self.events.publish('core', {'event': 'Stopped'})
         return True
 
     def shutdown(self, data=None):
         """ Signal MudPi to Stop and Unload """
         self.stop()
+        self.events.publish('core', {'event': 'ShuttingDown'})
+        self.unload_extensions()
         self.thread_events['mudpi_running'].clear()
         self.state = CoreState.not_running
+
+        for thread in self.threads:
+            thread.join()
+
+        self.events.publish('core', {'event': 'Shutdown'})
         return True
 
-    def register_worker(self, worker, key=None):
-        """ 
-            Register a worker to the core if it has 
-            not already been added under that name.
-        """
-        key = key or worker.config.get('key')
-        if not key in self.workers.keys():
-            self.workers[key] = worker
-
-    def register_workers(self):
-        """ Register All the Workers from Configs (TODO: Replace with WorkerRegistry) """
-        # If worker not already defined then define it
-        # If worker already is define then ignore unless reload=True
-        pass
+    def start_workers(self):
+        """ Start Workers and Create Threads """
+        for key, worker in self.workers.items():
+            _thread = worker.run()
+            self.threads.append(_thread)
+        return True
 
     def reload_workers(self):
         """ Reload Workers and Configurations """
-        # Load all the workers from configs and reload already registered workers
         pass
+
+    def unload_extensions(self):
+        """ Cleanup all extensions for shutdown or restart """
+        for key, extension in self.extensions.items():
+            extension.unload()
+        return True
 
 
 class CoreState(enum.Enum):

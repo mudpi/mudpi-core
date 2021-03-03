@@ -1,0 +1,9 @@
+{
+	"name": "Nanpy",
+	"namespace": "nanpy",
+	"details": {
+		"description": "Allows controlling of arduino and ESP boards through serial/wifi.",
+		"documentation": "https://mudpi.app/docs/nodes"
+	},
+	"requirements": ["https://github.com/olixr/nanpy/archive/master.zip"]
+}

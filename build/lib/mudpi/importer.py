@@ -385,14 +385,14 @@ class ExtensionImporter:
         # Check for overrided validate_config() function to determine if custom validation is set
         if self.module.Extension.validate_config != self.module.Extension.__bases__[0].validate_config:
             Logger.log_formatted(
-                LOG_LEVEL["warning"],
-                f'Checking Extension {namespace} Configuration',
+                LOG_LEVEL["debug"],
+                f'Extension {namespace} Configuration',
                 "Validating", 'notice'
             )
             try:
                 validated_config = self.extension.validate_config(config)
                 Logger.log_formatted(
-                    LOG_LEVEL["warning"],
+                    LOG_LEVEL["info"],
                     f'Extension {namespace} Configuration',
                     "Validated", 'success'
                 )
@@ -422,8 +422,8 @@ class ExtensionImporter:
             for key in config.keys() 
             if namespace in key ]
         Logger.log_formatted(
-                LOG_LEVEL["warning"],
-                f'Checking Extension {namespace} Configuration',
+                LOG_LEVEL["debug"],
+                f'Extension {namespace} Configuration',
                 "Validating", 'notice'
             )
 
@@ -475,14 +475,14 @@ class ExtensionImporter:
                 # TODO: change to interface class
                 if hasattr(interface, 'validate'):
                     Logger.log_formatted(
-                        LOG_LEVEL["warning"],
-                        f'Checking Extension  {interface_importer.namespace}:{namespace} Configuration',
+                        LOG_LEVEL["debug"],
+                        f'Extension  {interface_importer.namespace}:{namespace} Configuration',
                         "Validating", 'notice'
                     )
                     try:
                         validated_interface_config = interface.validate(self.mudpi, interface_config)
                         Logger.log_formatted(
-                            LOG_LEVEL["warning"],
+                            LOG_LEVEL["info"],
                             f'Successfully Validated Extension {interface_importer.namespace}:{namespace} Configuration',
                             "Validated", 'success'
                         )
@@ -506,7 +506,7 @@ class ExtensionImporter:
 
                 interfaces.append(validated_interface_config)
         Logger.log_formatted(
-            LOG_LEVEL["warning"],
+            LOG_LEVEL["info"],
             f'Extension {namespace} Configuration',
             "Validated", 'success'
         )

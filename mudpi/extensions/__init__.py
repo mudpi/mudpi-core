@@ -3,7 +3,10 @@
     Extensions can interact with events and add 
     components to MudPi through interfaces.  
 """
+import inspect
+from mudpi.workers import Worker
 from mudpi.exceptions import MudPiError
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.constants import DEFAULT_UPDATE_INTERVAL
 from mudpi.managers.extension_manager import ExtensionManager
 
@@ -32,7 +35,7 @@ class BaseExtension:
         self.config = None
 
         if self.namespace is not None:
-            self.init_manager()
+            self.load_manager()
 
     """ Overrideable Methods to Extend """
     def init(self, config):
@@ -43,12 +46,19 @@ class BaseExtension:
         self.config = config
         return True
 
-    def validate_config(self, config):
+    def validate(self, config):
         """ Validate the config for the extension. 
             Returns valid config or raises a ConfigError
             This gets called before `init()`.
         """
         return config
+
+    def unload(self):
+        """ Cleanup any data in memory and release 
+            system resources. This is called to 
+            just before removing the extension.
+        """
+        pass
 
 
     """ Lifecycle Function Hooks """
@@ -76,21 +86,97 @@ class BaseExtension:
     """ INTERNAL METHODS: DO NOT OVERRIDE! 
         These methods and properties are used internally.
     """
-    def init_manager(self):
+    def load_manager(self):
         """ Initalize a Manager for the Extension """
-        self.manager = self.mudpi.cache[self.namespace] = ExtensionManager(self.mudpi, self.namespace, self.update_interval)
+        self.manager = self.mudpi.cache[self.namespace] = ExtensionManager(self)
 
     def __repr__(self):
         """ Debug display of extension. """
         return f'<Extension {self.namespace} @ {self.update_interval}>'
 
 
+class BaseInterface:
+    """ Base class of all MudPi Interfaces. 
+        Interfaces connect to components to manage,
+        monitor and collect data for the extension.
+    """
+
+    """ Time between component updates. Can be changed via config"""
+    update_interval = DEFAULT_UPDATE_INTERVAL
+
+    def __init__(self, mudpi, namespace, interface_name, update_interval=None):
+        """ DO NOT OVERRIDE this method. Use load() instead """
+        self.mudpi = mudpi
+        self.namespace = namespace
+        self.type = interface_name
+        self.update_interval = update_interval or self.update_interval
+
+        self.extension = None
+        self.config = None
+        self.worker = self.load_worker()
+
+    """ Overrideable Methods to Extend """
+    def load(self, config):
+        """ This will be called per config entry that 
+            references the interface. Process the config
+            to add components, listen for events, etc. 
+        """
+        return True
+
+    def validate(self, config):
+        """ Validate the config for the interface. 
+            Returns valid config or raises a ConfigError
+            This gets called before `load()`.
+        """
+        return config
+
+
+    """ INTERNAL METHODS: DO NOT OVERRIDE! 
+        These methods and properties are used internally.
+    """
+    @property
+    def key(self):
+        """ Create a composite key """
+        return f"{self.namespace}.{self.type}.{self.update_interval}"
+
+    def add_component(self, component):
+        """ Add a component for the interface """
+        if not _is_component(component):
+            raise MudPiError(f"Passed non-component to add_component for {self.namesapce}.")
+        try:
+            if component.id is None:
+                Logger.log(
+                    LOG_LEVEL["debug"], f"Interface {self.namespace}:{self.type} component did not define `id`."
+                )
+                return False
+            if component.id in self.worker.components:
+                Logger.log(
+                    LOG_LEVEL["debug"], f"Interface {self.namespace}:{self.type} component id already registered."
+                )
+                return False
+            self.worker.components[component.id] = self.mudpi.components.register(component.id, component, self.namespace)
+            component.component_registered(mudpi=self.mudpi, interface=self)
+            return True
+        except Exception as error:
+            Logger.log(
+                LOG_LEVEL["debug"], f"Interface {self.namespace}:{self.type} unknown error adding component.\n{error}"
+            )
+
+    def load_worker(self):
+        """ Load a worker for any interface components """
+        return Worker(self.mudpi, {'key': self.key, 'update_interval': self.update_interval})
+
+    def __repr__(self):
+        """ Debug display of extension. """
+        return f'<Interface {self.namespace}:{self.type} @ {self.update_interval}>'
+
+
 class Component:
     """ Base class of all extension components in MudPi 
 
-        Components will be dynamically loaded from the 
-        config file. A component will either be updating
-        state from device or listening/hanlding events.
+        Components will be dynamically loaded by extensions
+        based on configs. A component will either be updating
+        state from device or listening / hanlding events.
     """
 
     """ Main MudPi Core Instance """
@@ -114,13 +200,12 @@ class Component:
 
 
     """ Base Constructor """
-    def __init__(self, mudpi, config):
+    def __init__(self, mudpi, config={}):
         """ Generally you shouldn't need to override this constructor,
             use init() instead. If you do override call `super().__init__()`
         """
         self.mudpi = mudpi
         self.config = config
-
 
     """ Properties 
     Override these depending on desired component functionality
@@ -142,7 +227,9 @@ class Component:
 
     @property
     def metadata(self):
-        """ Returns a dict of additonal info about the component """
+        """ Returns a dict of additonal info about the component 
+            This is mainly used by the dashboard / frontend
+        """
         return {}
 
     @property
@@ -162,10 +249,6 @@ class Component:
 
 
     """ Methods """
-    def init(self, config):
-        """ Perform component setup tasks with config """
-        pass
-
     def update(self):
         """ Get data, run tasks, update state, called during 
             each work cycle. Don't block longer than update_interfal 
@@ -208,6 +291,7 @@ class Component:
 
         additional_data = {}
 
+        # Used for fontend
         if self.metadata:
             additional_data.update(self.metadata)
 
@@ -218,8 +302,19 @@ class Component:
             additional_data.update({'classifier': self.classifier})
 
         data = self.mudpi.states.set(self.id, self.state, additional_data)
-        print(data)
 
     def __repr__(self):
         """ Returns the instance representation for debugging. """
         return f'<Component {self.name}: {self.state}>'
+
+""" Helpers """
+def _is_component(cls):
+    """ Check if a class is a MudPi component.
+        Accepts class or instance of class 
+    """
+    if not inspect.isclass(cls):
+        if hasattr(cls, '__class__'):
+            cls = cls.__class__
+        else:
+            return False
+    return issubclass(cls, Component)

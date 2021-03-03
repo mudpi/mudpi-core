@@ -16,6 +16,10 @@ Install MudPi using the [Installer](https://github.com/mudpi/installer) that wil
 For examples and guides on how to setup and use MudPi check out the [free guides available.](https://mudpi.app/guides)
 
 
+## Funding
+MudPi core is open source and has a bunch of free resources built around it. Being a solo developer it has become quite a lot to maintain the various areas of the project. It makes me happy seeing how MudPi has helped many people worldwide. I would like to continue working on MudPi and put even more time into the project to take on bigger ambitions. However it has come to a point that MudPi is taking more time to build with little to no income to help justify it. I really could use help from the community to continue building MudPi. If you like my work and MudPi please consider [helping me fund the project and keep the lights on.](https://www.patreon.com/mudpi) 
+
+
 ## Contributing
 Any contributions you can make will be greatly appreciated. If you are interested in contributing please get in touch with me and submit a pull request. There is much more I would like to add support for, however being a single developer limits my scope. Therefore mainly bugs will be accepted as issues.
 

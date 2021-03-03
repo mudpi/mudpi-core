@@ -1,0 +1,9 @@
+{
+	"name": "Digital Humidity Temperature (DHT)",
+	"namespace": "dht",
+	"details": {
+		"description": "Provides interface for DHT sensors to take climate readings.",
+		"documentation": "https://mudpi.app/docs/sensors/dht"
+	},
+	"requirements": ["adafruit-blinka", "adafruit-circuitpython-dht"]
+}

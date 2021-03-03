@@ -1,0 +1,9 @@
+{
+	"name": "Sensors",
+	"namespace": "sensor",
+	"details": {
+		"description": "Allows interfacing with components to get data periodically.",
+		"documentation": "https://mudpi.app/docs/sensors"
+	},
+	"requirements": []
+}
