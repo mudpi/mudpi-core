@@ -4,8 +4,6 @@
     available to MudPi. Sensors support interfaces to 
     allow additions of new types of devices easily.
 """
-import json
-import redis
 from mudpi.extensions import Component, BaseExtension
 
 
@@ -27,8 +25,8 @@ class Extension(BaseExtension):
 
 
 class Sensor(Component):
-    """ Example Sensor
-        Returns a random number
+    """ Base Sensor
+        Base Sensor for all sensor interfaces
     """
 
     """ Actions """

@@ -198,7 +198,7 @@ class ExtensionManager:
         return f"<ExtensionManager {self.namespace} @ {self.update_interval}s>"
 
 
-
+""" Helper """
 def _is_interface(cls):
     """ Check if a class is a MudPi Extension.
         Accepts class or instance of class 
