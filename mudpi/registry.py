@@ -131,6 +131,14 @@ class ActionRegistry(Registry):
         self.mudpi.events.publish('core', {'event': 'ActionCall', 'action': action_call, 'data': action_data, 'namespace': namespace})
         action(data=validated_data)
 
+
+    def handle_call(self, event_data={}):
+        """ Handle an Action call from event bus """
+        if event_data:
+            action = event_data.get('action')
+            if action:
+                return self.call(action, event_data.get('namespace'), event_data.get('data', {}))
+
 class Action:
     """ A callback associated with a string """
 

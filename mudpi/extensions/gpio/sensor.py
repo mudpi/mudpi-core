@@ -38,19 +38,6 @@ class GPIOSensor(Sensor):
         Returns a reading from gpio pin
     """
 
-    def connect(self):
-        """ Connect to the device """
-        self.pin_obj = getattr(board, self.config['pin'])
-
-        if re.match(r'D\d+$', pin):
-            self.is_digital = True
-        elif re.match(r'A\d+$', pin):
-            self.is_digital = False
-
-        self.gpio = digitalio
-
-        return True
-
     """ Properties """
     @property
     def id(self):
@@ -82,4 +69,16 @@ class GPIOSensor(Sensor):
             data = self.gpio.AnalogIn(self.pin_obj).value
         self._state = data
         return data
+    
+    def connect(self):
+        """ Connect to the device """
+        self.pin_obj = getattr(board, self.config['pin'])
 
+        if re.match(r'D\d+$', pin):
+            self.is_digital = True
+        elif re.match(r'A\d+$', pin):
+            self.is_digital = False
+
+        self.gpio = digitalio
+
+        return True

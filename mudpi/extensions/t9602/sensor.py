@@ -43,16 +43,6 @@ class T9602Sensor(Sensor):
         Get readings for humidity and temperature.
     """
 
-    def connect(self):
-        """ Connect to the Device 
-        This is the bus number : the 1 in "/dev/i2c-1"
-        I enforced it to 1 because there is only one on Raspberry Pi.
-        We might want to add this parameter in i2c sensor config in the future.
-        We might encounter boards with several buses."""
-        self.bus = smbus.SMBus(1)
-
-        return True
-
     """ Properties """
     @property
     def id(self):
@@ -76,6 +66,16 @@ class T9602Sensor(Sensor):
 
 
     """ Methods """
+    def connect(self):
+        """ Connect to the Device 
+        This is the bus number : the 1 in "/dev/i2c-1"
+        I enforced it to 1 because there is only one on Raspberry Pi.
+        We might want to add this parameter in i2c sensor config in the future.
+        We might encounter boards with several buses."""
+        self.bus = smbus.SMBus(1)
+
+        return True
+
     def update(self):
         """ Get data from T9602 device"""
         data = self.bus.read_i2c_block_data(self.address, 0, 4)
@@ -99,4 +99,3 @@ class T9602Sensor(Sensor):
                 'Failed to get reading [t9602]. Try again!'
             )
         return None
-

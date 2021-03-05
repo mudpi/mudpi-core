@@ -87,12 +87,6 @@ class NanpyGPIOSensor(Sensor):
         Get readings from GPIO (analog or digital)
     """
 
-    def connect(self, node):
-        """ Connect to the Parent Device """
-        self.node = node
-        self._state = None
-        return True
-
     """ Properties """
     @property
     def id(self):
@@ -125,6 +119,12 @@ class NanpyGPIOSensor(Sensor):
         return self.config.get('pin')
 
     """ Methods """
+    def connect(self, node):
+        """ Connect to the Parent Device """
+        self.node = node
+        self._state = None
+        return True
+
     def update(self):
         """ Get data from GPIO through nanpy"""
         if self.node.connected:
@@ -151,22 +151,6 @@ class NanpyDHTSensor(Sensor):
     models = {  '11': DHT.DHT11,
                 '22': DHT.DHT22,
                 '2301': DHT.AM2301 }
-
-    def connect(self, node):
-        """ Connect to the Parent Device """
-        self.node = node
-        self._state = None
-        self._dht = None
-        # Attribute to track from DHT device
-        self._attribute = self.config.get('attribute', 'temperature')
-        self.check_connection()
-        return True
-
-    def check_connection(self):
-        """ Check connection to node and DHT """
-        if self.node.connected:
-            if not self._dht:
-                self._dht = DHT(self.pin, self.model, connection=self.node.connection)
 
     """ Properties """
     @property
@@ -207,6 +191,22 @@ class NanpyDHTSensor(Sensor):
         return self.models[self.config.get('model', '11')]
 
     """ Methods """
+    def connect(self, node):
+        """ Connect to the Parent Device """
+        self.node = node
+        self._state = None
+        self._dht = None
+        # Attribute to track from DHT device
+        self._attribute = self.config.get('attribute', 'temperature')
+        self.check_connection()
+        return True
+
+    def check_connection(self):
+        """ Check connection to node and DHT """
+        if self.node.connected:
+            if not self._dht:
+                self._dht = DHT(self.pin, self.model, connection=self.node.connection)
+                
     def update(self):
         """ Get data from DHT through nanpy"""
         self.check_connection()

@@ -22,7 +22,7 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the control config """
-        if not config.get('pin'):
+        if config.get('pin') is None:
             raise ConfigError('Missing `pin` in GPIO config.')
 
         if not re.match(r'D\d+$', config['pin']) and not re.match(r'A\d+$', config['pin']):
@@ -39,6 +39,14 @@ class GPIOControl(Control):
         Get GPIO input via button, switch, etc.
     """
 
+    """ Properties """
+    @property
+    def state(self):
+        """ Return the state of the component (from memory, no IO!) """
+        return self._state
+
+
+    """ Methods """
     def connect(self):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.pin)
@@ -74,14 +82,6 @@ class GPIOControl(Control):
 
         return True
 
-    """ Properties """
-    @property
-    def state(self):
-        """ Return the state of the component (from memory, no IO!) """
-        return self._state
-
-
-    """ Methods """
     def update(self):
         """ Get data from GPIO connection"""
         data = None

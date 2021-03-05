@@ -49,6 +49,29 @@ class DHTSensor(Sensor):
         Returns a random number
     """
 
+    """ Properties """
+    @property
+    def id(self):
+        """ Return a unique id for the component """
+        return self.config['key']
+
+    @property
+    def name(self):
+        """ Return the display name of the component """
+        return self.config.get('name') or f"{self.id.replace('_', ' ').title()}"
+    
+    @property
+    def state(self):
+        """ Return the state of the component (from memory, no IO!) """
+        return self._state
+
+    @property
+    def classifier(self):
+        """ Classification further describing it, effects the data formatting """
+        return 'climate'
+
+
+    """ Methods """
     def connect(self):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.config['pin'])
@@ -77,29 +100,6 @@ class DHTSensor(Sensor):
             return False
         return True
 
-    """ Properties """
-    @property
-    def id(self):
-        """ Return a unique id for the component """
-        return self.config['key']
-
-    @property
-    def name(self):
-        """ Return the display name of the component """
-        return self.config.get('name') or f"{self.id.replace('_', ' ').title()}"
-    
-    @property
-    def state(self):
-        """ Return the state of the component (from memory, no IO!) """
-        return self._state
-
-    @property
-    def classifier(self):
-        """ Classification further describing it, effects the data formatting """
-        return 'climate'
-
-
-    """ Methods """
     def update(self):
         """ Get data from DHT device"""
         humidity = None
@@ -131,4 +131,3 @@ class DHTSensor(Sensor):
                 'DHT Reading was Invalid. Trying again next cycle.'
             )
             return None
-

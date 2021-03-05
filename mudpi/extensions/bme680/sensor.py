@@ -46,17 +46,6 @@ class BME680Sensor(Sensor):
         temperature and altitude.
     """
 
-    def connect(self):
-        """ Connect to the device """
-        self.i2c = I2C(board.SCL, board.SDA)
-        self._sensor = adafruit_bme680.Adafruit_BME680_I2C(
-            self.i2c, address=self.config['address'], debug=False
-        )
-        # Change this to match the location's pressure (hPa) at sea level
-        self._sensor.sea_level_pressure = self.config.get('calibration_pressure', 1013.25)
-
-        return True
-
     """ Properties """
     @property
     def id(self):
@@ -80,6 +69,17 @@ class BME680Sensor(Sensor):
 
 
     """ Methods """
+    def connect(self):
+        """ Connect to the device """
+        self.i2c = I2C(board.SCL, board.SDA)
+        self._sensor = adafruit_bme680.Adafruit_BME680_I2C(
+            self.i2c, address=self.config['address'], debug=False
+        )
+        # Change this to match the location's pressure (hPa) at sea level
+        self._sensor.sea_level_pressure = self.config.get('calibration_pressure', 1013.25)
+
+        return True
+
     def update(self):
         """ Get data from BME680 device"""
         temperature = round((self.sensor.temperature - 5) * 1.8 + 32, 2)
@@ -105,4 +105,3 @@ class BME680Sensor(Sensor):
             )
 
         return None
-

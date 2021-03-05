@@ -42,6 +42,9 @@ class Interface(BaseInterface):
             if not conf.get('node'):
                 raise ConfigError(f'Missing `node` in Nanpy sensor {conf["key"]} config. You need to add a node key.')
 
+            if conf.get('pin') is None:
+                raise ConfigError(f'Missing `pin` in Nanpy control {conf["key"]} config. You need to add a pin.')
+
             if not conf.get('type'):
                 # Default to the button type
                 conf['type'] = 'button'
@@ -56,23 +59,6 @@ class NanpyGPIOControl(Control):
     """ Nanpy GPIO Control
         Get readings from GPIO (analog or digital)
     """
-
-    def connect(self, node):
-        """ Connect to the Parent Device """
-        self.node = node
-        self._state = 0
-        self.reset_elapsed_time()
-        self._fired = False
-        self._pin_setup = False
-        self.previous_state = 0
-        self.check_connection()
-        return True
-
-    def check_connection(self):
-        """ Verify node connection and devices setup """
-        if self.node.connected:
-            if not self._pin_setup:
-                self.node.api.pinMode(self.pin, self.node.api.INPUT)
 
     """ Properties """
     @property
@@ -96,6 +82,24 @@ class NanpyGPIOControl(Control):
         return self.time_elapsed
 
     """ Methods """
+    def connect(self, node):
+        """ Connect to the Parent Device """
+        self.node = node
+        self._state = 0
+        self.reset_elapsed_time()
+        self._fired = False
+        self._pin_setup = False
+        self.previous_state = 0
+        self.check_connection()
+        return True
+
+    def check_connection(self):
+        """ Verify node connection and devices setup """
+        if self.node.connected:
+            if not self._pin_setup:
+                self.node.api.pinMode(self.pin, self.node.api.INPUT)
+                self._pin_setup = True
+
     def update(self):
         """ Get data from GPIO through nanpy"""
         if self.node.connected:

@@ -124,6 +124,7 @@ class MudPi:
         
         self.events = EventSystem(self.config.get('mudpi', {}).get('events', {}))
         self.events.connect()
+        self.events.subscribe('action_call', self.actions.handle_call)
 
         self.actions.register('turn_on', self.start, 'mudpi')
         self.actions.register('turn_off', self.stop, namespace='mudpi')
