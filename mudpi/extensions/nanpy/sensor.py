@@ -21,7 +21,6 @@ class Interface(BaseInterface):
             sensor = NanpyGPIOSensor(self.mudpi, config)
         elif config['type'].lower() == 'dht':
             sensor = NanpyDHTSensor(self.mudpi, config)
-            pass
         elif config['type'].lower() == 'dallas_temperature':
             # sensor = OneWireSensor(self.mudpi, config) NOT IMPLMENTED YET
             pass
@@ -29,6 +28,7 @@ class Interface(BaseInterface):
         if sensor:
             node = self.extension.nodes[config['node']]
             if node:
+                sensor.node = node
                 self.add_component(sensor)
             else:
                 raise MudPiError(f'Nanpy node {config["node"]} not found trying to connect {config["key"]}.')
@@ -118,9 +118,8 @@ class NanpyGPIOSensor(Sensor):
         return self.config.get('pin')
 
     """ Methods """
-    def init(self, node):
+    def init(self):
         """ Connect to the Parent Device """
-        self.node = node
         self._state = None
         return True
 
@@ -190,14 +189,12 @@ class NanpyDHTSensor(Sensor):
         return self.models[self.config.get('model', '11')]
 
     """ Methods """
-    def init(self, node):
+    def init(self):
         """ Connect to the Parent Device """
-        self.node = node
         self._state = None
         self._dht = None
         # Attribute to track from DHT device
         self._attribute = self.config.get('attribute', 'temperature')
-        self.check_connection()
         return True
 
     def check_connection(self):
@@ -208,10 +205,9 @@ class NanpyDHTSensor(Sensor):
                 
     def update(self):
         """ Get data from DHT through nanpy"""
-        self.check_connection()
-
         if self.node.connected:
             try:
+                self.check_connection()
                 if self._dht:
                     temperature = self._dht.readTemperature(True)
                     humidity = self._dht.readHumidity()
