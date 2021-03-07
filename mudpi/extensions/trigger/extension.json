@@ -1,0 +1,9 @@
+{
+	"name": "Triggers",
+	"namespace": "trigger",
+	"details": {
+		"description": "Causes actions based on events or state changes.",
+		"documentation": "https://mudpi.app/docs/triggers"
+	},
+	"requirements": ["pycron"]
+}

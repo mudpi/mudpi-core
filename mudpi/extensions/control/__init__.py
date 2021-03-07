@@ -80,7 +80,7 @@ class Control(Component):
     def fire(self):
         """ Fire a control event """
         event_data = {
-            'event': 'ControlUpdate',
+            'event': 'ControlUpdated',
             'component_id': self.id,
             'type': self.type,
             'name': self.name,

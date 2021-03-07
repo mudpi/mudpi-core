@@ -1,7 +1,7 @@
 <p align="center"><img alt="MudPi Smart Automation for the Garden & Home" title="MudPi Smart Automation for the Garden & Home" src="https://mudpi.app/img/mudPI_LOGO_small_grad.png" width="200px"></p>
 
 # MudPi Smart Automation for the Garden & Home
-> A python library to gather sensor readings, trigger components, control solenoids and more in an event based system that can be run on a linux SBC, including Raspberry Pi.
+> A python package to gather sensor readings, trigger components, control devices and more in an event based system that can be run on a linux SBC, including Raspberry Pi.
 
 
 ## Documentation
@@ -36,7 +36,7 @@ Breaking.Major.Minor
 * Discord  - [Join](https://discord.gg/daWg2YH)
 * [Twitter.com/MudpiApp](https://twitter.com/mudpiapp)
 
-## Hardware Tested On
+<!-- ## Hardware Tested On
 These are the devices and sensors I tested and used with MudPi successfully. Many sensors are similar so it will work with a range more than what is listed below.
 
 **Devices**
@@ -71,9 +71,10 @@ These are the devices and sensors I tested and used with MudPi successfully. Man
 * [LCD 20 x 4 Display I2C](https://www.dfrobot.com/product-590.html)
 * [USB to TTL USB 2.0 Serial Module UART](https://www.amazon.com/gp/product/B07CWKHTLH/ref=oh_aui_detailpage_o04_s00?ie=UTF8&psc=1)
 
-Let me know if you are able to confirm tests on any other devices. Note: This is not a complete list.
+Let me know if you are able to confirm tests on any other devices. Note: This is not a complete list. -->
 
-Also check out my [custom circuit boards design around MudPi](https://mudpi.app/boards)
+## MudPi Hardware
+There are [custom circuit boards designed around MudPi available.](https://mudpi.app/boards)
 
 ## License
 This project is licensed under the BSD-4-Clause License - see the [LICENSE.md](LICENSE.md) file for details
