@@ -247,14 +247,14 @@ class CoreManager:
             )
             Logger.log(
                 LOG_LEVEL["debug"],
-                f"{'ACTION CALL':<32}   {'ACTION':<32}   NAMESPACE\n{'':-<64}"
+                f"{'ACTION CALL':<28}   {'ACTION':<28}   NAMESPACE\n{'':-<72}"
             )
             for namespace, actions in self.mudpi.actions.items():
                 for key, action in actions.items():
-                    action_command = f"{namespace}.{key}" if namespace else key
+                    action_command = f"{namespace or ''}.{key}"
                     Logger.log(
                         LOG_LEVEL["debug"],
-                        f"{action_command:<32} | {key:<32} | {namespace}"
+                        f"{action_command:<28} | {key:<28} | {namespace}"
                     )
 
         print(f'{"":_<{FONT_PADDING+8}}')
