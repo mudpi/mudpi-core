@@ -457,7 +457,7 @@ class ExtensionImporter:
                         interface_name = None
 
                 # No interface to load which is ok. Not all extensions 
-                # support interfaces. i.e. triggers, actions
+                # support interfaces. i.e. actions
                 if interface_name is None:
                     interfaces.append(interface_config)
                     continue
@@ -500,7 +500,6 @@ class ExtensionImporter:
 
                 validated_interface_config = interface_config
 
-                # TODO: change to interface class
                 if interface:
                     try:
                         validated_interface_config = interface.validate(interface_config)
@@ -550,11 +549,13 @@ class ExtensionImporter:
                 LOG_LEVEL["debug"], f'Importing {self.namespace.title()}', 
                 'Pending', 'notice'
             )
-            self.module = module_cache[self.namespace] = importlib.import_module(self.extension_path)
+            module_cache[self.namespace] = importlib.import_module(self.extension_path)
             Logger.log_formatted(
                 LOG_LEVEL["info"], f'Imported {self.namespace.title()}', 
                 'Success', 'success'
             )
+        self.module = module_cache[self.namespace]
+
         extension_cache = self.mudpi.cache.setdefault("extensions", {})
         if self.namespace not in extension_cache:
             if not hasattr(self.module, 'Extension'):
