@@ -2,7 +2,7 @@
 	"name": "Action",
 	"namespace": "action",
 	"details": {
-		"description": "Enables custom actions through configurations.",
+		"description": "Custom behavior through configurations.",
 		"documentation": "https://mudpi.app/docs/actions"
 	}
 }

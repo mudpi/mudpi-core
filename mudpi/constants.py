@@ -39,19 +39,6 @@ WEEKDAYS = {
 	"sat": 'Saturday',
 	"sun": 'Sunday' }
 
-""" EVENTS """
-EVENT_MUDPI_CLOSE = "mudpi_close"
-EVENT_MUDPI_START = "mudpi_start"
-EVENT_MUDPI_STARTED = "mudpi_started"
-EVENT_MUDPI_STARTING = "mudpi_starting"
-EVENT_MUDPI_STOP = "mudpi_stop"
-EVENT_MUDPI_STOPPING = "mudpi_stopping"
-EVENT_STATE_CHANGED = "state_changed"
-EVENT_TIME_CHANGED = "time_changed"
-EVENT_SUNSET = "sunset"
-EVENT_SUNRISE = "sunrise"
-EVENT_CALL_SERVICE = "call_service"
-
 
 #### Display Characters #####
 FONT_RESET_CURSOR = "\x1b[1F"
@@ -101,29 +88,6 @@ CLASSIFIERS = [
 	CLASSIFIER_VOLTAGE
 ]
 
-""" STATES """
-STATE_UNKNOWN = "unknown"
-STATE_OK = "ok"
-STATE_ON = "on"
-STATE_OFF = "off"
-STATE_HOME = "home"
-STATE_AWAY = "away"
-STATE_OPEN = "open"
-STATE_OPENING = "opening"
-STATE_CLOSED = "closed"
-STATE_CLOSING = "closing"
-STATE_RUNNING = "running"
-STATE_STOPPED = "stopped"
-STATE_STOPPING = "stopping"
-STATE_PAUSED = "paused"
-STATE_IDLE = "idle"
-STATE_STANDBY = "standby"
-STATE_PENDING = "pending"
-STATE_LOCKED = "locked"
-STATE_UNLOCKED = "unlocked"
-STATE_UNAVAILABLE = "unavailable"
-STATE_PROBLEM = "problem"
-
 """ UNITS OF MEASUREMENT """
 IMPERIAL_SYSTEM = 1 
 METRIC_SYSTEM = 2
@@ -143,6 +107,9 @@ PERCENTAGE = "%"
 
 
 # #### API / SOCKET ####
+SOCKET_PORT = 7002
+SPROUT_PORT = 7003
+WS_PORT = 7004
 SERVER_PORT = 8080
 
 URL_ROOT = "/"
