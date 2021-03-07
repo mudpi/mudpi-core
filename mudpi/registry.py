@@ -1,3 +1,4 @@
+import json
 from mudpi.exceptions import MudPiError
 
 
@@ -57,7 +58,7 @@ class ComponentRegistry(Registry):
 
     def for_namespace(self, namespace=None):
         """ Get all the components for a given namespace """
-        return self._registry[namespace]
+        return self._registry.setdefault(namespace, {})
 
     def exists(self, component_ids):
         """ Return if key exists in the registry """
@@ -94,7 +95,7 @@ class ActionRegistry(Registry):
 
     def for_namespace(self, namespace=None):
         """ Get all the actions for a given namespace """
-        return self._registry[namespace]
+        return self._registry.setdefault(namespace, {})
 
     def exists(self, action_key):
         """ Return if action exists for given action command """
@@ -105,14 +106,17 @@ class ActionRegistry(Registry):
     def parse_call(self, action_call):
         """ Parse a command string and extract the namespace and action """
         parsed_action = {}
-        if '.' in action_call:
-            parts = action_call.split('.')
+        if action_call.startswith('.'):
+            # Empty Namespace
+            parsed_action['namespace'] = None
+            action_call = action_call.replace('.', '', 1)
+            parsed_action['action'] = action_call
+        elif '.' in action_call:
+            parts = action_call.split('.', 1)
             parsed_action['namespace'] = parts[0]
-            parsed_action['component'] = parts[1]
-            parsed_action['action'] = parts[-1]
+            parsed_action['action'] = parts[1]
         else:
             parsed_action['namespace'] = None
-            parsed_action['component'] = None
             parsed_action['action'] = action_call
         return parsed_action
 
@@ -122,22 +126,26 @@ class ActionRegistry(Registry):
                     {namespace}.{component}.{action}
         """
         command = self.parse_call(action_call)
-        action = self._registry.get(namespace, {}).get(action_call)
+        action = self._registry.get(command['namespace'], {}).get(command['action'])
         if not action:
             raise MudPiError("Call to action that doesn't exists!")
         validated_data = action.validate(action_data)
         if not validated_data and action_data:
             raise MudPiError("Action data was not valid!")
-        self.mudpi.events.publish('core', {'event': 'ActionCall', 'action': action_call, 'data': action_data, 'namespace': namespace})
+        self.mudpi.events.publish('core', {'event': 'ActionCall', 'action': action_call, 'data': action_data, 'namespace': namespace or command['namespace']})
         action(data=validated_data)
 
 
     def handle_call(self, event_data={}):
         """ Handle an Action call from event bus """
         if event_data:
-            action = event_data.get('action')
+            try:
+                _data = json.loads(event_data.get('data', {}))
+            except Exception:
+                _data = event_data
+            action = _data.get('action')
             if action:
-                return self.call(action, event_data.get('namespace'), event_data.get('data', {}))
+                return self.call(action, _data.get('namespace'), _data.get('data', {}))
 
 class Action:
     """ A callback associated with a string """
