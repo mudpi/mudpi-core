@@ -81,7 +81,7 @@ class Control(Component):
         """ Fire a control event """
         event_data = {
             'event': 'ControlUpdate',
-            'id': self.id,
+            'component_id': self.id,
             'type': self.type,
             'name': self.name,
             'updated_at': str(datetime.datetime.now().replace(microsecond=0)),

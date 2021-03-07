@@ -13,7 +13,7 @@ NAMESPACE = 'toggle'
 
 class Extension(BaseExtension):
     namespace = NAMESPACE
-    update_interval = 1
+    update_interval = 0.2
 
     def init(self, config):
         self.config = config[self.namespace]
@@ -90,7 +90,6 @@ class Toggle(Component):
                 if self.duration > self.max_duration:
                     # Failsafe cutoff duration
                     self.turn_off()
-                    print("FAILSAFE TRIGGERED")
 
     def restore_state(self, state={}):
         """ This is called on start to 
@@ -102,7 +101,7 @@ class Toggle(Component):
         """ Fire a toggle event """
         event_data = {
             'event': 'ToggleUpdate',
-            'id': self.id,
+            'component_id': self.id,
             'name': self.name,
             'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
             'state': self.state,
