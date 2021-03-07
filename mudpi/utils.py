@@ -23,7 +23,7 @@ def get_module_classes(module_name):
     return clsmembers
 
 
-def decode_message_data(self, message):
+def decode_event_data(self, message):
         if isinstance(message, dict):
             # print('Dict Found')
             return message
