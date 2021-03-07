@@ -29,7 +29,7 @@ class MudPi:
         # eventually change this to helper and backup in redis
         self.cache = {}
 
-        self.threads = []
+        self.threads = {}
         self.thread_events = {
             # Event to signal system to shutdown
             'mudpi_running': threading.Event(),
@@ -173,8 +173,28 @@ class MudPi:
         self.thread_events['mudpi_running'].clear()
         self.state = CoreState.not_running
 
-        for thread in self.threads:
-            thread.join()
+        _closed_threads = []
+        for thread_name, thread in self.threads.items():
+            thread.join(20)
+            if not thread.is_alive():
+                _closed_threads.append(thread_name)
+            else:
+                Logger.log_formatted(LOG_LEVEL["warning"],
+                   f"Worker {thread_name} is Still Stopping ", "Delayed", "notice")
+                
+        for _thread in _closed_threads:
+            del self.threads[_thread]
+
+        # Try one more time to clean close remaining slow threads
+        _closed_threads = []
+        for thread_name, thread in self.threads.items():
+            thread.join(20)
+            if not thread.is_alive():
+                _closed_threads.append(thread_name)
+            else:
+                Logger.log_formatted(LOG_LEVEL["error"],
+                   f"Worker {thread_name} Failed to Shutdown ", "Not Responding", "error")
+
 
         self.events.publish('core', {'event': 'Shutdown'})
         return True
@@ -183,7 +203,7 @@ class MudPi:
         """ Start Workers and Create Threads """
         for key, worker in self.workers.items():
             _thread = worker.run()
-            self.threads.append(_thread)
+            self.threads[key] = _thread
         return True
 
     def reload_workers(self):
