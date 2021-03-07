@@ -37,10 +37,11 @@ class ExtensionManager:
             for component in worker.components ]
     
     """ Methods """
-    def init(self, config):
+    def init(self, config, load_interfaces=True):
         """ Parses the config and setups up any interfaces detected """
         self.config = config
-        self.load_interfaces(config)
+        if load_interfaces:
+            self.load_interfaces(config)
 
     def load_interfaces(self, config):
         """ Load interfaces from config """
