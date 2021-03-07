@@ -113,7 +113,7 @@ class BaseInterface:
 
         self.extension = None
         self.config = None
-        self.worker = self.load_worker()
+        self.worker = None
 
     """ Overrideable Methods to Extend """
     def load(self, config):
@@ -143,6 +143,11 @@ class BaseInterface:
         """ Add a component for the interface """
         if not _is_component(component):
             raise MudPiError(f"Passed non-component to add_component for {self.namesapce}.")
+
+        # Worker is loaded here to prevent empty workers without components
+        if self.worker is None:
+            self.worker = self.load_worker()
+
         try:
             if component.id is None:
                 Logger.log(
@@ -151,7 +156,7 @@ class BaseInterface:
                 return False
             if component.id in self.worker.components:
                 Logger.log(
-                    LOG_LEVEL["debug"], f"Interface {self.namespace}:{self.type} component id already registered."
+                    LOG_LEVEL["debug"], f"Interface {self.namespace}:{self.type} component id ({component.id}) already registered."
                 )
                 return False
             self.worker.components[component.id] = self.mudpi.components.register(component.id, component, self.namespace)
