@@ -22,7 +22,6 @@ class Interface(BaseInterface):
         if toggle:
             node = self.extension.nodes[config['node']]
             if node:
-                toggle.connect(node)
                 self.add_component(toggle)
             else:
                 raise MudPiError(f'Nanpy node {config["node"]} not found trying to connect {config["key"]}.')
@@ -59,7 +58,7 @@ class NanpyGPIOToggle(Toggle):
 
 
     """ Methods """
-    def connect(self, node):
+    def init(self, node):
         """ Connect to the Parent Device """
         self.node = node
         self._pin_setup = False
@@ -108,7 +107,7 @@ class NanpyGPIOToggle(Toggle):
 
     
     """ Actions """
-    def toggle(self):
+    def toggle(self, data={}):
         # Toggle the GPIO state
         if self.mudpi.is_prepared:
             # Do inverted check and change value before setting active 
@@ -120,7 +119,7 @@ class NanpyGPIOToggle(Toggle):
                 self.active = not self.active
                 self.store_state()
 
-    def turn_on(self):
+    def turn_on(self, data={}):
         # Turn on GPIO if its not on
         if self.mudpi.is_prepared:
             if not self.active:
@@ -130,7 +129,7 @@ class NanpyGPIOToggle(Toggle):
                     self.active = True
                     self.store_state()
 
-    def turn_off(self):
+    def turn_off(self, data={}):
         # Turn off GPIO if its not off
         if self.mudpi.is_prepared:
             if self.active:

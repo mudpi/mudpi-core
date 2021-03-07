@@ -17,7 +17,7 @@ class Interface(BaseInterface):
     def load(self, config):
         """ Load BME680 sensor component from configs """
         sensor = BME680Sensor(self.mudpi, config)
-        if sensor.connect():
+        if sensor:
             self.add_component(sensor)
         return True
 
@@ -69,7 +69,7 @@ class BME680Sensor(Sensor):
 
 
     """ Methods """
-    def connect(self):
+    def init(self):
         """ Connect to the device """
         self.i2c = I2C(board.SCL, board.SDA)
         self._sensor = adafruit_bme680.Adafruit_BME680_I2C(

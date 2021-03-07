@@ -16,7 +16,7 @@ class Interface(BaseInterface):
     def load(self, config):
         """ Load DHT sensor component from configs """
         sensor = DHTSensor(self.mudpi, config)
-        if sensor.connect():
+        if sensor:
             self.add_component(sensor)
         return True
 
@@ -72,7 +72,7 @@ class DHTSensor(Sensor):
 
 
     """ Methods """
-    def connect(self):
+    def init(self):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.config['pin'])
         self.type = self.config['model']

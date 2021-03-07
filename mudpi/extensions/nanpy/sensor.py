@@ -29,7 +29,6 @@ class Interface(BaseInterface):
         if sensor:
             node = self.extension.nodes[config['node']]
             if node:
-                sensor.connect(node)
                 self.add_component(sensor)
             else:
                 raise MudPiError(f'Nanpy node {config["node"]} not found trying to connect {config["key"]}.')
@@ -119,7 +118,7 @@ class NanpyGPIOSensor(Sensor):
         return self.config.get('pin')
 
     """ Methods """
-    def connect(self, node):
+    def init(self, node):
         """ Connect to the Parent Device """
         self.node = node
         self._state = None
@@ -191,7 +190,7 @@ class NanpyDHTSensor(Sensor):
         return self.models[self.config.get('model', '11')]
 
     """ Methods """
-    def connect(self, node):
+    def init(self, node):
         """ Connect to the Parent Device """
         self.node = node
         self._state = None

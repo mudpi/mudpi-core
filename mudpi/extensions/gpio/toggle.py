@@ -16,7 +16,7 @@ class Interface(BaseInterface):
     def load(self, config):
         """ Load GPIO toggle component from configs """
         toggle = GPIOToggle(self.mudpi, config)
-        if toggle.connect():
+        if toggle:
             self.add_component(toggle)
         return True
 
@@ -52,7 +52,7 @@ class GPIOToggle(Toggle):
 
 
     """ Methods """
-    def connect(self):
+    def init(self):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.pin)
 
@@ -87,7 +87,7 @@ class GPIOToggle(Toggle):
 
 
     """ Actions """
-    def toggle(self):
+    def toggle(self, data={}):
         # Toggle the GPIO state
         if self.mudpi.is_prepared:
             # Do inverted check and change value before setting active 
@@ -96,7 +96,7 @@ class GPIOToggle(Toggle):
             self.active = not self.active
             self.store_state()
 
-    def turn_on(self):
+    def turn_on(self, data={}):
         # Turn on GPIO if its not on
         if self.mudpi.is_prepared:
             if not self.active:
@@ -104,7 +104,7 @@ class GPIOToggle(Toggle):
                 self.active = True
                 self.store_state()
 
-    def turn_off(self):
+    def turn_off(self, data={}):
         # Turn off GPIO if its not off
         if self.mudpi.is_prepared:
             if self.active:

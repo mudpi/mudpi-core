@@ -2,7 +2,7 @@
 	"name": "GPIO (Linux)",
 	"namespace": "gpio",
 	"details": {
-		"description": "Provides interfaces using linux board GPIO.",
+		"description": "Interfaces using linux board GPIO.",
 		"documentation": "https://mudpi.app/docs/gpio"
 	},
 	"requirements": ["adafruit-blinka"]

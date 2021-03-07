@@ -24,7 +24,6 @@ class Interface(BaseInterface):
         if control:
             node = self.extension.nodes[config['node']]
             if node:
-                control.connect(node)
                 self.add_component(control)
             else:
                 raise MudPiError(f'Nanpy node {config["node"]} not found trying to connect {config["key"]}.')
@@ -82,7 +81,7 @@ class NanpyGPIOControl(Control):
         return self.time_elapsed
 
     """ Methods """
-    def connect(self, node):
+    def init(self, node):
         """ Connect to the Parent Device """
         self.node = node
         self._state = 0

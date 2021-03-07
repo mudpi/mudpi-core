@@ -15,7 +15,7 @@ class Interface(BaseInterface):
     def load(self, config):
         """ Load GPIO sensor component from configs """
         sensor = GPIOSensor(self.mudpi, config)
-        if sensor.connect():
+        if sensor:
             self.add_component(sensor)
         return True
 
@@ -61,16 +61,7 @@ class GPIOSensor(Sensor):
 
 
     """ Methods """
-    def update(self):
-        """ Get data from GPIO connection"""
-        if self.is_digital:
-            data = self.gpio.DigitalInOut(self.pin_obj).value
-        else:
-            data = self.gpio.AnalogIn(self.pin_obj).value
-        self._state = data
-        return data
-    
-    def connect(self):
+    def init(self):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.config['pin'])
 
@@ -82,3 +73,12 @@ class GPIOSensor(Sensor):
         self.gpio = digitalio
 
         return True
+        
+    def update(self):
+        """ Get data from GPIO connection"""
+        if self.is_digital:
+            data = self.gpio.DigitalInOut(self.pin_obj).value
+        else:
+            data = self.gpio.AnalogIn(self.pin_obj).value
+        self._state = data
+        return data

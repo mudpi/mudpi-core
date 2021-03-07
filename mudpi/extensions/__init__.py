@@ -88,7 +88,7 @@ class BaseExtension:
     """
     def load_manager(self):
         """ Initalize a Manager for the Extension """
-        self.manager = self.mudpi.cache[self.namespace] = ExtensionManager(self)
+        self.manager = ExtensionManager(self)
 
     def __repr__(self):
         """ Debug display of extension. """
@@ -206,6 +206,7 @@ class Component:
         """
         self.mudpi = mudpi
         self.config = config
+        self.init()
 
     """ Properties 
     Override these depending on desired component functionality
@@ -249,6 +250,12 @@ class Component:
 
 
     """ Methods """
+    def init(self):
+        """ Called at end if __init__ and
+            used for additional setup tasks
+        """
+        pass
+
     def update(self):
         """ Get data, run tasks, update state, called during 
             each work cycle. Don't block longer than update_interfal 

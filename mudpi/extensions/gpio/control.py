@@ -16,7 +16,7 @@ class Interface(BaseInterface):
     def load(self, config):
         """ Load GPIO control component from configs """
         control = GPIOControl(self.mudpi, config)
-        if control.connect():
+        if control:
             self.add_component(control)
         return True
 
@@ -47,7 +47,7 @@ class GPIOControl(Control):
 
 
     """ Methods """
-    def connect(self):
+    def init(self):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.pin)
         self.gpio = digitalio
