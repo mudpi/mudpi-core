@@ -1,4 +1,5 @@
 import sys
+import json
 import socket
 import inspect
 import subprocess
@@ -23,7 +24,7 @@ def get_module_classes(module_name):
     return clsmembers
 
 
-def decode_event_data(self, message):
+def decode_event_data(message):
         if isinstance(message, dict):
             # print('Dict Found')
             return message
@@ -32,7 +33,7 @@ def decode_event_data(self, message):
                 temp = json.loads(message.decode('utf-8'))
                 # print('Json Found')
                 return temp
-            except:
+            except Exception as error:
                 # print('Json Error. Str Found')
                 return {'event': 'Unknown', 'data': message}
         else:
