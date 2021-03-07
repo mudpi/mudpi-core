@@ -97,7 +97,7 @@ def main(args=None):
     print(f'{"":_<{FONT_PADDING+8}}\n')
 
     """ Debug Mode Dump After System Online """
-    if arguments.debug:
+    if arguments.debug and arguments.dump:
         manager.debug_dump()
         time.sleep(1)
 
@@ -107,6 +107,8 @@ def main(args=None):
     PROGRAM_RUNNING = True
     while PROGRAM_RUNNING:
         try:
+            # Keep messages being processed
+            manager.mudpi.events.get_message()
             current_clock = datetime.datetime.now().replace(microsecond=0)
             manager.mudpi.events.publish('clock', {"clock":current_clock.strftime("%m-%d-%Y %H-%M-%S"), 
                 "date":str(current_clock.date()), "time": str(current_clock.time())})
@@ -151,6 +153,9 @@ def get_arguments():
     )
     parser.add_argument(
         "--debug", action="store_true", help="Start MudPi in forced debug mode"
+    )
+    parser.add_argument(
+        "--dump", action="store_true", help="Display important system information"
     )
     parser.add_argument(
         "--verbose", action="store_true", help="Enable verbose output."
