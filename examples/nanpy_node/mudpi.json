@@ -1,0 +1,26 @@
+
+        {
+            "name": "Nanpy GPIO D0",
+            "interface": "nanpy",
+            "node": "demo_box_1",
+            "key": "nanpy_gpio_d0",
+            "type": "gpio",
+            "pin":16
+        },
+        {
+            "name": "Nanpy GPIO D1",
+            "interface": "nanpy",
+            "node": "demo_box_1",
+            "key": "nanpy_gpio_d1",
+            "type": "gpio",
+            "pin":5
+        },
+        {
+            "name": "Nanpy GPIO A0",
+            "interface": "nanpy",
+            "node": "demo_box_1",
+            "key": "nanpy_gpio_a0",
+            "type": "gpio",
+            "analog": true,
+            "pin":0
+        }
