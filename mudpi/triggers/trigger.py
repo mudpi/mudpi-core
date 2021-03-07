@@ -1,6 +1,4 @@
-import time
 import json
-import redis
 import threading
 import sys
 
