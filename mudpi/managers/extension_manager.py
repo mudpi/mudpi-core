@@ -22,7 +22,7 @@ class ExtensionManager:
         self.config = None
         self.interfaces = {}
         # Create an default interface for the extension components without interfaces 
-        self.interfaces[self.namespace] = self.create_interface(self.namespace, {})
+        self.interfaces[self.namespace] = self.create_interface(self.namespace)
         self.importer = importer.get_extension_importer(self.mudpi, self.namespace)
 
         self.mudpi.cache.setdefault('extension_managers', {})[self.namespace] = self
@@ -84,11 +84,20 @@ class ExtensionManager:
                 )
         return True
 
-    def create_interface(self, interface_name, interface, update_interval=None, extension=None):
+    def create_interface(self, interface_name, interface=None, update_interval=None, extension=None):
         """ Create a new interface manager and return it """
         cache = self.mudpi.cache.setdefault("interfaces", {})
+
+        if interface:
+            if not hasattr(interface, 'Interface'):
+                raise MudPiError(f'No `Interface()` class to load for {self.namespace}:{interface_name}.')
+
         if update_interval is None:
-            update_interval = self.update_interval
+            if interface:
+                if interface.Interface.update_interval is not None:
+                    update_interval = interface.Interface.update_interval
+            else:
+                update_interval = self.update_interval
 
         key = f'{self.namespace}.{interface_name}.{update_interval}'
 
@@ -96,17 +105,16 @@ class ExtensionManager:
             return cache[key]
 
         if interface:
-            if not hasattr(interface, 'Interface'):
-                raise MudPiError(f'No `Interface()` class to load for {self.namespace}:{interface_name}.')
-
             if _is_interface(interface.Interface):
-                self.interfaces[key] = cache[key] = interface.Interface(self.mudpi, self.namespace, interface_name, update_interval)
+                cache[key] = interface.Interface(self.mudpi, self.namespace, interface_name, update_interval)
+                # Inject the extension here since its not needed in the init during validation
                 cache[key].extension = extension or self.extension
-                return self.interfaces[key]
+                return cache[key]
             else:
                 raise MudPiError(f'Interface {self.namespace}:{interface_name} does not extend BaseInterface.')
 
         cache[key] = extensions.BaseInterface(self.mudpi, self.namespace, interface_name, update_interval)
+        # Inject the extension here since its not needed in the init during validation
         cache[key].extension = extension or self.extension
         return cache[key]
 
@@ -117,26 +125,29 @@ class ExtensionManager:
             raise MudPiError("Config was null in extension manager. Call `init(config)` first.")
             return
 
-        cache = self.mudpi.cache.setdefault('interfaces', {})
-
-        update_interval = interface_config.get('update_interval', self.update_interval)
-
-        # Create a composite key based on interface and update intervals
-        interface_key = f'{self.namespace}.{interface_name}.{update_interval}'
-
-        # Check if interface is already added or in cache and not added
-        if interface_key in self.interfaces:
-            return self.interfaces[interface_key]
-        elif interface_key in cache:
-            self.interfaces[interface_key] = cache[interface_key]
-            return self.interfaces[interface_key]
-        
-        # Interface not added, begin the import process
+        # Get the interface and extension
         interface, extension = self.importer.prepare_interface_and_import(interface_name)
 
         if not interface:
             raise MudPiError(f'Interface {interface_name} failed to prepare for import.')
 
+        update_interval = interface_config.get('update_interval')
+
+        if not update_interval:
+            if hasattr(interface, 'Interface'):
+                if interface.Interface.update_interval is not None:
+                    update_interval = interface.Interface.update_interval
+
+        if not update_interval:
+            update_interval = self.update_interval
+
+        # Create a composite key based on interface and update intervals
+        interface_key = f'{self.namespace}.{interface_name}.{update_interval}'
+
+        # Check if interface is already added
+        if interface_key in self.interfaces:
+            return self.interfaces[interface_key]
+    
         self.interfaces[interface_key] = self.create_interface(interface_name, interface, update_interval, extension=extension)
         return self.interfaces[interface_key]
 

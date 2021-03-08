@@ -23,11 +23,11 @@ class BaseExtension:
         if cls.namespace:
             cls.registered_extensions[cls.namespace] = cls
 
-    """ A unique string slug for the extension """
+    # A unique string slug for the extension 
     namespace = None
 
-    """ Time between component updates. Can be changed via config"""
-    update_interval = DEFAULT_UPDATE_INTERVAL
+    # Time between component updates. Can be changed via config
+    update_interval = None # DEFAULT_UPDATE_INTERVAL
 
     def __init__(self, mudpi):
         """ DO NOT OVERRIDE this method. Use init() instead """
@@ -102,7 +102,7 @@ class BaseInterface:
     """
 
     """ Time between component updates. Can be changed via config"""
-    update_interval = DEFAULT_UPDATE_INTERVAL
+    update_interval = None # DEFAULT_UPDATE_INTERVAL
 
     def __init__(self, mudpi, namespace, interface_name, update_interval=None):
         """ DO NOT OVERRIDE this method. Use load() instead """
