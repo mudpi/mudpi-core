@@ -66,7 +66,7 @@ class Toggle(Component):
     def duration(self):
         """ Return how long the current state has been applied in seconds """
         self._current_duration = time.perf_counter() - self._duration_start
-        return self._current_duration
+        return round(self._current_duration, 4)
 
     @property
     def active(self):
