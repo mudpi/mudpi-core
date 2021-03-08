@@ -12,6 +12,9 @@ from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 
 class Interface(BaseInterface):
+
+    # Override the update time
+    update_interval = 60
     
     def load(self, config):
         """ Load cron trigger component from configs """
