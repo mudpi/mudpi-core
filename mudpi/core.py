@@ -174,8 +174,9 @@ class MudPi:
         self.state = CoreState.not_running
 
         _closed_threads = []
+        # First pass of threads to find out which ones are slower
         for thread_name, thread in self.threads.items():
-            thread.join(20)
+            thread.join(5)
             if not thread.is_alive():
                 _closed_threads.append(thread_name)
             else:
@@ -185,7 +186,7 @@ class MudPi:
         for _thread in _closed_threads:
             del self.threads[_thread]
 
-        # Try one more time to clean close remaining slow threads
+        # Now attempt to clean close slow threads
         _closed_threads = []
         for thread_name, thread in self.threads.items():
             thread.join(20)
