@@ -22,7 +22,7 @@ class ExtensionManager:
         self.config = None
         self.interfaces = {}
         # Create an default interface for the extension components without interfaces 
-        self.interfaces[self.namespace] = self.create_interface(self.namespace)
+        self.create_interface(self.namespace)
         self.importer = importer.get_extension_importer(self.mudpi, self.namespace)
 
         self.mudpi.cache.setdefault('extension_managers', {})[self.namespace] = self
@@ -116,6 +116,7 @@ class ExtensionManager:
         cache[key] = extensions.BaseInterface(self.mudpi, self.namespace, interface_name, update_interval)
         # Inject the extension here since its not needed in the init during validation
         cache[key].extension = extension or self.extension
+        self.interfaces[key] = cache[key]
         return cache[key]
 
     def find_or_create_interface(self, interface_name, interface_config = {}):
@@ -155,8 +156,8 @@ class ExtensionManager:
         """ Delegate register component using the specified interface. """
         interface_name = interface_name or self.namespace
         interface_key = f'{self.namespace}.{interface_name}.{self.update_interval}'
-        if interface_name not in self.interfaces:
-            raise MudPiError(f"Attempted to add_component to interface {interface_name} that doesn't exist.")
+        if interface_key not in self.interfaces:
+            raise MudPiError(f"Attempted to add_component to interface {interface_key} that doesn't exist.")
 
         return self.interfaces[interface_key].add_component(component)
 
