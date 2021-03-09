@@ -191,17 +191,18 @@ class CoreManager:
 
         return True
 
-    def debug_dump(self):
+    def debug_dump(self, cache_dump=False):
         """ Dump important data from MudPi instance for debugging mode """
-        # Logger.log(
-        #     LOG_LEVEL["debug"],
-        #     f'{YELLOW_BACK}MUDPI CACHE DUMP{FONT_RESET}'
-        # )
-        # for key in self.mudpi.cache.keys():
-        #     Logger.log(
-        #         LOG_LEVEL["debug"],
-        #         f"{FONT_YELLOW}{key}:{FONT_RESET} {self.mudpi.cache[key]}"
-        #     )
+        if cache_dump:
+            Logger.log(
+                LOG_LEVEL["debug"],
+                f'{YELLOW_BACK}MUDPI CACHE DUMP{FONT_RESET}'
+            )
+            for key in self.mudpi.cache.keys():
+                Logger.log(
+                    LOG_LEVEL["debug"],
+                    f"{FONT_YELLOW}{key}:{FONT_RESET} {self.mudpi.cache[key]}"
+                )
 
         Logger.log(
             LOG_LEVEL["debug"],
@@ -247,14 +248,14 @@ class CoreManager:
             )
             Logger.log(
                 LOG_LEVEL["debug"],
-                f"{'ACTION CALL':<28}   {'ACTION':<28}   NAMESPACE\n{'':-<72}"
+                f"{'ACTION CALL':<48}   {'ACTION':<32}\n{'':-<80}"
             )
             for namespace, actions in self.mudpi.actions.items():
                 for key, action in actions.items():
                     action_command = f"{namespace or ''}.{key}"
                     Logger.log(
                         LOG_LEVEL["debug"],
-                        f"{action_command:<28} | {key:<28} | {namespace}"
+                        f"{action_command:<48} | {key:<32}"
                     )
 
         print(f'{"":_<{FONT_PADDING+8}}')
