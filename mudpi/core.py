@@ -198,6 +198,7 @@ class MudPi:
 
 
         self.events.publish('core', {'event': 'Shutdown'})
+        self.events.disconnect()
         return True
 
     def start_workers(self):
