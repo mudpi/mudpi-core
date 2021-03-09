@@ -6,6 +6,7 @@
 """
 import datetime
 import threading
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.extensions import Component, BaseExtension
 
 
@@ -13,7 +14,7 @@ NAMESPACE = 'trigger'
 
 class Extension(BaseExtension):
     namespace = NAMESPACE
-    update_interval = 0.1
+    update_interval = 0.05
 
     def init(self, config):
         self.config = config[self.namespace] #list of lists
@@ -125,38 +126,39 @@ class Trigger(Component):
         thresholds_passed = False
         for threshold in self.thresholds:
             comparison = threshold.get("comparison", "eq")
+            
             if comparison == "eq":
                 if value == threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-
             elif comparison == "ne":
                 if value != threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-
             elif comparison == "gt":
                 if value > threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-
             elif comparison == "gte":
                 if value >= threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-
             elif comparison == "lt":
                 if value < threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-
             elif comparison == "lte":
                 if value <= threshold["value"]:
+                    thresholds_passed = True
+                else:
+                    thresholds_passed = False
+            elif comparison == "ex":
+                if value is not None:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
@@ -188,7 +190,7 @@ class Trigger(Component):
 
         except Exception as e:
             Logger.log(LOG_LEVEL["error"],
-                       f"Error triggering action {self.key}. \n{e}")
+                       f"Error triggering action {self.id}. \n{e}")
         return
 
     def unload(self):

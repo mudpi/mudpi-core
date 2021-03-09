@@ -98,8 +98,9 @@ def main(args=None):
 
     """ Debug Mode Dump After System Online """
     if arguments.debug and arguments.dump:
-        manager.debug_dump()
+        manager.debug_dump(cache_dump=arguments.cache_dump)
         time.sleep(1)
+
 
     ###############################
     """ MAIN PROGRAM HEARTBEAT """
@@ -112,7 +113,9 @@ def main(args=None):
             current_clock = datetime.datetime.now().replace(microsecond=0)
             manager.mudpi.events.publish('clock', {"clock":current_clock.strftime("%m-%d-%Y %H-%M-%S"), 
                 "date":str(current_clock.date()), "time": str(current_clock.time())})
-            time.sleep(1)
+            for i in range(10):
+                time.sleep(0.1)
+                manager.mudpi.events.get_message()
         except KeyboardInterrupt as error:
             PROGRAM_RUNNING = False
         except Exception as error:
@@ -156,6 +159,9 @@ def get_arguments():
     )
     parser.add_argument(
         "--dump", action="store_true", help="Display important system information"
+    )
+    parser.add_argument(
+        "--cache_dump", action="store_true", help="Display cache when --dump is set"
     )
     parser.add_argument(
         "--verbose", action="store_true", help="Enable verbose output."
