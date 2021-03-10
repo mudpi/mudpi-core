@@ -29,6 +29,18 @@ class Sensor(Component):
         Base Sensor for all sensor interfaces
     """
 
+    """ Properties """
+    @property
+    def id(self):
+        """ Unique id or key """
+        return self.config.get('key')
+
+    @property
+    def name(self):
+        """ Friendly name of control """
+        return self.config.get('name') or f"{self.id.replace('_', ' ').title()}"
+
+
     """ Actions """
     def force_update(self, data=None):
         """ Force an update of the component. Useful for testing """
