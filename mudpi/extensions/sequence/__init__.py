@@ -203,11 +203,11 @@ class Sequence(Component):
 
                     if self._step_complete:
                         self.fire({"event": "SequenceStepEnded"})
-                        Logger.log(
-                            LOG_LEVEL["debug"],
-                            f'Sequence {FONT_CYAN}{self.name}{FONT_RESET} Step {self._current_step+1} Debug\n' \
-                            f'Delay: {self.step_delay} Actual: {self._delay_actual} Duration: {self.step_duration} Actual: {self._duration_actual}'
-                        )
+                        # Logger.log(
+                        #     LOG_LEVEL["debug"],
+                        #     f'Sequence {FONT_CYAN}{self.name}{FONT_RESET} Step {self._current_step+1} Debug\n' \
+                        #     f'Delay: {self.step_delay} Actual: {self._delay_actual} Duration: {self.step_duration} Actual: {self._duration_actual}'
+                        # )
                         return self.next_step()
                 else:
                     # Sequence is not active.
@@ -312,9 +312,9 @@ class Sequence(Component):
                     self.reset_step()
                     self._current_step += 1
                     self.fire({"event": "SequenceStepStarted"})
-                    Logger.log(
+                    Logger.log_formatted(
                         LOG_LEVEL["info"],
-                        f'Sequence: {FONT_CYAN}{self.name:<28}{FONT_RESET} Step {self._current_step+1}/{self.total_steps}'
+                        f'Sequence: {FONT_CYAN}{self.name}{FONT_RESET}', f'Step {self._current_step+1}/{self.total_steps}'
                     )
                 else:
                     # Last step of sequence completed
