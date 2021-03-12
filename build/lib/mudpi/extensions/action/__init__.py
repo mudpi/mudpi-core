@@ -5,7 +5,6 @@
     actions manually through configs for more custom interactions.
 """
 import json
-import redis
 import subprocess
 from mudpi.extensions import Component, BaseExtension
 
@@ -25,7 +24,7 @@ class Extension(BaseExtension):
             self.mudpi.actions.register(action.id, action)
         return True
 
-    def validate_config(self, config):
+    def validate(self, config):
         """ Custom Validation for Action configs
             - Requires `key`
         """
@@ -102,7 +101,7 @@ class Action:
     """ Internal Methods """
     def _emit_event(self):
         """ Emit an event """
-        self.mudpi.bus.publish(self.topic, json.dumps(self.action))
+        self.mudpi.events.publish(self.topic, json.dumps(self.action))
         return
 
     def _run_command(self, value=None):

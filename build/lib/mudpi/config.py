@@ -4,40 +4,36 @@ import yaml
 from mudpi.constants import (FONT_YELLOW, RED_BACK, FONT_RESET, IMPERIAL_SYSTEM, PATH_MUDPI, PATH_CONFIG, DEFAULT_CONFIG_FILE)
 from mudpi.exceptions import ConfigNotFoundError, ConfigError
 
+
 class Config(object):
     """ MudPi Config Class
 
     A class to represent the MudPi configuration that 
     is typically pulled from a file.
     """
-    def __init__(self, config={}, config_path=None):
-        self.config = config
+    def __init__(self, config_path=None):
         self.config_path = config_path or os.path.abspath(os.path.join(os.getcwd(), PATH_CONFIG))
+        
+        self.config = {}
         self.set_defaults()
 
-    def __getattr__(self, key):
-        config = self.config.get(key)
-        if config:
-            super().__setattr__(key, config)
-        return config
-
-    def __setattr__(self, key, value):
-        if key is not 'config':
-            if key in self.config:
-                self.config[key] = value
-        super(Config, self).__setattr__(key, value)
-
-    def __repr__(self):
-        return f'<Config {self.config_path}>'
 
     """ Properties """
     @property
     def name(self):
-        return self.config.get('name', 'MudPi')
+        return self.config.get('mudpi', {}).get('name', 'MudPi')
 
     @name.setter
     def name(self, value):
-        self.config['name'] = value
+        self.config.get('mudpi', {})['name'] = value
+
+    @property
+    def debug(self):
+        return self.config.get('mudpi', {}).get('debug', False)
+
+    @debug.setter
+    def debug(self, value):
+        self.config.setdefault('mudpi', {})['debug'] = value
 
 
     """ Methods """
@@ -45,56 +41,39 @@ class Config(object):
         """ Returns path relative to the config folder. """
         return os.path.join(self.config_path, *path)
 
-
     def set_defaults(self):
         """ Set default configurations for any null values """
         core_config = {
-            "name": self.name or 'MudPi',
-            "debug": self.debug or False,
-            "bus": {
-                "redis": self.redis or {
-                    'host': '127.0.0.1',
-                    'port': 6379
-                }
-            }
+            "name": self.config.get('mudpi', {}).get('name', 'MudPi'),
+            "debug": self.config.get('mudpi', {}).get('debug', False),
+            "unit_system": self.config.get('mudpi', {}).get('unit_system', "imperial"),
         }
-        self.mudpi = self.mudpi or core_config
-        self.workers = self.workers or []
-        # self.logging = self.logging or {}
-
+        self.config['mudpi'] = core_config
 
     def to_dict(self):
         """ Return Config as Dict """
         return dict(self.config)
-        pass
-
 
     def to_json(self):
         """ Return Config as JSON """
         return json.dumps(self.to_dict())
-        pass
-
 
     def keys(self):
         """ Return the keys of the config """
         return self.config.keys()
 
-
     def values(self):
         """ Return the values of the config """
         return self.config.values()
-
 
     def setdefault(self, key, default):
         """ Provide setdefault on config """
         return self.config.setdefault(key, default)
 
-
     def file_exists(self, file=None):
         """ Check if config files exists at given path """
         file = file or self.path(DEFAULT_CONFIG_FILE)
         return os.path.exists(file)
-
 
     def load_from_file(self, file=None, format=None):
         """ 
@@ -137,7 +116,6 @@ class Config(object):
             )
             raise ConfigError()
 
-
     def load_from_json(self, json_data):
         """ Load configs from JSON """
         try:
@@ -145,7 +123,6 @@ class Config(object):
             return self.config
         except Exception as e:
             print(f'{RED_BACK}Problem loading configs from JSON {FONT_RESET}\n{FONT_YELLOW}{e}{FONT_RESET}\r')
-
 
     def load_from_yaml(self, yaml_data):
         """ Load configs from YAML """
@@ -155,13 +132,11 @@ class Config(object):
         except Exception as e:
             print(f'{RED_BACK}Problem loading configs from YAML {FONT_RESET}\n{FONT_YELLOW}{e}{FONT_RESET}\r')
 
-
-    def save_to_file(self, file=None, format=None, config=None, overwrite=False):
+    def save_to_file(self, file=None, format=None, config=None):
         """ Save current configs to a file 
             File: Full path to file
             Format: 'json' or 'yaml'
             Config: Dict of data to write to file (Default: self)
-            Overwrite: Boolean to allow overwrite of existing file
         """
         if file is not None:
             file = self.validate_file(file)
@@ -182,8 +157,7 @@ class Config(object):
             f.write(config)
         return True
 
-
-    def validate_file(self, file: str):
+    def validate_file(self, file):
         """ Validate a file path and return a prepared path to save """
         if '.'  in file:
             if not self.file_exists(file):
@@ -198,12 +172,10 @@ class Config(object):
             file = os.path.join(file, DEFAULT_CONFIG_FILE)
         return file
 
-
-    def config_format(self, file: str):
+    def config_format(self, file):
         """ Returns the file format if supported """
         if '.' in file:
             if any(extension in file for extension in ['.config', '.json', '.conf']):
-                # v0.9.1 config found
                 config_format = 'json'
             elif '.yaml' in file:
                 config_format = 'yaml'
@@ -211,3 +183,19 @@ class Config(object):
             config_format = None
         
         return config_format 
+
+    def get(self, key, default=None, replace_char=None):
+        """ Get an item from the config with a default 
+            Use replace_char to slug the config value
+        """
+        value = self.config.get(key, default)
+
+        if replace_char:
+            if type(value) == str:
+                value = value.replace(" ", replace_char).lower()
+
+        return value
+
+    def __repr__(self):
+        """ Debug print of config """
+        return f'<Config {self.config_path}>'

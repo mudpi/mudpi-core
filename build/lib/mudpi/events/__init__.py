@@ -32,12 +32,12 @@ class EventSystem():
         for key, adaptor in self.adaptors.items():
             Logger.log_formatted(
                 LOG_LEVEL["debug"],
-                f"Setting up events on {key} ", 'Pending', 'notice'
+                f"Preparing Event System for {key} ", 'Pending', 'notice'
             )
             connection_data[key] = adaptor.connect()
             Logger.log_formatted(
                 LOG_LEVEL["info"],
-                f"Event system ready on {key}  ", 'Connected', 'success'
+                f"Event System Ready on {key}  ", 'Connected', 'success'
             )
         return connection_data
 

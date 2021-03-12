@@ -1,25 +1,49 @@
-import redis
-from mudpi.components import Component
+""" 
+    Sensors Extension
+    Sensors are components that gather data and make it 
+    available to MudPi. Sensors support interfaces to 
+    allow additions of new types of devices easily.
+"""
+from mudpi.extensions import Component, BaseExtension
+
+
+NAMESPACE = 'sensor'
+UPDATE_INTERVAL = 30
+
+class Extension(BaseExtension):
+    namespace = NAMESPACE
+    update_interval = UPDATE_INTERVAL
+
+    def init(self, config):
+        self.config = config[self.namespace]
+        
+        self.manager.init(self.config)
+
+        self.manager.register_component_actions('force_update', action='force_update')
+        return True
+
+
 
 class Sensor(Component):
-	""" MudPi Core Sensor Component """
-    def init(self):
-        self.pin = pin
+    """ Base Sensor
+        Base Sensor for all sensor interfaces
+    """
 
-        if key is None:
-            raise Exception('No "key" Found in Sensor Config')
-        else:
-            self.key = key.replace(" ", "_").lower()
+    """ Properties """
+    @property
+    def id(self):
+        """ Unique id or key """
+        return self.config.get('key')
 
-        if name is None:
-            self.name = self.key.replace("_", " ").title()
-        else:
-            self.name = name
+    @property
+    def name(self):
+        """ Friendly name of control """
+        return self.config.get('name') or f"{self.id.replace('_', ' ').title()}"
 
-        try:
-            self.r = redis_conn if redis_conn is not None else redis.Redis(
-                host='127.0.0.1', port=6379)
-        except KeyError:
-            self.r = redis.Redis(host='127.0.0.1', port=6379)
-        pass
 
+    """ Actions """
+    def force_update(self, data=None):
+        """ Force an update of the component. Useful for testing """
+        self.update()
+        self.store_state()
+        return True

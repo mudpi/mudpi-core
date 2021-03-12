@@ -7,15 +7,16 @@ This is the main entry point for running MudPi.
 import os
 import sys
 import time
+import datetime
 import argparse
 import threading
-from mudpi import utils, boot, importer
+from mudpi.config import Config
+from mudpi import utils, importer
+from mudpi.logger.Logger import Logger, LOG_LEVEL
+from mudpi.managers.core_manager import CoreManager
 from mudpi.constants import __version__, PATH_CONFIG, DEFAULT_CONFIG_FILE, \
     FONT_RESET_CURSOR, FONT_RESET, YELLOW_BACK, GREEN_BACK, FONT_GREEN, FONT_RED, FONT_YELLOW, FONT_PADDING
 from mudpi.exceptions import ConfigNotFoundError, ConfigFormatError
-from mudpi.core import MudPi
-from mudpi.config import Config
-from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 
 def main(args=None):
@@ -36,7 +37,7 @@ def main(args=None):
         Config().save_to_file(config_path)
         return
 
-
+    #######################
     ### Configurations ###
     config_path = os.path.abspath(os.path.join(os.getcwd(), arguments.config))
 
@@ -45,18 +46,18 @@ def main(args=None):
     print(chr(27) + "[2J")
     display_greeting()
 
-    mudpi = MudPi()
-    boot.mudpi_from_config(mudpi, config_path)
+    manager = CoreManager()
+    manager.load_mudpi_from_config(config_path)
 
     print(f'{"Loading MudPi Configs ":.<{FONT_PADDING+1}} {FONT_GREEN}Complete{FONT_RESET}')
 
-
+    #####################
     ### Bootstrapping ###
     
     if arguments.debug:
         print(f'{YELLOW_BACK}DEBUG MODE ENABLED{FONT_RESET}')
-        mudpi.config.config["mudpi"]["debug"] = True
-        print(arguments) #DEBUG
+        manager.mudpi.config.config["mudpi"]["debug"] = True
+        # print(arguments) #DEBUG
         print(f'Config path: {config_path}') #DEBUG
         print(f'Current Directory: {os.getcwd()}')
         # print(f'Config keys {mudpi.config.keys()}')
@@ -65,95 +66,77 @@ def main(args=None):
     # Logging Module
     try:
         print('Initializing Logger \r', end='', flush=True)
-        boot.initialize_logging(mudpi)
+        manager.initialize_logging()
     except Exception as e:
         print(f'{"Initializing Logger  ":.<{FONT_PADDING}} {FONT_RED}Disabled{FONT_RESET}')
 
-    boot.load_mudpi_core(mudpi)
+    # MudPi Core Systems
+    manager.load_mudpi_core()
+
+    Logger.log_formatted(LOG_LEVEL["warning"], "Initializing Core ", "Complete", 'success')
+
+    Logger.log(LOG_LEVEL["debug"], f'{" Detecting Configurations ":_^{FONT_PADDING+8}}')
+    # Load the Extension System
+    loaded_extensions = manager.load_all_extensions()
 
     Logger.log_formatted(
-        LOG_LEVEL["warning"], "Initializing Core ", "Complete", 'success'
+        LOG_LEVEL["warning"], f"Loaded {len(loaded_extensions)} Extensions ", "Complete", 'success'
     )
 
-    loaded_extensions = boot.load_all_extensions(mudpi)
-
-    Logger.log_formatted(
-        LOG_LEVEL["warning"], f"Loaded {len(loaded_extensions)} Prepared Extensions ", "Complete", 'success'
-    )
-
-
-    # #########################
-    # ### Register Workers ###
-    #     for worker in mudpi.config.workers:
-    #         worker_type = f'linux.{worker["type"]}_worker'
-    #         wrker = importer.get_worker(worker_type)
-    #         # Worker import magic
-    #         if wrker:
-    #             clss = [item for item in utils.get_module_classes(wrker.__name__) if 'Worker' in item[0] and item[0] is not "Worker"]
-    #             worker_instance = clss[0][1](mudpi, worker)
-    #             registered_worker_count += 1
-    #         else:  
-    #             # Unable to import module
-    #             Logger.log(
-    #                 LOG_LEVEL["error"],
-    #                 f'{f"Failed Loading {worker_type} ":.<{FONT_PADDING}} {FONT_RED}Failed{FONT_RESET}'
-    #             )
-    #     
-
-    Logger.log_formatted(
-        LOG_LEVEL["warning"],
-        "Booting MudPi ", 'Complete', 'success'
-    )
+    Logger.log_formatted(LOG_LEVEL["warning"], "MudPi Fully Loaded", 'Complete', 'success')
 
     #########################
     ### Start All Systems ###
-    Logger.log_formatted(
-        LOG_LEVEL["info"],
-        "Signaling All Workers to Start ", 'Pending', 'notice'
-    )
-    # for worker in mudpi.worker_registry:
-    #     t = mudpi.worker_registry[worker].run()
-    #     mudpi.threads.append(t)
-    
-    mudpi.start()
-    Logger.log_formatted(
-        LOG_LEVEL["info"],
-        "Signaling All Workers to Start  ", 'Complete', 'success'
-    )
-    print(f'{"":_<{FONT_PADDING+8}}')
-    print('')
+    Logger.log(LOG_LEVEL["debug"], f'{" Start Systems ":_^{FONT_PADDING+8}}')
+    Logger.log_formatted(LOG_LEVEL["debug"], "Starting All Workers ", 'Pending', 'notice')
+    manager.mudpi.start_workers()
+    Logger.log_formatted(LOG_LEVEL["info"], "Started All Workers ", 'Complete', 'success')
 
+    # Everything should be loaded and running
+    Logger.log_formatted(LOG_LEVEL["info"], "MudPi Systems  ", 'Online', 'success')
+    print(f'{"":_<{FONT_PADDING+8}}\n')
 
     """ Debug Mode Dump After System Online """
-    if arguments.debug:
-        debug_dump(mudpi)
+    if arguments.debug and arguments.dump:
+        manager.debug_dump(cache_dump=arguments.cache_dump)
+        time.sleep(1)
 
+
+    ###############################
+    """ MAIN PROGRAM HEARTBEAT """
+    manager.mudpi.start()
+    PROGRAM_RUNNING = True
+    while PROGRAM_RUNNING:
+        try:
+            # Keep messages being processed
+            manager.mudpi.events.get_message()
+            current_clock = datetime.datetime.now().replace(microsecond=0)
+            manager.mudpi.events.publish('clock', {"clock":current_clock.strftime("%m-%d-%Y %H-%M-%S"), 
+                "date":str(current_clock.date()), "time": str(current_clock.time())})
+            for i in range(10):
+                time.sleep(0.1)
+                manager.mudpi.events.get_message()
+        except KeyboardInterrupt as error:
+            PROGRAM_RUNNING = False
+        except Exception as error:
+            Logger.log(
+                LOG_LEVEL["error"],
+                f"Runtime Error:  {error}"
+            )
+            PROGRAM_RUNNING = False
 
     """ PROGRAM SHUTDOWN """
-    time.sleep(5)
-    mudpi.shutdown()
+    print(f'{"":_<{FONT_PADDING+8}}')
+    Logger.log_formatted(
+        LOG_LEVEL["info"],
+        "Stopping All Workers for Shutdown  ", 'Pending', 'notice'
+    )
+    manager.mudpi.shutdown()
 
-    for thread in mudpi.threads:
-        thread.join()
-
-    # Check the config
-    # 
-    # Check other options before running
-    # 
-    # Boot Up MudPi
-    #  - MudPi Set to LOADING
-    #  - Load the Config from Conf Path
-    #  - Load the MudPi Core Components
-    #       - Load the Event Bus (redis)
-    #       - Load the State Manager (redis)
-    #  - Load all Workers and Register Them
-    #       - Workers initalize components
-    #  
-    #  - MudPi Set to STARTING
-    #  - Set Threading Event for Core
-    #  - Start Up all Registered Workers
-    #  
-    #  - MudPi Set to RUNNING
+    Logger.log_formatted(
+        LOG_LEVEL["info"],
+        "All MudPi Systems  ", 'Offline', 'error'
+    )
     
 
 def get_arguments():
@@ -173,6 +156,12 @@ def get_arguments():
     )
     parser.add_argument(
         "--debug", action="store_true", help="Start MudPi in forced debug mode"
+    )
+    parser.add_argument(
+        "--dump", action="store_true", help="Display important system information"
+    )
+    parser.add_argument(
+        "--cache_dump", action="store_true", help="Display cache when --dump is set"
     )
     parser.add_argument(
         "--verbose", action="store_true", help="Enable verbose output."
@@ -210,62 +199,6 @@ def display_greeting():
     print('Version: ', __version__)
     print(FONT_RESET)
 
-
-def debug_dump(mudpi):
-    """ Dump important data from MudPi instance for debugging mode """
-    Logger.log(
-        LOG_LEVEL["debug"],
-        f'{YELLOW_BACK}MUDPI CACHE DUMP{FONT_RESET}'
-    )
-    for key in mudpi.cache.keys():
-        Logger.log(
-            LOG_LEVEL["debug"],
-            f"{FONT_YELLOW}{key}:{FONT_RESET} {mudpi.cache[key]}"
-        )
-
-    Logger.log(
-        LOG_LEVEL["debug"],
-        f'{YELLOW_BACK}MUDPI LOADED EXTENSIONS{FONT_RESET}'
-    )
-    for ext in mudpi.extensions.all():
-        ext = mudpi.cache.get("extension_importers", {}).get(ext)
-        Logger.log(
-            LOG_LEVEL["debug"],
-            f"Namespace: {FONT_YELLOW}{ext.namespace}{FONT_RESET}\n{ext.description}\n{ext.documentation}"
-        )      
-
-    if mudpi.components.all():
-        Logger.log(
-            LOG_LEVEL["debug"],
-            f'{YELLOW_BACK}MUDPI REGISTERED COMPONENTS{FONT_RESET}'
-        )
-        Logger.log(
-            LOG_LEVEL["debug"],
-            f"{'COMPONENT':<10}   {'ID':<20}   NAME\n{'':-<60}"
-        )
-        for comp in mudpi.components.all():
-            comp = mudpi.components.get(comp)
-            Logger.log(
-                LOG_LEVEL["debug"],
-                f"{comp.__class__.__name__:<10} | {comp.id:<20} | {comp.name}"
-            )
-
-    if mudpi.actions.all():
-        Logger.log(
-            LOG_LEVEL["debug"],
-            f'{YELLOW_BACK}MUDPI REGISTERED ACTIONS{FONT_RESET}'
-        )
-        Logger.log(
-            LOG_LEVEL["debug"],
-            f"{'ACTION CALL':<24}   {'ACTION':<20}   NAMESPACE\n{'':-<60}"
-        )
-        for namespace, actions in mudpi.actions.items():
-            for key, action in actions.items():
-                action_command = f"{namespace}.{key}" if namespace else key
-                Logger.log(
-                    LOG_LEVEL["debug"],
-                    f"{action_command:<24} | {key:<20} | {namespace}"
-                )                         
 
 if __name__ == "__main__":
     sys.exit(main())

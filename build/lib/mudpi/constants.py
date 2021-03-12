@@ -39,25 +39,15 @@ WEEKDAYS = {
 	"sat": 'Saturday',
 	"sun": 'Sunday' }
 
-""" EVENTS """
-EVENT_MUDPI_CLOSE = "mudpi_close"
-EVENT_MUDPI_START = "mudpi_start"
-EVENT_MUDPI_STARTED = "mudpi_started"
-EVENT_MUDPI_STARTING = "mudpi_starting"
-EVENT_MUDPI_STOP = "mudpi_stop"
-EVENT_MUDPI_STOPPING = "mudpi_stopping"
-EVENT_STATE_CHANGED = "state_changed"
-EVENT_TIME_CHANGED = "time_changed"
-EVENT_SUNSET = "sunset"
-EVENT_SUNRISE = "sunrise"
-EVENT_CALL_SERVICE = "call_service"
-
 
 #### Display Characters #####
 FONT_RESET_CURSOR = "\x1b[1F"
 FONT_RED = "\033[1;31m"
 FONT_GREEN = '\033[1;32m'
 FONT_YELLOW = "\033[1;33m"
+FONT_PURPLE = "\033[1;34m"
+FONT_MAGENTA = "\033[1;35m"
+FONT_CYAN = "\033[1;36m"
 FONT_RESET = "\x1b[0m"
 RED_BACK = "\x1b[41;37m"
 GREEN_BACK = "\x1b[42;30m"
@@ -101,34 +91,6 @@ CLASSIFIERS = [
 	CLASSIFIER_VOLTAGE
 ]
 
-""" STATES """
-STATE_UNKNOWN = "unknown"
-STATE_OK = "ok"
-STATE_ON = "on"
-STATE_OFF = "off"
-STATE_HOME = "home"
-STATE_AWAY = "away"
-STATE_OPEN = "open"
-STATE_OPENING = "opening"
-STATE_CLOSED = "closed"
-STATE_CLOSING = "closing"
-STATE_RUNNING = "running"
-STATE_STOPPED = "stopped"
-STATE_STOPPING = "stopping"
-STATE_PAUSED = "paused"
-STATE_IDLE = "idle"
-STATE_STANDBY = "standby"
-STATE_PENDING = "pending"
-STATE_LOCKED = "locked"
-STATE_UNLOCKED = "unlocked"
-STATE_UNAVAILABLE = "unavailable"
-STATE_PROBLEM = "problem"
-
-""" ATTRIBUTE NAMES """
-ATTR_FRIENDLY_NAME = "name"
-ATTR_KEY = "key"
-ATTR_ID = "uid"
-
 """ UNITS OF MEASUREMENT """
 IMPERIAL_SYSTEM = 1 
 METRIC_SYSTEM = 2
@@ -148,6 +110,9 @@ PERCENTAGE = "%"
 
 
 # #### API / SOCKET ####
+SOCKET_PORT = 7002
+SPROUT_PORT = 7003
+WS_PORT = 7004
 SERVER_PORT = 8080
 
 URL_ROOT = "/"

@@ -109,7 +109,7 @@ class Logger:
             Logger.logger.log_this(log_level, msg)
 
     @staticmethod
-    def log_formatted(log_level, message, status, status_level=None, padding=FONT_PADDING, spacer="."):
+    def log_formatted(log_level, message, status='', status_level=None, padding=FONT_PADDING, spacer="."):
         """ Log a formatted message with a status level """
         status_color = ''
         if status_level == 'success':

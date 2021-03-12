@@ -44,7 +44,7 @@ class MQTTAdaptor(Adaptor):
             self.callbacks[topic] = [callback]
         else:
             if callback not in self.callbacks[topic]:
-                self.callbacks[topic]
+                self.callbacks[topic].append(callback)
 
         def callback_handler(client, userdata, message):
             # log = f"{message.payload.decode()} {message.topic}"
