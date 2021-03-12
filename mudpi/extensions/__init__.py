@@ -199,6 +199,9 @@ class Component:
     """ Static Variable to Track Components """
     registered_components = {}
 
+    """ Variable suggestion to use for state """
+    _state = None
+
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         cls.registered_components[cls.__name__] = cls
