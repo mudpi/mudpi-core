@@ -106,8 +106,9 @@ class RTSPCamera(Camera):
                         int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
         if not self.size:
-            self._scale = (self._detected_size[0] - (self._detected_size[0] - self.width)) / self._detected_size[0]
-            self.size = (int(self._detected_size[0] * self._scale), int(self._detected_size[1] * self._scale))
+            if self._detected_size[0] > 0:
+                self._scale = (self._detected_size[0] - (self._detected_size[0] - self.width)) / self._detected_size[0]
+                self.size = (int(self._detected_size[0] * self._scale), int(self._detected_size[1] * self._scale))
 
         if not self.cap.isOpened():
             self.cap.open(str(self.source))

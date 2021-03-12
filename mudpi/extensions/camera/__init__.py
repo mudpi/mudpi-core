@@ -39,7 +39,7 @@ class Camera(Component):
     image_count = 0
 
     # Duration tracking. Set high to cause capture on first load
-    _duration_start = (60 * 60 * 24)
+    _duration_start = -(60 * 60 * 24)
 
     """ Properties """
     @property
