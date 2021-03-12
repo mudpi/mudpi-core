@@ -26,6 +26,7 @@ class Worker:
 
         self._worker_available = threading.Event()
         self._thread = None
+        self.init()
         self.mudpi.workers.register(self.key, self)
 
     """ Properties """
@@ -49,6 +50,10 @@ class Worker:
             self._worker_available.clear()
     
     """ Methods """
+    def init(self):
+        """ Called at end of __init__ for additonal setup """
+        pass
+
     def run(self, func=None):
         if not self._thread:
             self._thread = threading.Thread(target=self.work, args=(func,))
