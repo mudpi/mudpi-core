@@ -22,6 +22,9 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the dht config """
+        if config.get('key') is None:
+            raise ConfigError('Missing `key` in GPIO toggle config.')
+
         if config.get('pin') is None:
             raise ConfigError('Missing `pin` in GPIO toggle config.')
 
@@ -32,6 +35,8 @@ class Interface(BaseInterface):
                 "Please refer to "
                 "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
             )
+
+        return config
 
 
 class GPIOToggle(Toggle):

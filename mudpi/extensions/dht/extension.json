@@ -3,7 +3,7 @@
 	"namespace": "dht",
 	"details": {
 		"description": "Provides interface for DHT sensors to take climate readings.",
-		"documentation": "https://mudpi.app/docs/sensors/dht"
+		"documentation": "https://mudpi.app/docs/pi-sensors-humidity"
 	},
 	"requirements": ["adafruit-blinka", "adafruit-circuitpython-dht"]
 }

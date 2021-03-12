@@ -22,6 +22,9 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the control config """
+        if config.get('key') is None:
+            raise ConfigError('Missing `key` in example control.')
+            
         if config.get('pin') is None:
             raise ConfigError('Missing `pin` in GPIO config.')
 
