@@ -35,7 +35,7 @@ def decode_event_data(message):
                 return temp
             except Exception as error:
                 # print('Json Error. Str Found')
-                return {'event': 'Unknown', 'data': message}
+                return message.decode('utf-8') #{'event': 'Unknown', 'data': message}
         else:
             # print('Failed to detect type')
             return {'event': 'Unknown', 'data': message}
