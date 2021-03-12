@@ -287,6 +287,8 @@ class ExtensionImporter:
 
     def import_extension(self, config):
         """ Prepare and import the actual extension module """
+        disabled_cache = self.mudpi.cache.setdefault("disabled_namespaces", {})
+
         if self.mudpi.extensions.exists(self.namespace):
             # Extension already loaded
             self.extension = self.mudpi.extensions.get(self.namespace)
@@ -337,6 +339,7 @@ class ExtensionImporter:
             LOG_LEVEL["debug"], f"Initializing {self.namespace.title()}", "Pending", 'notice'
         )
         init_result = self.extension.init(validated_config)
+        
 
         if init_result:
             Logger.log_formatted(
