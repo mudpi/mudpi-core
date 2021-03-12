@@ -6,6 +6,7 @@
 """
 import time
 import datetime
+import threading
 from mudpi.extensions import Component, BaseExtension
 
 
@@ -34,7 +35,13 @@ class Toggle(Component):
 
     # State should be if the toggle is active or not
     _state = False
+
+    # Duration tracking
     _duration_start = time.perf_counter()
+
+    # Thread safe bool for if sequence is active
+    _active = threading.Event()
+    
 
     """ Properties """
     @property
@@ -70,14 +77,16 @@ class Toggle(Component):
 
     @property
     def active(self):
-        return self._active
+        """ Thread save active boolean """
+        return self._active.is_set()
 
     @active.setter
     def active(self, value):
-        self._active = bool(value)
-        _prev_duration = self.duration
-        self.reset_duration()
-        self.fire({"previous_duration": _prev_duration})
+        """ Allows `self.active = False` while still being thread safe """
+        if bool(value):
+            self._active.set()
+        else:
+            self._active.clear()
 
 
     """ Methods """
