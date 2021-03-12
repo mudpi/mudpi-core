@@ -22,6 +22,7 @@ class Extension(BaseExtension):
     update_interval = 30
 
     def init(self, config):
+        """ Setup the nodes for components """
         self.config = config
         self.nodes = {}
         self.connections = {}

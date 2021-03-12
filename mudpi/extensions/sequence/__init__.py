@@ -391,7 +391,7 @@ class Sequence(Component):
             except:
                 Logger.log(
                     LOG_LEVEL["info"],
-                    f"Error Decoding Message for Sequence {self.id}"
+                    f"Error Decoding Event for Sequence {self.id}"
                 )
 
     def trigger(self, value=None):
