@@ -1,9 +1,10 @@
-import socket
+
 import sys
-import threading
 import json
 import time
 import redis
+import socket
+import threading
 
 from logger.Logger import Logger, LOG_LEVEL
 	
