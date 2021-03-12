@@ -1,0 +1,9 @@
+{
+	"name": "Grow - A Friendly Display Name",
+	"namespace": "grow",
+	"details": {
+		"description": "Grow - a few words about the extension",
+		"documentation": "https://mudpi.app/docs/extending-mudpi"
+	},
+	"requirements": []
+}

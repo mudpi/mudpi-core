@@ -1,26 +1,72 @@
-
-        {
-            "name": "Nanpy GPIO D0",
-            "interface": "nanpy",
-            "node": "demo_box_1",
-            "key": "nanpy_gpio_d0",
-            "type": "gpio",
-            "pin":16
-        },
-        {
-            "name": "Nanpy GPIO D1",
-            "interface": "nanpy",
-            "node": "demo_box_1",
-            "key": "nanpy_gpio_d1",
-            "type": "gpio",
-            "pin":5
-        },
-        {
-            "name": "Nanpy GPIO A0",
-            "interface": "nanpy",
-            "node": "demo_box_1",
-            "key": "nanpy_gpio_a0",
-            "type": "gpio",
-            "analog": true,
-            "pin":0
-        }
+{
+"mudpi": {   
+    "name": "MudPi Nanpy Example",
+    "debug": false,
+},
+"sensor": [
+    {
+        "name": "Nanpy DHT",
+        "interface": "nanpy",
+        "node": "demo_box_1",
+        "key": "nanpy_dht_d3",
+        "type": "dht",
+        "pin": 2
+    }
+],
+"control": [
+    {
+        "name": "Nanpy Button D0",
+        "interface": "nanpy",
+        "node": "demo_box_1",
+        "key": "nanpy_button_d0",
+        "type": "button",
+        "pin": 16
+    },
+    {
+        "name": "Nanpy Switch D1",
+        "interface": "nanpy",
+        "node": "demo_box_1",
+        "key": "nanpy_switch_d1",
+        "type": "switch",
+        "pin": 5
+    },
+    {
+        "name": "Nanpy Potentiometer A0",
+        "interface": "nanpy",
+        "node": "demo_box_1",
+        "key": "nanpy_pot_a0",
+        "type": "potentiometer",
+        "pin": 0
+    }
+],
+"toggle": [
+    {
+        "name": "Nanpy LED GPIO 8",
+        "interface": "nanpy",
+        "node": "demo_box_1",
+        "key": "nanpy_toggle_d8",
+        "max_duration": 10,
+        "pin": 15
+    },
+    {
+        "key": "example_toggle_1",
+        "interface": "example"
+    }
+],
+"nanpy": [
+    {
+        "name": "Demo Box 1",
+        "key" : "demo_box_1",
+        "address": "192.168.2.150",
+        "use_wifi":true,
+        "controls":[
+            {
+                "pin":3,
+                "type":"switch",
+                "name":"Switch 1",
+                "key": "switch_1",
+                "topic": "garden/pi/controls/2"
+            }
+        ]
+    }
+]}
