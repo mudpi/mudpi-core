@@ -7,7 +7,6 @@
 import sys
 import json
 import time
-import redis
 import socket
 import threading
 from mudpi.workers import Worker
@@ -102,6 +101,8 @@ class SocketServer(Worker):
                     self._server_running = True
             time.sleep(0.1)
         self._server_ready.clear()
+        self.sock.close()
+        self._server.join()
         if len(self.client_threads) > 0:
             for client in self.client_threads:
                 client.join()
