@@ -1,9 +1,4 @@
-pycron
 redis
-picamera
-Adafruit_DHT
+paho-mqtt
+pyyaml
 adafruit-circuitpython-mcp3xxx
-adafruit-blinka
-adafruit-circuitpython-bme680
-https://github.com/olixr/nanpy/archive/master.zip
-git+https://github.com/olixr/Adafruit_CircuitPython_CharLCD.git#egg=adafruit-circuitpython-charlcd

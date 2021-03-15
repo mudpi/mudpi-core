@@ -1,0 +1,9 @@
+{
+	"name": "Automation Sequences",
+	"namespace": "sequence",
+	"details": {
+		"description": "Fire multiple actions in sequential order.",
+		"documentation": "https://mudpi.app/docs/sequences"
+	},
+	"requirements": []
+}

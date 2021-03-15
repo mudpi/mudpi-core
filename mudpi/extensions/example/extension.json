@@ -1,0 +1,8 @@
+{
+	"name": "Example",
+	"namespace": "example",
+	"details": {
+		"description": "Example components for testing and demontstration."
+	},
+	"requirements": []
+}

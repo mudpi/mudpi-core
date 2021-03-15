@@ -1,0 +1,9 @@
+{
+	"name": "Socket Server",
+	"namespace": "socket",
+	"details": {
+		"description": "Simple socket server to interface with MudPi",
+		"documentation": "https://mudpi.app/docs/socket"
+	},
+	"requirements": []
+}

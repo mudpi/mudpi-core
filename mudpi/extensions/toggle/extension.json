@@ -1,0 +1,9 @@
+{
+	"name": "Toggle",
+	"namespace": "toggle",
+	"details": {
+		"description": "Interfaces with components that can turn on and off.",
+		"documentation": "https://mudpi.app/docs/toggle"
+	},
+	"requirements": []
+}

@@ -1,0 +1,25 @@
+{
+"mudpi": {   
+    "name": "MudPi Example Sensor",
+    "debug": false,
+},
+"sensor": [
+    {
+        "interface": "example",
+        "update_interval": 10,
+        "key": "example_1",
+        "data": 3, 
+        "classifier": "light"
+    },
+    {   
+        "interface": "example",
+        "key": "example_two",
+        "data": 20, 
+        "classifier": "power"
+    },
+    {   
+        "interface": "example",
+        "key": "example_3",
+        "data": 5 
+    }
+]}

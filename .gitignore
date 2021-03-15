@@ -7,6 +7,7 @@ mudpi.config
 *.log
 # Python compiled
 __pycache__/
+*.egg-info
 
 # Virtual Environments
 .env

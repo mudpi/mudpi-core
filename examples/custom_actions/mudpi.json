@@ -1,0 +1,32 @@
+{
+"mudpi": {   
+    "name": "MudPi Actions Example",
+    "debug": false,
+},
+"action": [
+    {
+        "type": "event",
+        "name": "Display Warm Temps",
+        "key": "display_warm_temp",
+        "action": {"event":"Message", "data": {"message": "Warm Temperature\nCurrent: [dht_temperature]", "duration":10}},
+        "topic": "mudpi/lcd/1"
+    },
+    {
+        "type": "event",
+        "name": "An Example LCD Event",
+        "key": "example_lcd_event",
+        "event": "Message",
+        "data": {
+            "message": "System Last Boot\n[started_at]", 
+            "duration":10
+        },
+        "topic": "mudpi/lcd/1"
+    },
+    {
+        "type": "event",
+        "name": "Turn Valve Off",
+        "key": "turn_off_valve_2",
+        "topic": "garden/pi/relays/4",
+        "action": {"event":"Switch", "data": 0}
+    }
+]}

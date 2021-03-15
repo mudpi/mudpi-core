@@ -1,0 +1,8 @@
+{
+	"name": "Camera",
+	"namespace": "camera",
+	"details": {
+		"description": "Camera photo capture and streaming.",
+		"documentation": "https://mudpi.app/docs/camera"
+	}
+}

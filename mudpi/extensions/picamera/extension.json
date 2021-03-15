@@ -1,0 +1,9 @@
+{
+	"name": "Raspberry Pi Camera",
+	"namespace": "picamera",
+	"details": {
+		"description": "Camera module for Raspberry Pi",
+		"documentation": "https://mudpi.app/docs/camera/picamera"
+	},
+	"requirements": ["picamera"]
+}
