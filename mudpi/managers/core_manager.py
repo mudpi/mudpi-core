@@ -12,7 +12,7 @@ import time
 import redis
 from mudpi import importer, utils, core
 from mudpi.logger.Logger import Logger, LOG_LEVEL
-from mudpi.exceptions import ExtensionNotFound, RecursiveDependency, ConfigError, MudPiError
+from mudpi.exceptions import ExtensionNotFound, RecursiveDependency, ConfigError, MudPiError, ConfigNotFoundError
 from mudpi.constants import FONT_RESET, FONT_GREEN, FONT_RED, FONT_YELLOW, RED_BACK, YELLOW_BACK, FONT_PADDING
 
 class CoreManager:
