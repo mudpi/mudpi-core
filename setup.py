@@ -18,6 +18,6 @@ setup(
     install_requires=[
         "redis",
         "pyyaml",
-        "pycron"
+        "paho-mqtt"
     ]
 )
