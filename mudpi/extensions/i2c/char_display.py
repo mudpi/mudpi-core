@@ -49,10 +49,10 @@ class Interface(BaseInterface):
 
                 conf['address'] = addr
 
-            if not isinstance conf.get('columns', 16):
+            if not conf.get('columns', 16):
                 raise ConfigError('Missing `columns` must be an int.')
 
-            if not isinstance conf.get('rows', 2):
+            if not conf.get('rows', 2):
                 raise ConfigError('Missing `rows` must be an int.')
 
         return config

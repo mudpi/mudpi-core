@@ -55,10 +55,10 @@ class Interface(BaseInterface):
 
                 conf['address'] = addr
 
-            if not isinstance conf.get('columns', 16):
+            if not conf.get('columns', 16):
                 raise ConfigError('Missing `columns` must be an int.')
 
-            if not isinstance conf.get('rows', 2):
+            if not conf.get('rows', 2):
                 raise ConfigError('Missing `rows` must be an int.')
 
             if conf['type'].lower() not in ('gpio', 'i2c'):
@@ -95,7 +95,7 @@ class NanpyCharDisplay(CharDisplay):
         """ Check connection to node and lcd """
         if self.node.connected:
             if not self._lcd:
-                if self.type == 'i2c'
+                if self.type == 'i2c':
                     # PCF I2C Backpack
                     # [lcd_Addr, enable, Rw, Rs, d4, d5, d6, d7, backlighPin, pol]
                     pins = [0x27, 2, 1, 0, 4, 5, 6, 7, 3, 0]  

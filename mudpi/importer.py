@@ -345,6 +345,7 @@ class ExtensionImporter:
             Logger.log_formatted(
                 LOG_LEVEL["warning"], f"Initialized {self.namespace.title()}", "Success", 'success'
             )
+            self.extension.setup_complete = True
             # Call extension post init hook
             self.extension.extension_initialized(importer=self, validated_config=validated_config)
         else:
