@@ -1,0 +1,7 @@
+include README.md
+include *.json
+include *.yaml
+include *.yml
+include *.config
+include *.config.example
+include *.sh
