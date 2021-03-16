@@ -40,6 +40,11 @@ class Sensor(Component):
         """ Friendly name of control """
         return self.config.get('name') or f"{self.id.replace('_', ' ').title()}"
 
+    @property
+    def state(self):
+        """ Return state for the sensor """
+        return self._state
+
 
     """ Actions """
     def force_update(self, data=None):
