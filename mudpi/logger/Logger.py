@@ -15,7 +15,7 @@ LOG_LEVEL = {
 
 
 class Logger:
-    logger = None
+    logger = logging.getLogger("mudpi_stream")
 
     def __init__(self, config: dict):
         if "logging" in config.keys():
@@ -106,7 +106,7 @@ class Logger:
                     log_level = LOG_LEVEL[log_level]
                 else:
                     log_level = LOG_LEVEL['unknown']
-            Logger.logger.log_this(log_level, msg)
+            Logger.logger.log(log_level, msg)
 
     @staticmethod
     def log_formatted(log_level, message, status='', status_level=None, padding=FONT_PADDING, spacer="."):
