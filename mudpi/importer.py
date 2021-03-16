@@ -78,9 +78,9 @@ def get_extension_importer(mudpi, extension, install_requirements=False):
             'Ready', 'success'
         )
     else:
-        Logger.log_formatted(
-            "error", f'Import Preperations for {extension.title()}', 
-            'Failed', 'error'
+        Logger.log_formatted(LOG_LEVEL["debug"],
+            f'Import Preperations for {extension.title()}',
+            'error', 'error'
         )
         Logger.log(
                 LOG_LEVEL["debug"],
