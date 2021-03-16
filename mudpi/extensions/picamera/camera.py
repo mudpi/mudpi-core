@@ -87,7 +87,7 @@ class RaspberryPiCamera(Camera):
             self.increment_count()
             self.fire({'event': 'ImageCaptured', 'image': image_name})
 
-    def capture_recording(self, data={}:
+    def capture_recording(self, data={}):
         """ Record a video from the camera """
         _duration = data.get('duration', 5)
         if self.camera:

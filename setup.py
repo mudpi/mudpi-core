@@ -7,6 +7,8 @@ setup(
     author="Eric Davisson",
     author_email="eric@mudpi.app",
     url="https://mudpi.app",
+    include_package_data=True,
+    package_data={'': ['*.json', '*.yml', '*.config', '*.config.example', '*.sh']},
     packages=find_packages(exclude=['tools', 'tests', 'scripts', 'debug']),
     entry_points={
         'console_scripts': [
@@ -16,6 +18,6 @@ setup(
     install_requires=[
         "redis",
         "pyyaml",
-        "pycron"
+        "paho-mqtt"
     ]
 )

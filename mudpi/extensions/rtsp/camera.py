@@ -140,7 +140,6 @@ class RTSPCamera(Camera):
             
         self.fourcc = cv2.VideoWriter_fourcc(*'MP4V')
         _file_name = f'{os.path.join(self.path, self.filename)}.mp4'
-        print(_file_name)
         _writer = cv2.VideoWriter(_file_name, self.fourcc, self.framerate, self.size)
 
         _start = time.perf_counter()

@@ -109,7 +109,7 @@ class Toggle(Component):
     def fire(self, data={}):
         """ Fire a toggle event """
         event_data = {
-            'event': 'ToggleUpdate',
+            'event': 'ToggleUpdated',
             'component_id': self.id,
             'name': self.name,
             'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
