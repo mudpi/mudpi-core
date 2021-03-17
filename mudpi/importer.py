@@ -747,6 +747,10 @@ def _install_extension_requirements(mudpi, extension):
                 f'{FONT_YELLOW}{extension.namespace.title()}{FONT_RESET} requirements', 
                 'Installing', 'notice'
             )
+            Logger.log(
+                LOG_LEVEL["debug"],
+                f'Installing package {FONT_YELLOW}{requirement}{FONT_RESET}',
+            )
             if not utils.install_package(requirement):
                 Logger.log(
                     LOG_LEVEL["error"],
