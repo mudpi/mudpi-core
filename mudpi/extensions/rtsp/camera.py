@@ -90,7 +90,6 @@ class RTSPCamera(Camera):
                     self.capture_recording(duration=self.record_duration)
                 else:
                     self.capture_image()
-                print(f'Camera {self.id} time:{self.duration}')
                 self.reset_duration()
 
     def open_stream(self):
