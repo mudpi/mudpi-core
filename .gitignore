@@ -3,6 +3,7 @@ package-lock.json
 scripts/
 tests/
 img/
+build/
 mudpi.config
 *.log
 # Python compiled
