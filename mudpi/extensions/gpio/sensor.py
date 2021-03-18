@@ -59,7 +59,7 @@ class GPIOSensor(Sensor):
     @property
     def classifier(self):
         """ Classification further describing it, effects the data formatting """
-        return 'general'
+        return self.config.get('classifier', 'general')
 
 
     """ Methods """
