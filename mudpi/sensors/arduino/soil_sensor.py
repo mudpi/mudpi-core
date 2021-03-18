@@ -15,9 +15,9 @@ default_connection = SerialManager(device='/dev/ttyUSB0')
 
 # Wet Water = 287
 # Dry Air = 584
-AirBounds = 590;
-WaterBounds = 280;
-intervals = int((AirBounds - WaterBounds) / 3);
+AirBounds = 590
+WaterBounds = 280
+intervals = int((AirBounds - WaterBounds) / 3)
 
 
 class SoilSensor(Sensor):

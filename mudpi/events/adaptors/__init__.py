@@ -1,54 +1,54 @@
 class Adaptor:
-    """ Base adaptor for pubsub event system """
+	""" Base adaptor for pubsub event system """
 
-    # This key should represent key in configs that it will load form
-    key = None
-    
-    adaptors = {}
+	# This key should represent key in configs that it will load form
+	key = None
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        cls.adaptors[cls.key] = cls
+	adaptors = {}
 
-    def __init__(self, config={}):
-        self.config = config
+	def __init_subclass__(cls, **kwargs):
+		super().__init_subclass__(**kwargs)
+		cls.adaptors[cls.key] = cls
 
-    def connect(self):
-        """ Authenticate to system and cache connections """
-        raise NotImplementedError()
+	def __init__(self, config={}):
+		self.config = config
 
-    def disconnect(self):
-        """ Close active connections and cleanup subscribers """
-        raise NotImplementedError()
+	def connect(self):
+		""" Authenticate to system and cache connections """
+		raise NotImplementedError()
 
-    def subscribe(self, topic, callback):
-        """ Listen on a topic and pass event data to callback """
-        raise NotImplementedError()
+	def disconnect(self):
+		""" Close active connections and cleanup subscribers """
+		raise NotImplementedError()
 
-    def unsubscribe(self, topic):
-        """ Stop listening for events on a topic """
-        raise NotImplementedError()
+	def subscribe(self, topic, callback):
+		""" Listen on a topic and pass event data to callback """
+		raise NotImplementedError()
 
-    def publish(self, topic, data=None):
-        """ Publish an event on the topic """
-        raise NotImplementedError()
+	def unsubscribe(self, topic):
+		""" Stop listening for events on a topic """
+		raise NotImplementedError()
 
-    """ No need to override this unless necessary """
-    def subscribe_once(self, topic, callback):
-        """ Subscribe to topic for only one event """
-        def handle_once(data):
-            """ Wrapper to unsubscribe after event handled """
-            self.unsubscribe(topic)
-            if callable(callback):
-                # Pass data to real callback
-                callback(data)
+	def publish(self, topic, data=None):
+		""" Publish an event on the topic """
+		raise NotImplementedError()
 
-        return self.subscribe(topic, handle_once)
+	""" No need to override this unless necessary """
+	def subscribe_once(self, topic, callback):
+		""" Subscribe to topic for only one event """
+		def handle_once(data):
+			""" Wrapper to unsubscribe after event handled """
+			self.unsubscribe(topic)
+			if callable(callback):
+				# Pass data to real callback
+				callback(data)
 
-    def get_message(self):
-    	""" Some protocols need to initate a poll for new messages """
-    	pass
-    	
+		return self.subscribe(topic, handle_once)
+
+	def get_message(self):
+		""" Some protocols need to initate a poll for new messages """
+		pass
+
 # Import adaptors
 from . import redis, mqtt
 
