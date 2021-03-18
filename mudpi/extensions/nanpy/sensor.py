@@ -115,7 +115,7 @@ class NanpyGPIOSensor(Sensor):
     @property
     def pin(self):
         """ Return if gpio is digital or analog """
-        return self.config.get('pin')
+        return int(self.config.get('pin'))
 
     """ Methods """
     def init(self):

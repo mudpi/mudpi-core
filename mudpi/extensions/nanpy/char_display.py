@@ -116,7 +116,8 @@ class NanpyCharDisplay(CharDisplay):
         """ Control LCD display nanpy"""
         if self.node.connected:
             try:
-               super().update()
+                self.check_connection()
+                super().update()
             except (SerialManagerError, SocketManagerError,
                     BrokenPipeError, ConnectionResetError, OSError,
                     socket.timeout) as e:
