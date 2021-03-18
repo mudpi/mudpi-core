@@ -8,7 +8,7 @@ import sys
 default_connection = SerialManager()
 
 # Base sensor class to extend all other arduino sensors from.
-class Control():
+class Control:
 
     def __init__(self, pin, name=None, connection=default_connection, analog_pin_mode=False, key=None, redis_conn=None):
         self.pin = pin

@@ -7,7 +7,7 @@ from busio import I2C
 
 # PIN MODE : OUT | IN
 
-class Sensor():
+class Sensor:
 
     def __init__(self, address, name=None, key=None, redis_conn=None):
         self.address = address

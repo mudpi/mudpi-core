@@ -17,10 +17,10 @@ class T9602Sensor(Sensor):
         return
 
     def init_sensor(self):
-        '''This is the bus number : the 1 in "/dev/i2c-1"
+        """This is the bus number : the 1 in "/dev/i2c-1"
         I enforced it to 1 because there is only one on Raspberry Pi.
         We might want to add this parameter in i2c sensor config in the future.
-        We might encounter boards with several buses.'''
+        We might encounter boards with several buses."""
         self.bus = smbus.SMBus(1)
         return
 

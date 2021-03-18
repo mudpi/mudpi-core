@@ -224,4 +224,4 @@ def split_trigger_configs(config):
         else:
             _triggers.append(conf)
 
-    return (_triggers, _groups)
+    return _triggers, _groups

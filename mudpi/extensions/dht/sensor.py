@@ -9,6 +9,7 @@ import adafruit_dht
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
 from mudpi.exceptions import MudPiError, ConfigError
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 
 class Interface(BaseInterface):

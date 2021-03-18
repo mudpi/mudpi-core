@@ -282,7 +282,7 @@ class ExtensionImporter:
         else:
             extension = self.mudpi.extensions.get(interface_name)
 
-        return (interface, extension)
+        return interface, extension
 
 
     def import_extension(self, config):

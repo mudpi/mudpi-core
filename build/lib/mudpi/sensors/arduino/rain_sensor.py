@@ -47,17 +47,17 @@ class RainSensor(Sensor):
         return resistance
 
     def parseSensorReading(self, raw_data):
-        if (raw_data > MIST_BOUNDS):
+        if raw_data > MIST_BOUNDS:
             return 'No Rain'
-        elif (raw_data <= MIST_BOUNDS and raw_data > LIGHT_RAIN_BOUNDS):
+        elif MIST_BOUNDS >= raw_data > LIGHT_RAIN_BOUNDS:
             return 'Mist'
-        elif (raw_data <= LIGHT_RAIN_BOUNDS and raw_data > RAIN_BOUNDS):
+        elif LIGHT_RAIN_BOUNDS >= raw_data > RAIN_BOUNDS:
             return 'Light Rain'
-        elif (raw_data <= RAIN_BOUNDS and raw_data > HEAVY_RAIN_BOUNDS):
+        elif RAIN_BOUNDS >= raw_data > HEAVY_RAIN_BOUNDS:
             return 'Rain'
-        elif (raw_data <= HEAVY_RAIN_BOUNDS and raw_data > DOWNPOUR_BOUNDS):
+        elif HEAVY_RAIN_BOUNDS >= raw_data > DOWNPOUR_BOUNDS:
             return 'Heavy Rain'
-        elif (raw_data <= DOWNPOUR_BOUNDS):
+        elif raw_data <= DOWNPOUR_BOUNDS:
             return 'Downpour'
         else:
             return 'Bad Sensor Data'
@@ -66,7 +66,7 @@ class RainSensor(Sensor):
 if __name__ == '__main__':
     try:
         loop_count = 10
-        while (loop_count > 0):
+        while loop_count > 0:
             sensor = RainSensor(4)
             rainread = sensor.read()
             print('Rain: ', rainread)

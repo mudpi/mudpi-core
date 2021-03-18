@@ -7,7 +7,7 @@ from mudpi.constants import FONT_RESET, FONT_YELLOW
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 
-class StateManager():
+class StateManager:
     """
      A Central Manager to Control All States in MudPi.
 
@@ -109,7 +109,7 @@ class StateManager():
                 self.states[key] = _state
 
 
-class State():
+class State:
     """ 
     A Class for Stored State from Components
     """

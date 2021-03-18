@@ -144,7 +144,7 @@ class RTSPCamera(Camera):
         _writer = cv2.VideoWriter(_file_name, self.fourcc, self.framerate, self.size)
 
         _start = time.perf_counter()
-        while(self.cap.isOpened()):
+        while self.cap.isOpened():
             ret, frame = self.cap.read()
             if ret and frame is not None:
                 frame = cv2.resize(frame, self.size, interpolation = cv2.INTER_AREA)

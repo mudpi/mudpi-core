@@ -65,7 +65,7 @@ if __name__ == '__main__':
         loop_count = 10
         sensor = TemperatureSensor(2)
         sensor.init_sensor()
-        while (loop_count > 0):
+        while loop_count > 0:
             tempread = sensor.readAll()
             print('Temps: ', tempread)
             loop_count += 1

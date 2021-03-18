@@ -78,7 +78,7 @@ class ArduinoRelayWorker(Worker):
         if (self.config.get('restore_last_known_state',
                             None) is not None and self.config.get(
                 'restore_last_known_state', False) is True):
-            if (self.r.get(self.key + '_state')):
+            if self.r.get(self.key + '_state'):
                 self.api.digitalWrite(self.config['pin'], self.pin_state_on)
                 Logger.log(LOG_LEVEL["warning"],
                            'Restoring Relay \033[1;36m{0} On\033[0;0m'.format(

@@ -15,7 +15,7 @@ except:
 
 
 # Base sensor class to extend all other arduino sensors from.
-class Control():
+class Control:
 
     def __init__(self, pin, name=None, key=None, resistor=None, edge_detection=None, debounce=None, redis_conn=None):
         if key is None:

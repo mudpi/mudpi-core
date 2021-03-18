@@ -85,9 +85,9 @@ class DisplayWorker(Worker):
         # prepare sensor on specified pin
         self.i2c = busio.I2C(board.SCL, board.SDA)
 
-        if (self.model):
+        if self.model:
 
-            if (self.model.lower() == 'rgb'):
+            if self.model.lower() == 'rgb':
                 self.lcd = character_lcd.Character_LCD_RGB_I2C(
                     self.i2c,
                     self.columns,
@@ -95,7 +95,7 @@ class DisplayWorker(Worker):
                     self.address
                 )
 
-            elif (self.model.lower() == 'pcf'):
+            elif self.model.lower() == 'pcf':
                 self.lcd = character_lcd.Character_LCD_I2C(
                     self.i2c,
                     self.columns,

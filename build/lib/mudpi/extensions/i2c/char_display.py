@@ -106,7 +106,7 @@ class I2CCharDisplay(CharDisplay):
         # Prepare the display i2c connection
         self.i2c = busio.I2C(board.SCL, board.SDA)
 
-        if (self.model == 'rgb'):
+        if self.model == 'rgb':
             self.lcd = character_lcd.Character_LCD_RGB_I2C(
                 self.i2c,
                 self.columns,
@@ -114,7 +114,7 @@ class I2CCharDisplay(CharDisplay):
                 self.address
             )
 
-        elif (self.model == 'pcf'):
+        elif self.model == 'pcf':
             self.lcd = character_lcd.Character_LCD_I2C(
                 self.i2c,
                 self.columns,

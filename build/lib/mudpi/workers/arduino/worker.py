@@ -12,7 +12,7 @@ from logger.Logger import Logger, LOG_LEVEL
 
 # Base Worker Class
 # A worker is responsible for handling its set of operations and running on a thread
-class Worker():
+class Worker:
     def __init__(self, config, main_thread_running, system_ready):
         self.config = config
         try:

@@ -10,7 +10,7 @@ from mudpi.events import adaptors
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 
-class EventSystem():
+class EventSystem:
     """ Main event manager that loads adaptors 
         and coordinates the bus operations. """
 

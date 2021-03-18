@@ -17,7 +17,7 @@ class Interface(BaseInterface):
         # Check for test messages to fill the queue with
         if config.get('messages'):
             _count = 0
-            while(_count < display.message_limit):
+            while _count < display.message_limit:
                 for msg in config['messages']:
                     display.add_message({'message': msg})
                     _count +=1
