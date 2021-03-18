@@ -176,7 +176,7 @@ class Camera(Component):
         """ Update the image counter """
         self.image_count +=1
         if self.image_count > self.max_count:
-            self.image_count = 0 # overflow
+            self.image_count = self.count_start # overflow
 
 
     """ Actions """

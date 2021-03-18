@@ -120,7 +120,7 @@ class ActionRegistry(Registry):
             parsed_action['action'] = action_call
         return parsed_action
 
-    def call(self, action_call, namespace=None, action_data={}):
+    def call(self, action_call, action_data={}):
         """ Call an action from the registry 
             Format: {namespace}.{action} or 
                     {namespace}.{component}.{action}
@@ -132,7 +132,7 @@ class ActionRegistry(Registry):
         validated_data = action.validate(action_data)
         if not validated_data and action_data:
             raise MudPiError("Action data was not valid!")
-        self.mudpi.events.publish('core', {'event': 'ActionCall', 'action': action_call, 'data': action_data, 'namespace': namespace or command['namespace']})
+        self.mudpi.events.publish('core', {'event': 'ActionCall', 'action': action_call, 'data': action_data, 'namespace': command['namespace']})
         action(data=validated_data)
 
 

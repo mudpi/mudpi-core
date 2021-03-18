@@ -55,7 +55,7 @@ class NanpyGPIOToggle(Toggle):
     @property
     def pin(self):
         """ The GPIO pin """
-        return self.config.get('pin')
+        return int(self.config.get('pin'))
 
 
     """ Methods """

@@ -44,7 +44,9 @@ class Interface(BaseInterface):
 
             if conf.get('pin') is None:
                 raise ConfigError(f'Missing `pin` in Nanpy control {conf["key"]} config. You need to add a pin.')
-
+            else:
+                conf['pin'] = int(conf['pin'])
+                
             if not conf.get('type'):
                 # Default to the button type
                 conf['type'] = 'button'
