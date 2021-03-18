@@ -150,7 +150,7 @@ class Sequence(Component):
     def topic(self):
         """ Return the topic to listen on """
         return self.config.get('topic', '').replace(" ", "/").lower() if self.config.get(
-            'topic') is not None else f'mudpi/sequences/{self.id}'
+            'topic') is not None else f'{NAMESPACE}/{self.id}'
     
 
     """ Methods """
