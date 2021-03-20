@@ -5,6 +5,7 @@
     turning things on like lights or pumps. 
 """
 import re
+import time
 import board
 import digitalio
 from mudpi.extensions import BaseInterface
@@ -34,7 +35,7 @@ class Interface(BaseInterface):
                 raise ConfigError('Missing `pin` in GPIO toggle config.')
 
             conf['pin'] = str(conf['pin'])
-            
+
             if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
                 raise ConfigError(
                     "Cannot detect pin type (Digital or analog), "

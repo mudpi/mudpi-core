@@ -9,6 +9,7 @@ import redis
 from mudpi.utils import decode_event_data
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.exceptions import MudPiError, ConfigError
 
 
