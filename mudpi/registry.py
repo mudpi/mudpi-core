@@ -145,7 +145,7 @@ class ActionRegistry(Registry):
                 _data = event_data
             action = _data.get('action')
             if action:
-                return self.call(action, _data.get('namespace'), _data.get('data', {}))
+                return self.call(action, _data.get('data', {}))
 
 class Action:
     """ A callback associated with a string """

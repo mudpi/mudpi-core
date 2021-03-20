@@ -53,6 +53,8 @@ class DHTSensor(Sensor):
     """ DHT Sensor
         Returns a random number
     """
+    
+    _sensor = None
 
     """ Properties """
     @property
@@ -105,6 +107,10 @@ class DHTSensor(Sensor):
             Logger.log(
                 LOG_LEVEL["error"],
                 'Sensor Initialize Error: DHT Failed to Init'
+            )
+            Logger.log(
+                LOG_LEVEL["debug"],
+                error
             )
             return False
         return True
