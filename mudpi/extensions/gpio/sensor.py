@@ -21,16 +21,20 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the dht config """
-        if not config.get('pin'):
-            raise ConfigError('Missing `pin` in GPIO config.')
+        if not isinstance(config, list):
+            config = [config]
 
-        if not re.match(r'D\d+$', config['pin']) and not re.match(r'A\d+$', config['pin']):
-            raise ConfigError(
-                "Cannot detect pin type (Digital or analog), "
-                "should be D## or A## for digital or analog. "
-                "Please refer to "
-                "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
-            )
+        for conf in config:
+            if not conf.get('pin'):
+                raise ConfigError('Missing `pin` in GPIO config.')
+
+            if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
+                raise ConfigError(
+                    "Cannot detect pin type (Digital or analog), "
+                    "should be D## or A## for digital or analog. "
+                    "Please refer to "
+                    "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
+                )
             
         return config
 

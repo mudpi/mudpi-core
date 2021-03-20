@@ -468,6 +468,7 @@ class Sequence(Component):
                             thresholds_passed = False
                 else:
                 # Data was null 
+                    comparison = threshold.get("comparison", "eq")
                     # Comparison if data not exists
                     if comparison == "nex":
                         thresholds_passed = True

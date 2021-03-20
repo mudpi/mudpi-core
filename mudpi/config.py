@@ -139,7 +139,7 @@ class Config(object):
             Config: Dict of data to write to file (Default: self)
         """
         if file is not None:
-            file = self.validate_file(file)
+            file = self.validate_file(file, exists=False)
         else:
             file = self.path(DEFAULT_CONFIG_FILE)
 
@@ -157,10 +157,12 @@ class Config(object):
             f.write(config)
         return True
 
-    def validate_file(self, file):
-        """ Validate a file path and return a prepared path to save """
+    def validate_file(self, file, exists=True):
+        """ Validate a file path and return a prepared path to save 
+            Set exists to False to prevent file exists check
+        """
         if '.'  in file:
-            if not self.file_exists(file):
+            if not self.file_exists(file) and exists:
                 raise ConfigNotFoundError(f"The config path {file} does not exist.")
                 return False
             extensions = ['.config', '.json', '.yaml', '.conf']

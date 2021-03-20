@@ -34,7 +34,7 @@ def main(args=None):
         if os.path.exists(config_location) and not arguments.overwrite:
             print(f'{FONT_RED}{"File already exists and `--overwrite` was not set."}{FONT_RESET}')
             return
-        Config().save_to_file(config_path)
+        Config().save_to_file(config_location)
         return
 
     #######################

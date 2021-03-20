@@ -22,19 +22,23 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the dht config """
-        if config.get('key') is None:
-            raise ConfigError('Missing `key` in GPIO toggle config.')
+        if not isinstance(config, list):
+            config = [config]
 
-        if config.get('pin') is None:
-            raise ConfigError('Missing `pin` in GPIO toggle config.')
+        for conf in config:
+            if conf.get('key') is None:
+                raise ConfigError('Missing `key` in GPIO toggle config.')
 
-        if not re.match(r'D\d+$', config['pin']) and not re.match(r'A\d+$', config['pin']):
-            raise ConfigError(
-                "Cannot detect pin type (Digital or analog), "
-                "should be D## or A## for digital or analog. "
-                "Please refer to "
-                "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
-            )
+            if conf.get('pin') is None:
+                raise ConfigError('Missing `pin` in GPIO toggle config.')
+
+            if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
+                raise ConfigError(
+                    "Cannot detect pin type (Digital or analog), "
+                    "should be D## or A## for digital or analog. "
+                    "Please refer to "
+                    "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
+                )
 
         return config
 
