@@ -75,6 +75,11 @@ class DHTSensor(Sensor):
         """ Classification further describing it, effects the data formatting """
         return 'climate'
 
+    @property
+    def type(self):
+        """ Classification further describing it, effects the data formatting """
+        return self.config.get('model', '11')
+
 
     """ Methods """
     def init(self):
