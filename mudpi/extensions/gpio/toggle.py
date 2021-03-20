@@ -33,6 +33,8 @@ class Interface(BaseInterface):
             if conf.get('pin') is None:
                 raise ConfigError('Missing `pin` in GPIO toggle config.')
 
+            conf['pin'] = str(conf['pin'])
+            
             if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
                 raise ConfigError(
                     "Cannot detect pin type (Digital or analog), "
