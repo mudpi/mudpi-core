@@ -60,8 +60,10 @@ def install_package(package, upgrade=False, target=None):
 def is_package_installed(package):
     """ Check if a package is already installed """
     reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
-
-    installed_packages = [r.decode().split('==')[0].lower() for r in reqs.split()]
+    if '==' not in package:
+        installed_packages = [r.decode().split('==')[0].lower() for r in reqs.split()]
+    else:
+        installed_packages = [r.decode().lower() for r in reqs.split()]
 
     return package in installed_packages
 
