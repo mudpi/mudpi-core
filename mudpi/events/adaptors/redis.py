@@ -32,8 +32,12 @@ class RedisAdaptor(Adaptor):
 
         def callback_handler(message):
             """ callback handler to allow multiple hanlders on one topic """
-            if message["channel"] in self.callbacks:
-                for callbk in self.callbacks[message["channel"]]:
+            try:
+                _topic = message["channel"].decode('utf-8')
+            except Exception as error:
+                _topic = message["channel"]
+            if _topic in self.callbacks:
+                for callbk in self.callbacks[_topic]:
                     callbk(message)
 
         return self.pubsub.subscribe(**{topic: callback_handler})
