@@ -154,7 +154,7 @@ class CharDisplay(Component):
     def add_message(self, data={}):
         """ Add message to display queue """
         message = data.get('message', '')
-        duration = data.get('duration', self.default_duration)
+        duration = int(data.get('duration', self.default_duration))
         if duration > self.max_duration:
             duration = self.max_duration
 
@@ -173,7 +173,7 @@ class CharDisplay(Component):
                     data = json.loads(state.state)
                 except Exception:
                     data = ''
-            message = message.replace('[' + code + ']', str(data))
+            message = str(message).replace('[' + code + ']', str(data))
 
         new_message = {
             "message": message.replace("\\n", "\n"),
@@ -212,11 +212,11 @@ class CharDisplay(Component):
                     if _event.get('data', None):
                         _duration = _event['data'].get('duration', self.default_duration)
                         _message = _event['data'].get('message', '')
-                        self.add_message(_message, int(_duration))
+                        self.add_message(_event['data'])
                 elif _event['event'] == 'Clear':
                     self.clear()
                 elif _event['event'] == 'ClearQueue':
                     self.clear_queue()
-            except Exception:
+            except Exception as error:
                 Logger.log(LOG_LEVEL["error"],
                            f'Error Handling Event for {self.id}')
