@@ -77,15 +77,14 @@ class DHTSensor(Sensor):
 
     @property
     def type(self):
-        """ Classification further describing it, effects the data formatting """
-        return self.config.get('model', '11')
+        """ Model of the device """
+        return str(self.config.get('model', '11'))
 
 
     """ Methods """
     def init(self):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.config['pin'])
-        self.type = self.config['model']
 
         sensor_types = {
             '11': adafruit_dht.DHT11,
