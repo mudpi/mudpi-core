@@ -4,6 +4,7 @@
     toggle output on and off. Useful for 
     turning things on like lights or pumps. 
 """
+import re
 import board
 import digitalio
 from mudpi.extensions import BaseInterface

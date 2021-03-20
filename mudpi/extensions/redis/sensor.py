@@ -141,7 +141,8 @@ class RedisSensor(Sensor):
         if self._conn:
             if self.type == 'state':
                 _data = self._conn.get(self.state_key)
-                self._state = _data.decode('utf-8')
+                if _data:
+                    self._state = _data.decode('utf-8')
             else:
                 self.bus.get_message()
             if self.expired:

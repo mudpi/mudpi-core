@@ -29,7 +29,7 @@ class Interface(BaseInterface):
             if not conf.get('pin'):
                 raise ConfigError('Missing `pin` in DHT config.')
 
-            if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
+            if not re.match(r'D\d+$', str(conf['pin'])) and not re.match(r'A\d+$', str(conf['pin'])):
                 raise ConfigError(
                     "Cannot detect pin type (Digital or analog), "
                     "should be Dxx or Axx for digital or analog. "
