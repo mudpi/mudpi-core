@@ -43,9 +43,7 @@ class Interface(BaseInterface):
 
                 # Convert hex string/int to actual hex
                 if isinstance(addr, str):
-                    addr = hex(int(addr, 39))
-                elif isinstance(addr, int):
-                    addr = hex(addr)
+                    addr = int(addr, 16)
 
                 conf['address'] = addr
 
@@ -113,7 +111,6 @@ class I2CCharDisplay(CharDisplay):
                 self.rows,
                 self.address
             )
-
         elif (self.model == 'pcf'):
             self.lcd = character_lcd.Character_LCD_I2C(
                 self.i2c,

@@ -40,7 +40,7 @@ class Toggle(Component):
     _duration_start = time.perf_counter()
 
     # Thread safe bool for if sequence is active
-    _active = threading.Event()
+    _active = False #threading.Event()
     
 
     """ Properties """
@@ -78,15 +78,15 @@ class Toggle(Component):
     @property
     def active(self):
         """ Thread save active boolean """
-        return self._active.is_set()
+        return self._active #self._active.is_set()
 
     @active.setter
     def active(self, value):
         """ Allows `self.active = False` while still being thread safe """
         if bool(value):
-            self._active.set()
+            self._active = True #self._active.set()
         else:
-            self._active.clear()
+            self._active = False #self._active.clear()
 
 
     """ Methods """
@@ -94,7 +94,7 @@ class Toggle(Component):
         """ Update doesn't actually update the state 
             but is instead used for failsafe checks and 
             event detection. """
-        if self.max_duration:
+        if self.max_duration is not None:
             if self.active:
                 if self.duration > self.max_duration:
                     # Failsafe cutoff duration

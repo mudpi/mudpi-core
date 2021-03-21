@@ -105,8 +105,8 @@ class GPIOToggle(Toggle):
         if self.mudpi.is_prepared:
             # Do inverted check and change value before setting active 
             # to avoid false state being provided in the event fired.
-            self.gpio_pin.value = self.pin_state_on if not self.active else self.pin_state_off
             self.active = not self.active
+            self.gpio_pin.value = self.pin_state_on if self.active else self.pin_state_off
             self.store_state()
 
     def turn_on(self, data={}):
