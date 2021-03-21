@@ -56,7 +56,7 @@ class GPIOToggle(Toggle):
     @property
     def state(self):
         """ Return the state of the component (from memory, no IO!) """
-        return self.gpio_pin.value
+        return self.active
 
     @property
     def pin(self):
