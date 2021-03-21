@@ -96,6 +96,16 @@ class CharDisplay(Component):
         self._current_duration = time.perf_counter() - self._duration_start
         return round(self._current_duration, 4)
 
+    @property
+    def rows(self):
+        """ Return number of rows """
+        return int(self.config.get('rows', 2))
+
+    @property
+    def columns(self):
+        """ Return number of columns """
+        return int(self.config.get('columns', 16))
+
 
     """ Actions """
     def show(self, data=None): 
