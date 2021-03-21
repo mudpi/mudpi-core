@@ -101,7 +101,7 @@ class Action:
     """ Internal Methods """
     def _emit_event(self):
         """ Emit an event """
-        self.mudpi.events.publish(self.topic, json.dumps(self.action))
+        self.mudpi.events.publish(self.topic, self.action)
         return
 
     def _run_command(self, value=None):
