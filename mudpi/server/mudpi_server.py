@@ -106,7 +106,7 @@ if __name__ == "__main__":
 	system_ready = threading.Event()
 	system_ready.set()
 	server = MudpiServer(config, system_ready)
-	server.listen();
+	server.listen()
 	try:
 		while system_ready.is_set():
 			time.sleep(1)

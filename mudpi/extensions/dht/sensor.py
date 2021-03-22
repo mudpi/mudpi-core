@@ -3,13 +3,13 @@
     Connects to a DHT device to get
     humidity and temperature readings. 
 """
-import re
-import board
 import adafruit_dht
+import board
+
+from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
 from mudpi.logger.Logger import Logger, LOG_LEVEL
-from mudpi.exceptions import MudPiError, ConfigError
 
 
 class Interface(BaseInterface):
@@ -30,14 +30,6 @@ class Interface(BaseInterface):
             if not conf.get('pin'):
                 raise ConfigError('Missing `pin` in DHT config.')
 
-            if not re.match(r'D\d+$', str(conf['pin'])) and not re.match(r'A\d+$', str(conf['pin'])):
-                raise ConfigError(
-                    "Cannot detect pin type (Digital or analog), "
-                    "should be Dxx or Axx for digital or analog. "
-                    "Please refer to "
-                    "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
-                )
-
             valid_models = ['11', '22', '2302']
             if conf.get('model') not in valid_models:
                 conf['model'] = '11'
@@ -45,7 +37,7 @@ class Interface(BaseInterface):
                     LOG_LEVEL["warning"],
                     'Sensor Model Error: Defaulting to DHT11'
                 )
-            
+
         return config
 
 
@@ -53,10 +45,7 @@ class DHTSensor(Sensor):
     """ DHT Sensor
         Returns a random number
     """
-    
-    _sensor = None
 
-    """ Properties """
     @property
     def id(self):
         """ Return a unique id for the component """
@@ -66,7 +55,7 @@ class DHTSensor(Sensor):
     def name(self):
         """ Return the display name of the component """
         return self.config.get('name') or f"{self.id.replace('_', ' ').title()}"
-    
+
     @property
     def state(self):
         """ Return the state of the component (from memory, no IO!) """
@@ -86,7 +75,15 @@ class DHTSensor(Sensor):
     """ Methods """
     def init(self):
         """ Connect to the device """
-        self.pin_obj = getattr(board, self.config['pin'])
+        try:
+            self.pin_obj = getattr(board, self.config['pin'])
+        except AttributeError:
+            raise ConfigError(
+                "Seem like the pin does not exists"
+                "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
+            )
+
+        self.type = self.config['model']
 
         sensor_types = {
             '11': adafruit_dht.DHT11,
@@ -122,7 +119,7 @@ class DHTSensor(Sensor):
 
         try:
             # Calling temperature or humidity triggers measure()
-            temperature_c = self._sensor.temperature 
+            temperature_c = self._sensor.temperature
             humidity = self._sensor.humidity
         except RuntimeError as error:
             # Errors happen fairly often, DHT's are hard to read

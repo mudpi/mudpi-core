@@ -1,8 +1,9 @@
 import os
 import json
 import yaml
-from mudpi.constants import (FONT_YELLOW, RED_BACK, FONT_RESET, IMPERIAL_SYSTEM, PATH_MUDPI, PATH_CONFIG, DEFAULT_CONFIG_FILE)
-from mudpi.exceptions import ConfigNotFoundError, ConfigError
+from mudpi.constants import (FONT_YELLOW, RED_BACK, FONT_RESET, IMPERIAL_SYSTEM, PATH_MUDPI,
+                             PATH_CONFIG, DEFAULT_CONFIG_FILE)
+from mudpi.exceptions import ConfigNotFoundError, ConfigError, ConfigFormatError
 
 
 class Config(object):
@@ -11,14 +12,16 @@ class Config(object):
     A class to represent the MudPi configuration that 
     is typically pulled from a file.
     """
+
     def __init__(self, config_path=None):
         self.config_path = config_path or os.path.abspath(os.path.join(os.getcwd(), PATH_CONFIG))
-        
+
         self.config = {}
         self.set_defaults()
 
 
     """ Properties """
+
     @property
     def name(self):
         return self.config.get('mudpi', {}).get('name', 'MudPi')
@@ -35,8 +38,8 @@ class Config(object):
     def debug(self, value):
         self.config.setdefault('mudpi', {})['debug'] = value
 
-
     """ Methods """
+
     def path(self, *path):
         """ Returns path relative to the config folder. """
         return os.path.join(self.config_path, *path)
@@ -122,7 +125,8 @@ class Config(object):
             self.config = json.loads(json_data)
             return self.config
         except Exception as e:
-            print(f'{RED_BACK}Problem loading configs from JSON {FONT_RESET}\n{FONT_YELLOW}{e}{FONT_RESET}\r')
+            print(
+                f'{RED_BACK}Problem loading configs from JSON {FONT_RESET}\n{FONT_YELLOW}{e}{FONT_RESET}\r')
 
     def load_from_yaml(self, yaml_data):
         """ Load configs from YAML """
@@ -130,7 +134,8 @@ class Config(object):
             self.config = yaml.load(yaml_data, yaml.FullLoader)
             return self.config
         except Exception as e:
-            print(f'{RED_BACK}Problem loading configs from YAML {FONT_RESET}\n{FONT_YELLOW}{e}{FONT_RESET}\r')
+            print(
+                f'{RED_BACK}Problem loading configs from YAML {FONT_RESET}\n{FONT_YELLOW}{e}{FONT_RESET}\r')
 
     def save_to_file(self, file=None, format=None, config=None):
         """ Save current configs to a file 
@@ -158,17 +163,18 @@ class Config(object):
         return True
 
     def validate_file(self, file, exists=True):
-        """ Validate a file path and return a prepared path to save 
+        """ Validate a file path and return a prepared path to save
             Set exists to False to prevent file exists check
         """
         if '.'  in file:
             if not self.file_exists(file) and exists:
                 raise ConfigNotFoundError(f"The config path {file} does not exist.")
-                return False
+
             extensions = ['.config', '.json', '.yaml', '.conf']
+
             if not any([file.endswith(extension) for extension in extensions]):
-                raise ConfigFormatError("An unknown config file format was provided in the config path.")
-                return False
+                raise ConfigFormatError(
+                    "An unknown config file format was provided in the config path.")
         else:
             # Path provided but not file
             file = os.path.join(file, DEFAULT_CONFIG_FILE)
@@ -176,6 +182,8 @@ class Config(object):
 
     def config_format(self, file):
         """ Returns the file format if supported """
+
+        config_format = None
         if '.' in file:
             if any(extension in file for extension in ['.config', '.json', '.conf']):
                 config_format = 'json'

@@ -4,6 +4,7 @@
     take analog or digital readings. 
 """
 import re
+
 import board
 import digitalio
 from mudpi.extensions import BaseInterface
@@ -22,12 +23,8 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the dht config """
-        if not isinstance(config, list):
-            config = [config]
-
-        for conf in config:
-            if not conf.get('pin'):
-                raise ConfigError('Missing `pin` in GPIO config.')
+        if not config.get('pin'):
+            raise ConfigError('Missing `pin` in GPIO config.')
 
             if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
                 raise ConfigError(
