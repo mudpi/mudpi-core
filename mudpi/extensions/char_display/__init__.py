@@ -207,7 +207,11 @@ class CharDisplay(Component):
 
     def handle_event(self, event):
         """ Handle events from event system """
-        data = event['data']
+        try:
+            data = event['data'].decode('utf-8')
+        except Exception as error:
+            data = event['data']
+            
         if data is not None:
             _event = decode_event_data(data)
             try:
