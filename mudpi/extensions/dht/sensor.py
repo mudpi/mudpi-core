@@ -4,6 +4,7 @@
     humidity and temperature readings. 
 """
 import re
+import time
 import board
 import adafruit_dht
 from mudpi.constants import METRIC_SYSTEM
@@ -157,6 +158,6 @@ class DHTSensor(Sensor):
                     LOG_LEVEL["error"],
                     f'DHT Reading was Invalid. Attempt {_attempts+1}/{self.read_attempts}'
                 )
-
+            time.sleep(1)
             _attempts +=1
         return None
