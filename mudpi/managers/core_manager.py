@@ -10,6 +10,7 @@ import os
 import sys
 import time
 import redis
+import socket
 from mudpi import importer, utils, core
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.exceptions import ExtensionNotFound, RecursiveDependency, ConfigError, MudPiError, ConfigNotFoundError
@@ -259,3 +260,7 @@ class CoreManager:
                     )
 
         print(f'{"":_<{FONT_PADDING+8}}')
+
+    def shutdown(self):
+        """ Shutdown MudPi and cleanup """
+        self.mudpi.shutdown()

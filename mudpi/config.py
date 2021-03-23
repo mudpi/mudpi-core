@@ -35,6 +35,10 @@ class Config(object):
     def debug(self, value):
         self.config.setdefault('mudpi', {})['debug'] = value
 
+    @property
+    def unit_system(self):
+        return self.config.get('mudpi', {}).get('unit_system', 'imperial').lower()
+
 
     """ Methods """
     def path(self, *path):

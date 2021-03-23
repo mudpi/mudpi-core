@@ -37,7 +37,7 @@ class Extension(BaseExtension):
                 self.servers[key] = SocketServer(self.mudpi, conf)
 
         self.cache['servers'] = servers
-        
+
         # self.manager.register_component_actions('shutdown', action='shutdown')
         return True
 
@@ -103,7 +103,9 @@ class SocketServer(Worker):
                     self._server_running = True
             time.sleep(0.1)
         self._server_ready.clear()
-        self.sock.close()
+        # Connect a client to prevent hanging on accept()
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((self.host, self.port))
         self._server.join()
         if len(self.client_threads) > 0:
             for client in self.client_threads:
