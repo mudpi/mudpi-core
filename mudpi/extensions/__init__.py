@@ -190,17 +190,8 @@ class Component:
     """ Configuration dict passed in at init() """
     config = {}
 
-    """ Set to true after the component completes `init()` """
-    setup_complete = False
-
-    """ Time it takes to complete one cycle, used to find slow components """
-    processing_time = None
-
     """ Static Variable to Track Components """
     registered_components = {}
-
-    """ Variable suggestion to use for state """
-    _state = None
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -214,6 +205,20 @@ class Component:
         """
         self.mudpi = mudpi
         self.config = config
+
+        """ Set to true after the component completes `init()` """
+        self.setup_complete = False
+
+        """ Time it takes to complete one cycle, used to find slow components """
+        self.processing_time = None
+
+        """ Variable suggestion to use for state """
+        self._state = None
+
+        # Developer _init so users don't need to call super().init()
+        self._init()
+
+        # Init hook for components
         self.init()
 
     """ Properties 
@@ -296,6 +301,12 @@ class Component:
     """ INTERNAL METHODS: DO NOT OVERRIDE! 
         These methods and properties are used internally.
     """
+    def _init(self):
+        """ Used for additional setup tasks. 
+            This is used by developers to hook into
+            __init__ instead of using the init() """
+        pass
+
     def store_state(self):
         """ Stores the current state into the MudPi state managers """
         if self.mudpi is None:

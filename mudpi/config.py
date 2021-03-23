@@ -19,7 +19,6 @@ class Config(object):
         self.config = {}
         self.set_defaults()
 
-
     """ Properties """
 
     @property
@@ -38,7 +37,9 @@ class Config(object):
     def debug(self, value):
         self.config.setdefault('mudpi', {})['debug'] = value
 
-    """ Methods """
+    @property
+    def unit_system(self):
+        return self.config.get('mudpi', {}).get('unit_system', 'imperial').lower()
 
     def path(self, *path):
         """ Returns path relative to the config folder. """
@@ -166,7 +167,7 @@ class Config(object):
         """ Validate a file path and return a prepared path to save
             Set exists to False to prevent file exists check
         """
-        if '.'  in file:
+        if '.' in file:
             if not self.file_exists(file) and exists:
                 raise ConfigNotFoundError(f"The config path {file} does not exist.")
 
@@ -191,8 +192,8 @@ class Config(object):
                 config_format = 'yaml'
         else:
             config_format = None
-        
-        return config_format 
+
+        return config_format
 
     def get(self, key, default=None, replace_char=None):
         """ Get an item from the config with a default 

@@ -33,16 +33,6 @@ class Toggle(Component):
         Base Toggle for all toggle interfaces
     """
 
-    # State should be if the toggle is active or not
-    _state = False
-
-    # Duration tracking
-    _duration_start = time.perf_counter()
-
-    # Thread safe bool for if sequence is active
-    _active = False #threading.Event()
-    
-
     """ Properties """
     @property
     def id(self):
@@ -144,3 +134,16 @@ class Toggle(Component):
         """ Turn off the device """
         self.active = False
         return self.active
+
+    """ Internal Methods 
+    Do not override """
+    def _init(self):
+        """ Initialize toggle default settings """
+        # State should be if the toggle is active or not
+        self._state = False
+
+        # Duration tracking
+        self._duration_start = time.perf_counter()
+
+        # Thread safe bool for if sequence is active
+        self._active = False #threading.Event()
