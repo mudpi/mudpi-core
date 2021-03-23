@@ -6,6 +6,7 @@
 import socket
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
+from mudpi.constants import IMPERIAL_SYSTEM
 from nanpy import (ArduinoApi, SerialManager, DHT)
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 from nanpy.serialmanager import SerialManagerError
@@ -209,7 +210,8 @@ class NanpyDHTSensor(Sensor):
             try:
                 self.check_connection()
                 if self._dht:
-                    temperature = self._dht.readTemperature(True)
+                    _temp_format = bool(self.mudpi.unit_system == IMPERIAL_SYSTEM)
+                    temperature = self._dht.readTemperature(_temp_format)
                     humidity = self._dht.readHumidity()
                     data = {'temperature': round(temperature, 2),
                             'humidity': round(humidity, 2)}
