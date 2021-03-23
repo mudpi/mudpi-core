@@ -190,6 +190,9 @@ class Component:
     """ Configuration dict passed in at init() """
     config = {}
 
+    """ Static Variable to Track Components """
+    registered_components = {}
+
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         cls.registered_components[cls.__name__] = cls
@@ -209,12 +212,9 @@ class Component:
         """ Time it takes to complete one cycle, used to find slow components """
         self.processing_time = None
 
-        """ Static Variable to Track Components """
-        self.registered_components = {}
-
         """ Variable suggestion to use for state """
         self._state = None
-        
+
         # Developer _init so users don't need to call super().init()
         self._init()
 
