@@ -37,24 +37,6 @@ class CharDisplay(Component):
         Base Character Display Class
     """
 
-    # Current message being displayed
-    current_message = ''
-
-    # Check current_message to display once / prevent flickers
-    cached_message = {
-        'message': '',
-        'duration': 3
-    }
-
-    # Bool if message should be rotated
-    message_expired = True
-
-    # Queue of messages to display
-    queue = [] #queue.Queue()
-
-    # Duration tracking
-    _duration_start = time.perf_counter()
-
     @property
     def id(self):
         """ Unique id or key """
@@ -173,7 +155,18 @@ class CharDisplay(Component):
         short_codes = re.findall(r'\[(.*?) *\]', message)
 
         for code in short_codes:
-            data = self.mudpi.states.get(code)
+            data = None
+            if '.' in code:
+                _parts = code.split('.')
+                data = self.mudpi.states.get(_parts[0])
+                for key in _parts[1:]:
+                    try:
+                        data = data[key]
+                    except Exception as error:
+                        data = None
+                        break
+            else:
+                data = self.mudpi.states.get(code)
 
             if data is None:
                 data = ''
@@ -230,3 +223,23 @@ class CharDisplay(Component):
             except Exception as error:
                 Logger.log(LOG_LEVEL["error"],
                            f'Error Handling Event for {self.id}')
+    """ Internal Methods 
+    Do not override """
+    def _init(self):
+        # Current message being displayed
+        self.current_message = ''
+
+        # Check current_message to display once / prevent flickers
+        self.cached_message = {
+            'message': '',
+            'duration': 3
+        }
+
+        # Bool if message should be rotated
+        self.message_expired = True
+
+        # Queue of messages to display
+        self.queue = [] #queue.Queue()
+
+        # Duration tracking
+        self._duration_start = time.perf_counter()

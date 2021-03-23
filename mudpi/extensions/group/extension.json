@@ -4,6 +4,5 @@
 	"details": {
 		"description": "Enables grouping for components (Triggers).",
 		"documentation": "https://mudpi.app/docs/triggers"
-	},
-	"requirements": []
+	}
 }

@@ -55,21 +55,6 @@ class RTSPCamera(Camera):
         Camera connected over RTSP stream
     """
 
-    # Video capture object
-    cap = None
-
-    # Resolution tuple for capture
-    size = None
-
-    # Resolution tuple for capture
-    _detected_size = None
-
-    # Value to scale image to target size
-    _scale = None
-
-    # Number of recordings saved
-    _rec_count = 0
-
     """ Properties """
     @property
     def source(self):
@@ -82,6 +67,23 @@ class RTSPCamera(Camera):
         return self.config.get('record_video', False)
 
     """ Methods """
+    def init(self):
+        """ Initialize hook for additional setup """
+        # Video capture object
+        self.cap = None
+
+        # Resolution tuple for capture
+        self.size = None
+
+        # Resolution tuple for capture
+        self._detected_size = None
+
+        # Value to scale image to target size
+        self._scale = None
+
+        # Number of recordings saved
+        self._rec_count = 0
+
     def update(self):
         """ Main update loop to check when to capture images """
         if self.mudpi.is_prepared:

@@ -63,30 +63,6 @@ class Sequence(Component):
         and conditions inbetween each phase.  
     """
 
-    # Current step of the automation (0 index)
-    _current_step = 0
-
-    # True if current step delay finished
-    _delay_complete = False
-
-    # True if current step is completed and delay done
-    _step_complete = False
-
-    # True if step triggered to advanced
-    _step_triggered = False
-
-    # Thread safe bool for if sequence is active
-    _active = threading.Event()
-
-    # Used for duration tracking
-    _duration_start = time.perf_counter()
-
-    # Tracking delay config vs actual delay duration
-    _delay_actual = 0
-
-    # Tracking duration config vs actual step duration
-    _duration_actual = 0
-
     """ Properties """
     @property
     def id(self):
@@ -156,6 +132,30 @@ class Sequence(Component):
     """ Methods """
     def init(self):
         """ Init hook to subscribe to events """
+        # Current step of the automation (0 index)
+        self._current_step = 0
+
+        # True if current step delay finished
+        self._delay_complete = False
+
+        # True if current step is completed and delay done
+        self._step_complete = False
+
+        # True if step triggered to advanced
+        self._step_triggered = False
+
+        # Thread safe bool for if sequence is active
+        self._active = threading.Event()
+
+        # Used for duration tracking
+        self._duration_start = time.perf_counter()
+
+        # Tracking delay config vs actual delay duration
+        self._delay_actual = 0
+
+        # Tracking duration config vs actual step duration
+        self._duration_actual = 0
+        
         self.mudpi.events.subscribe(self.topic, self.handle_event)
 
     def update(self):

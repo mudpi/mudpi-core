@@ -32,15 +32,6 @@ class Camera(Component):
         Base Camera for all camera interfaces
     """
 
-    # A string of the last image taken
-    last_image = None
-
-    # Number of images captured
-    image_count = 0
-
-    # Duration tracking. Set high to cause capture on first load
-    _duration_start = -(60 * 60 * 24)
-
     """ Properties """
     @property
     def id(self):
@@ -190,4 +181,17 @@ class Camera(Component):
     def capture_recording(self, data={}):
         """ Record a video from the camera """
         pass
+
+    """ Internal Methods 
+    Do Not Override """
+    def _init(self):
+        """ Init hook for base component """
+        # A string of the last image taken
+        self.last_image = None
+
+        # Number of images captured
+        self.image_count = 0
+
+        # Duration tracking. Set high to cause capture on first load
+        self._duration_start = -(60 * 60 * 24)
     

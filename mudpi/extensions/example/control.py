@@ -39,11 +39,6 @@ class ExampleControl(Control):
         Randomly fires active for demonstration of controls
     """
 
-    # Default inital state
-    _state = False
-
-    # One time firing
-    _fired = False
 
     """ Properties """
     @property
@@ -62,6 +57,15 @@ class ExampleControl(Control):
 
 
     """ Methods """
+    def init(self):
+        """ Initalize the control """
+
+        # Default inital state
+        self._state = False
+
+        # One time firing
+        self._fired = False
+
     def update(self):
         """ Check if control should flip state randomly """
         _state = self._state

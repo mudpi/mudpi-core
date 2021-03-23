@@ -37,9 +37,6 @@ class RaspberryPiCamera(Camera):
         Base Camera for all camera interfaces
     """
 
-    # Pi camera object
-    camera = None
-
     """ Properties """
     @property
     def record_video(self):

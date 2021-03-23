@@ -36,6 +36,8 @@ class Extension(BaseExtension):
             if key not in self.servers:
                 self.servers[key] = SocketServer(self.mudpi, conf)
 
+        self.cache['servers'] = servers
+        
         # self.manager.register_component_actions('shutdown', action='shutdown')
         return True
 

@@ -51,15 +51,6 @@ class MQTTSensor(Sensor):
         Returns a reading from events
     """
 
-    # Track state change
-    _prev_state = None
-
-    # Connection to mqtt
-    _conn = None
-
-    # For duration tracking
-    _duration_start = time.perf_counter()
-
     """ Properties """
     @property
     def id(self):
@@ -106,6 +97,15 @@ class MQTTSensor(Sensor):
         # Perform inital state fetch
         # self.update()
         # self.store_state()
+        
+        # Track state change
+        self._prev_state = None
+
+        # Connection to mqtt
+        self._conn = None
+
+        # For duration tracking
+        self._duration_start = time.perf_counter()
 
         return True
 

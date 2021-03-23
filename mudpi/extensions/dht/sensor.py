@@ -53,8 +53,6 @@ class DHTSensor(Sensor):
     """ DHT Sensor
         Returns a random number
     """
-    
-    _sensor = None
 
     """ Properties """
     @property
@@ -86,6 +84,7 @@ class DHTSensor(Sensor):
     """ Methods """
     def init(self):
         """ Connect to the device """
+        self._sensor = None
         self.pin_obj = getattr(board, self.config['pin'])
 
         sensor_types = {

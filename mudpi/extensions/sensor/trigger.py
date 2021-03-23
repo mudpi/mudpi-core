@@ -39,14 +39,16 @@ class SensorTrigger(Trigger):
         matches any thresholds.
     """
 
-    # Used for onetime subscribe
-    _listening = False
 
 
     """ Methods """
     def init(self):
         """ Listen to the sensors state for changes """
         super().init()
+
+        # Used for onetime subscribe
+        self._listening = False
+
         if self.mudpi.is_prepared:
             if not self._listening:
                 # TODO: Eventually get a handler returned to unsub just this listener

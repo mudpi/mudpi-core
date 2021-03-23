@@ -29,6 +29,7 @@ class Interface(BaseInterface):
             if not conf.get('pin'):
                 raise ConfigError('Missing `pin` in GPIO config.')
 
+            # TODO: change this to work with all the other pin options beyond D## and A##
             if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
                 raise ConfigError(
                     "Cannot detect pin type (Digital or analog), "
