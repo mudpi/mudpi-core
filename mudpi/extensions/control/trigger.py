@@ -85,7 +85,6 @@ class ControlTrigger(Trigger):
     def _parse_data(self, data):
         """ Get nested data if set otherwise return the data """
         if isinstance(data, dict):
-            print('dict con')
             return data if not self.nested_source else data.get(self.nested_source, None)
         return data
 

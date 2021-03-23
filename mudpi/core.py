@@ -6,11 +6,11 @@ import threading
 from mudpi import importer
 from mudpi.config import Config
 from mudpi.events import EventSystem
-from mudpi.constants import DEFAULT_CONFIG_FILE
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.managers.state_manager import StateManager
 from mudpi.exceptions import ConfigNotFoundError, ConfigFormatError
 from mudpi.registry import Registry, ActionRegistry, ComponentRegistry
+from mudpi.constants import DEFAULT_CONFIG_FILE, IMPERIAL_SYSTEM, METRIC_SYSTEM
 
 class MudPi:
     """ 
@@ -72,6 +72,11 @@ class MudPi:
     def is_stopping(self):
         """ Return if MudPi is stopping. """
         return self.state in (CoreState.stopping,)
+
+    @property
+    def unit_system(self):
+        """ Return unit system for measurements. Default (IMPERIAL - 1) """
+        return METRIC_SYSTEM if self.config.unit_system == 'metric' else IMPERIAL_SYSTEM
 
 
     """ Methods """

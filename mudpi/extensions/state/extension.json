@@ -5,5 +5,5 @@
 		"description": "Interfaces to core Mudpi state manager",
 		"documentation": "https://mudpi.app/docs/states"
 	},
-	"requirements": [""]
+	"requirements": []
 }

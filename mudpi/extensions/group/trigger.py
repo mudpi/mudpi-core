@@ -35,9 +35,6 @@ class GroupTrigger(Trigger):
         between multiple trigger types. 
     """
 
-    # List of triggers to monitor
-    _triggers = []
-
     """ Properties """
     @property
     def triggers(self):
@@ -53,6 +50,9 @@ class GroupTrigger(Trigger):
     """ Methods """
     def init(self):
         """ Load in the triggers for the group """
+        # List of triggers to monitor
+        self._triggers = []
+        
         # Doesnt call super().init() because that is for non-groups
         self.cache = self.mudpi.cache.get('trigger', {})
         self.cache.setdefault('groups', {})[self.id] = self

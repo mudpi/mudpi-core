@@ -8,6 +8,7 @@ import datetime
 import threading
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.extensions import Component, BaseExtension
+from mudpi.exceptions import MudPiError
 
 
 NAMESPACE = 'trigger'
@@ -39,16 +40,6 @@ class Trigger(Component):
     """ Base Trigger
         Base class for all trigger interfaces
     """
-    _actions = []
-
-    # Used for trigger groups
-    group = None
-
-    # Thread safe active boolean 
-    _active = threading.Event()
-
-    # Used to fire triggers `once` or `many`
-    _previous_state = False
 
     """ Properties """
     @property
@@ -178,12 +169,22 @@ class Trigger(Component):
         event_data.update(data)
         self.mudpi.events.publish(NAMESPACE, event_data)
 
-    def trigger(self, value=None):
+    def trigger(self, value={}):
         """ Fire off any actions or sequences """
         try:
             self.fire({'trigger_value': value})
             # Trigger the actions of the trigger
             for action in self.actions:
+                if isinstance(action, str):
+                    _action = action
+                elif isinstance(action, dict):
+                    _action = action.get('action')
+                    if _action is None:
+                        raise MudPiError("No `action` passed in action data.")
+                    _action_data = action.get('data', {})
+                    if not isinstance(_action_data, dict):
+                        _action_data = {'data': _action_data} 
+                    value.update(_action_data)
                 if self.mudpi.actions.exists(action):
                     _data = value or {}
                     self.mudpi.actions.call(action, action_data=_data)
@@ -196,6 +197,22 @@ class Trigger(Component):
     def unload(self):
         """ Called during shutdown for cleanup operations """
         pass
+
+
+    """ Internal Methods
+    Do not override """
+    def _init(self):
+        """ Set the trigger default settings """
+        self._actions = []
+
+        # Used for trigger groups
+        self.group = None
+
+        # Thread safe active boolean 
+        self._active = threading.Event()
+
+        # Used to fire triggers `once` or `many`
+        self._previous_state = False
 
 
 """ Helper """

@@ -131,7 +131,7 @@ def main(args=None):
         LOG_LEVEL["info"],
         "Stopping All Workers for Shutdown  ", 'Pending', 'notice'
     )
-    manager.mudpi.shutdown()
+    manager.shutdown()
 
     Logger.log_formatted(
         LOG_LEVEL["info"],
