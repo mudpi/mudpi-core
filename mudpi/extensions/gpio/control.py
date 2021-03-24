@@ -14,6 +14,8 @@ from mudpi.exceptions import MudPiError, ConfigError
 
 class Interface(BaseInterface):
 
+    update_interval = 0.01
+
     def load(self, config):
         """ Load GPIO control component from configs """
         control = GPIOControl(self.mudpi, config)
