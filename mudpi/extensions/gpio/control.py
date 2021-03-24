@@ -69,15 +69,15 @@ class GPIOControl(Control):
 
         if self.resistor is not None:
             if self.resistor == "up" or self.resistor == digitalio.Pull.UP:
-                self.resistor = digitalio.Pull.UP
+                self._resistor = digitalio.Pull.UP
             elif self.resistor == "down" or self.resistor == digitalio.Pull.DOWN:
-                self.resistor = digitalio.Pull.DOWN
+                self._resistor = digitalio.Pull.DOWN
             else:
                 # Unknown resistor pull, defaulting to None
-                self.config['resistor'] = None
+                self.config['resistor'] = self._resistor = None
 
         self._control_pin = self.gpio.DigitalInOut(self.pin_obj)
-        self._control_pin.switch_to_input(pull=self.resistor)
+        self._control_pin.switch_to_input(pull=self._resistor)
 
         # Switches use debounce for better detection
         # TODO: get rid of this to allow long press, release, and press detection
