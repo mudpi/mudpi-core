@@ -60,7 +60,7 @@ class Control(Component):
     @property
     def edge_detection(self):
         """ Return if edge detection is used """
-        _edge_detection = config.get('edge_detection')
+        _edge_detection = self.config.get('edge_detection')
         if _edge_detection is not None:
             if _edge_detection == "falling" or _edge_detection == "fell":
                 _edge_detection = "fell"
