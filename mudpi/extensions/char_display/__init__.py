@@ -168,7 +168,7 @@ class CharDisplay(Component):
                             break
             else:
                 if self.mudpi.states.id_exists(code):
-                    data = json.loads(self.mudpi.states.get(code))
+                    data = json.loads(self.mudpi.states.get(code).state)
 
             if data is None:
                 data = ''
