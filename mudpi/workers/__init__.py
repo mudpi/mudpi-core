@@ -95,7 +95,7 @@ class Worker:
         time_remaining = duration
         while time_remaining > 0 and self.mudpi.is_prepared:
             time.sleep(0.001)
-            time_remaining -= 1
+            time_remaining -= 0.001
 
     """ Should be moved to Timer util """
     @property
