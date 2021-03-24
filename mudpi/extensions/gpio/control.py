@@ -40,6 +40,7 @@ class Interface(BaseInterface):
                     "Please refer to "
                     "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
                 )
+        return config
 
 
 class GPIOControl(Control):
