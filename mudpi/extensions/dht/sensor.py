@@ -108,10 +108,6 @@ class DHTSensor(Sensor):
 
         try:
             self._sensor = self._dht_device(self.pin_obj)
-            Logger.log(
-                LOG_LEVEL["debug"],
-                'Sensor Initializing: DHT'
-            )
         except Exception as error:
             Logger.log(
                 LOG_LEVEL["error"],
