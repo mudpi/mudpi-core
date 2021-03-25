@@ -1,159 +1,37 @@
 {
-    "name": "MudPi",
+"mudpi": {   
+    "name": "MudPi Example",
     "debug": false,
-    "logging": {
-        "file_log_level": "debug",
-        "terminal_log_level": "debug",
-        "file": "mudpi.log"
+    "unit_system": "imperial",
+    "location": {
+        "latitude":12.526,
+        "longitude":-33.043
     },
-    "server": {
-        "host": "127.0.0.1",
-        "port": 6602
+    "events": {
+        "redis": {
+            "host": "127.0.0.1",
+            "port": 6379
+        }
+    }
+},
+"sensor": [
+    {
+        "interface": "example",
+        "update_interval": 10,
+        "key": "example_one",
+        "data": 3, 
+        "classifier": "light"
     },
-    "redis": {
-        "host": "127.0.0.1",
-        "port": 6379
+    {   
+        "interface": "example",
+        "key": "example_two",
+        "update_interval": 3,
+        "data": 20, 
+        "classifier": "power"
     },
-    "relays": [
-        {
-            "pin": "D13",
-            "normally_open": true,
-            "group": "1",
-            "name": "Relay Name",
-            "topic": "garden/linux/relays/1",
-            "key": "relay_1"
-        },
-        {
-            "pin": "D12",
-            "normally_open": true,
-            "group": "2",
-            "name": "Relay Name 2",
-            "topic": "garden/linux/relays/2",
-            "key": "relay_2"
-        },
-        {
-            "pin": "D20",
-            "normally_open": true,
-            "group": "2",
-            "name": "Relay Name 3",
-            "topic": "garden/linux/relays/3",
-            "key": "relay_3"
-        }
-    ],
-    "workers":[
-        {
-            "type":"control",
-            "sleep_duration":0.5,
-            "channel":"controls",
-            "controls": [
-                {
-                    "pin":"D18",
-                    "type":"button",
-                    "name":"Button 1",
-                    "key": "button_1",
-                    "topic": "garden/linux/relays/1",
-                    "action":"Toggle",
-                    "resistor":"up",
-                    "edge_detection":"falling",
-                    "debounce":200
-                }
-            ]
-        }
-    ],
-    "nodes": [
-        {
-            "name": "Demo Box 1",
-            "address": "192.168.2.150",
-            "type":"arduino",
-            "use_wifi":true,
-            "sensors": [
-                {
-                    "pin": "D2",
-                    "is_digital": false,
-                    "type": "Humidity",
-                    "name": "Weather"
-                }
-            ],
-            "controls": [
-                {
-                    "pin": 16,
-                    "type":"button",
-                    "name":"Button 1",
-                    "key": "button_1",
-                    "topic": "garden/linux/relays/1"
-                },
-                {
-                    "pin":5,
-                    "type":"switch",
-                    "name":"Switch 1",
-                    "key": "switch_1",
-                    "topic": "garden/linux/relays/1"
-                },
-                {
-                    "pin":0,
-                    "type":"potentiometer",
-                    "name":"Pot 1",
-                    "key": "pot_1"
-                }
-            ]
-        }
-    ],
-    "triggers": [
-        {
-            "group":"Trigger Group 1",
-            "actions": ["turn_on_lights_1"],
-            "triggers":[
-                {
-                    "type": "control",
-                    "source": "button_1",
-                    "key": "button_1_trigger",
-                    "name": "Override Button Pressed",
-                    "frequency":"once",
-                    "thresholds": [
-                        {
-                            "comparison":"eq",
-                            "value":true
-                        }
-                    ]
-                },
-                {
-                    "type": "sensor",
-                    "source": "weather",
-                    "nested_source":"temperature",
-                    "key": "temp_trigger",
-                    "name": "Temp too hot",
-                    "frequency":"once",
-                    "thresholds": [
-                        {
-                            "comparison":"gte",
-                            "value":70
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "time",
-            "key": "daily_lights_on",
-            "name": "Daily Lights On",
-            "schedule": "*/5 * * * *",
-            "actions": ["turn_on_lights_1"]
-        }
-    ],
-    "actions": [
-        {
-            "type": "command",
-            "name": "Save to file",
-            "key": "save_to_file",
-            "action": "ls -a",
-            "shell": true
-        },
-        {
-            "type": "event",
-            "name": "Turn on Lights",
-            "key": "turn_on_lights_1",
-            "action": {"event":"Toggle"},
-            "topic": "garden/linux/relays/2"
-        }
-    ]
-}
+    {   
+        "interface": "example",
+        "key": "example_three",
+        "data": 5 
+    }
+]}
