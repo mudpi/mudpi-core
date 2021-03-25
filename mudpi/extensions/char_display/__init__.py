@@ -158,24 +158,21 @@ class CharDisplay(Component):
             data = None
             if '.' in code:
                 _parts = code.split('.')
-                data = self.mudpi.states.get(_parts[0])
-                for key in _parts[1:]:
-                    try:
-                        data = data[key]
-                    except Exception as error:
-                        data = None
-                        break
+                if self.mudpi.states.id_exists(_parts[0]):
+                    data = json.loads(self.mudpi.states.get(_parts[0]).state)
+                    for key in _parts[1:]:
+                        try:
+                            data = data[key]
+                        except Exception as error:
+                            data = None
+                            break
             else:
-                data = self.mudpi.states.get(code)
+                if self.mudpi.states.id_exists(code):
+                    data = json.loads(self.mudpi.states.get(code).state)
 
             if data is None:
                 data = ''
 
-            else:
-                try:
-                    data = json.loads(state.state)
-                except Exception:
-                    data = ''
             message = str(message).replace('[' + code + ']', str(data))
 
         new_message = {
@@ -207,13 +204,13 @@ class CharDisplay(Component):
 
     def handle_event(self, event):
         """ Handle events from event system """
-        try:
-            data = event['data'].decode('utf-8')
+        _event = None
+        try: 
+            _event = decode_event_data(event['data'])
         except Exception as error:
-            data = event['data']
-            
-        if data is not None:
-            _event = decode_event_data(data)
+            _event = decode_event_data(event)
+
+        if _event is not None:
             try:
                 if _event['event'] == 'Message':
                     if _event.get('data', None):
@@ -226,7 +223,7 @@ class CharDisplay(Component):
                     self.clear_queue()
             except Exception as error:
                 Logger.log(LOG_LEVEL["error"],
-                           f'Error Handling Event for {self.id}')
+                           f'Error handling event for {self.id}')
     """ Internal Methods 
     Do not override """
     def _init(self):

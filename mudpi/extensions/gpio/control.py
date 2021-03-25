@@ -3,6 +3,7 @@
     Connects to a linux board GPIO to
     take analog or digital readings. 
 """
+import re
 import board
 import digitalio
 from adafruit_debouncer import Debouncer
@@ -12,6 +13,8 @@ from mudpi.exceptions import MudPiError, ConfigError
 
 
 class Interface(BaseInterface):
+
+    update_interval = 0.01
 
     def load(self, config):
         """ Load GPIO control component from configs """
@@ -39,6 +42,7 @@ class Interface(BaseInterface):
                     "Please refer to "
                     "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
                 )
+        return config
 
 
 class GPIOControl(Control):
@@ -67,15 +71,15 @@ class GPIOControl(Control):
 
         if self.resistor is not None:
             if self.resistor == "up" or self.resistor == digitalio.Pull.UP:
-                self.resistor = digitalio.Pull.UP
+                self._resistor = digitalio.Pull.UP
             elif self.resistor == "down" or self.resistor == digitalio.Pull.DOWN:
-                self.resistor = digitalio.Pull.DOWN
+                self._resistor = digitalio.Pull.DOWN
             else:
                 # Unknown resistor pull, defaulting to None
-                self.config['resistor'] = None
+                self.config['resistor'] = self._resistor = None
 
         self._control_pin = self.gpio.DigitalInOut(self.pin_obj)
-        self._control_pin.switch_to_input(pull=self.resistor)
+        self._control_pin.switch_to_input(pull=self._resistor)
 
         # Switches use debounce for better detection
         # TODO: get rid of this to allow long press, release, and press detection

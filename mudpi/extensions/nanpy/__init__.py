@@ -115,7 +115,8 @@ class Node(Worker):
         # MudPi Shutting Down, Perform Cleanup Below
         Logger.log_formatted(LOG_LEVEL["debug"],
                    f"Worker {self.key} ", "Stopping", "notice")
-        self.connection.close()
+        if self.connection:
+            self.connection.close()
         self.reset_connection()
         Logger.log_formatted(LOG_LEVEL["info"],
                    f"Worker {self.key} ", "Offline", "error")

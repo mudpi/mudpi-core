@@ -5,5 +5,5 @@
 		"description": "Interfaces using linux board GPIO.",
 		"documentation": "https://mudpi.app/docs/gpio"
 	},
-	"requirements": ["adafruit-blinka"]
+	"requirements": ["adafruit-blinka", "adafruit-circuitpython-debouncer"]
 }
