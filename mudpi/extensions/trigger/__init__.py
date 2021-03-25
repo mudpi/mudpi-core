@@ -117,7 +117,7 @@ class Trigger(Component):
         thresholds_passed = False
         for threshold in self.thresholds:
             comparison = threshold.get("comparison", "eq")
-            
+
             if comparison == "eq":
                 if value == threshold["value"]:
                     thresholds_passed = True
@@ -150,6 +150,21 @@ class Trigger(Component):
                     thresholds_passed = False
             elif comparison == "ex":
                 if value is not None:
+                    thresholds_passed = True
+                else:
+                    thresholds_passed = False
+            elif comparison == "is":
+                if value is threshold["value"]:
+                    thresholds_passed = True
+                else:
+                    thresholds_passed = False
+            elif comparison == "not":
+                if value is not threshold["value"]:
+                    thresholds_passed = True
+                else:
+                    thresholds_passed = False
+            elif comparison == "in":
+                if value in threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
