@@ -136,7 +136,6 @@ class Sequence(Component):
             "current_step": self.current_step,
             "step_delay": self.step_delay,
             "step_duration": self.step_duration,
-            "duration": self.duration,
             "delay_complete": self._delay_complete,
             "step_triggered": self._step_triggered,
             "step_complete": self._step_complete
