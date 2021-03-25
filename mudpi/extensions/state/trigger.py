@@ -4,6 +4,7 @@
     checks new state against any 
     thresholds if provided.
 """
+import json
 from mudpi.utils import decode_event_data
 from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
@@ -46,6 +47,7 @@ class StateTrigger(Trigger):
     def init(self):
         """ Listen to the state for changes """
         super().init()
+        self._listening = False
         if self.mudpi.is_prepared:
             if not self._listening:
                 # TODO: Eventually get a handler returned to unsub just this listener
@@ -60,7 +62,7 @@ class StateTrigger(Trigger):
             try:
                 if _event_data['event'] == 'StateUpdated':
                     if _event_data['component_id'] == self.source:
-                        sensor_value = self._parse_data(_event_data["new_state"]["state"])
+                        sensor_value = self._parse_data(json.loads(_event_data["new_state"]["state"]))
                         if self.evaluate_thresholds(sensor_value):
                             self.active = True
                             if self._previous_state != self.active:
@@ -84,5 +86,5 @@ class StateTrigger(Trigger):
 
     def _parse_data(self, data):
         """ Get nested data if set otherwise return the data """
-        return data if self.nested_source is None else data.get(self.nested_source, None)
+        return data if not self.nested_source else data.get(self.nested_source, None)
 
