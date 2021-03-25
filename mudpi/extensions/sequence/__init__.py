@@ -128,6 +128,19 @@ class Sequence(Component):
         return self.config.get('topic', '').replace(" ", "/").lower() if self.config.get(
             'topic') is not None else f'{NAMESPACE}/{self.id}'
     
+    @property
+    def state(self):
+        """ Current state of sequence """
+        return {
+            "active": self.active,
+            "current_step": self.current_step,
+            "step_delay": self.step_delay,
+            "step_duration": self.step_duration,
+            "duration": self.duration,
+            "delay_complete": self._delay_complete,
+            "step_triggered": self._step_triggered,
+            "step_complete": self._step_complete
+        }
 
     """ Methods """
     def init(self):
