@@ -150,6 +150,7 @@ class DHTSensor(Sensor):
                         f'DHT Device Encountered an Error. Attempt {_attempts+1}/{self.read_attempts}'
                     )
                     self._sensor.exit()
+                    self._sensor = None
 
                 if humidity is not None and temperature_c is not None:
                     _temperature = temperature_c if self.mudpi.unit_system == METRIC_SYSTEM else (temperature_c * 1.8 + 32)
