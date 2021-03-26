@@ -39,6 +39,14 @@ class Config(object):
     def unit_system(self):
         return self.config.get('mudpi', {}).get('unit_system', 'imperial').lower()
 
+    @property
+    def latitude(self):
+        return self.config.get('mudpi', {}).get('latitude', 43)
+
+    @property
+    def longitude(self):
+        return self.config.get('mudpi', {}).get('longitude', -88)
+
 
     """ Methods """
     def path(self, *path):
