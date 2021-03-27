@@ -1,6 +1,7 @@
 import redis
 import json
 from . import Adaptor
+from mudpi.utils import decode_event_data
 
 
 class RedisAdaptor(Adaptor):
@@ -29,7 +30,6 @@ class RedisAdaptor(Adaptor):
         else:
             if callback not in self.callbacks[topic]:
                 self.callbacks[topic].append(callback)
-
         def callback_handler(message):
             """ callback handler to allow multiple hanlders on one topic """
             try:
@@ -38,7 +38,7 @@ class RedisAdaptor(Adaptor):
                 _topic = message["channel"]
             if _topic in self.callbacks:
                 for callbk in self.callbacks[_topic]:
-                    callbk(message)
+                    callbk(decode_event_data(message["data"]))
 
         return self.pubsub.subscribe(**{topic: callback_handler})
 

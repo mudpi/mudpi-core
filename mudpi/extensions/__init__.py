@@ -214,6 +214,9 @@ class Component:
 
         """ Variable suggestion to use for state """
         self._state = None
+        
+        """ Keep last event cached to prevent duplicate event fires """
+        self._last_event = {}
 
         # Developer _init so users don't need to call super().init()
         self._init()

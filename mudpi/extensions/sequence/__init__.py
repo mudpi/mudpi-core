@@ -364,11 +364,16 @@ class Sequence(Component):
         self._step_complete = True
         self._step_triggered = True
 
-    def handle_event(self, message):
-        """ Process event data for the sequnce """
-        data = message['data']
-        if data is not None:
-            _event_data = self.last_event = decode_event_data(data)
+    def handle_event(self, event):
+        """ Process event data for the sequence """
+        _event_data = decode_event_data(event)
+
+        if _event_data == self._last_event:
+            # Event already handled
+            return
+
+        self._last_event = _event_data
+        if _event_data.get('event'):
             try:
                 if _event_data['event'] == 'SequenceNextStep':
                     self.advance_step()
