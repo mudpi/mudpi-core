@@ -210,6 +210,11 @@ class CharDisplay(Component):
         except Exception as error:
             _event = decode_event_data(event)
 
+        if _event == self._last_event:
+            # Event already handled
+            return
+
+        self._last_event = _event
         if _event is not None:
             try:
                 if _event['event'] == 'Message':
