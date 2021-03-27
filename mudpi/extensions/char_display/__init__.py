@@ -206,9 +206,9 @@ class CharDisplay(Component):
         """ Handle events from event system """
         _event = None
         try: 
-            _event = decode_event_data(event['data'])
-        except Exception as error:
             _event = decode_event_data(event)
+        except Exception as error:
+            _event = decode_event_data(event['data'])
 
         if _event == self._last_event:
             # Event already handled
