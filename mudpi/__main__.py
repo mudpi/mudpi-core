@@ -290,15 +290,15 @@ def convert_old_config(config):
             if worker["type"].lower() == "display":
                 for display in worker.get('displays', []):
                     config.config.setdefault("char_display", [])
-                    new_display = {'key': sensor["key"], 'interface': 'i2c'}
-                    if sensor.get("name"):
-                        new_display['name']=sensor['name']
-                    if sensor.get("address"):
-                        new_display['address']=sensor['address']
-                    if sensor.get("model"):
-                        new_display['model']=sensor['model']
-                    if sensor.get("topic"):
-                        new_display['topic']=sensor['topic']
+                    new_display = {'key': display["key"], 'interface': 'i2c'}
+                    if display.get("name"):
+                        new_display['name']=display['name']
+                    if display.get("address"):
+                        new_display['address']=display['address']
+                    if display.get("model"):
+                        new_display['model']=display['model']
+                    if display.get("topic"):
+                        new_display['topic']=display['topic']
                     if worker.get("sleep_duration"):
                         new_display['update_interval']=worker['sleep_duration']
                     config.config['char_display'].append(new_display)
