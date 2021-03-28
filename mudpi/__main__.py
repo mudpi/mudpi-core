@@ -242,6 +242,8 @@ def convert_old_config(config):
                 for sensor in worker.get('sensors', []):
                     config.config.setdefault("sensor", [])
                     new_sensor = {'key': sensor["key"], 'interface': 'gpio', 'classifier': sensor["type"].lower()}
+                    if sensor['type'].lower() == 'humidity':
+                        new_sensor['interface'] = 'dht'
                     if sensor.get("name"):
                         new_sensor['name']=sensor['name']
                     if sensor.get("pin"):

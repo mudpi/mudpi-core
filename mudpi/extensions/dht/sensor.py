@@ -40,7 +40,7 @@ class Interface(BaseInterface):
                     "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
                 )
 
-            if conf.get('model') not in DHTSensor.models:
+            if str(conf.get('model')) not in DHTSensor.models:
                 conf['model'] = '11'
                 Logger.log(
                     LOG_LEVEL["warning"],
