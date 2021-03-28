@@ -27,6 +27,9 @@ class Interface(BaseInterface):
             config = [config]
 
         for conf in config:
+            if not conf.get('key'):
+                raise ConfigError('Missing `key` in i2c display config.')
+
             if not conf.get('address'):
                 # raise ConfigError('Missing `address` in BME680 config.')
                 conf['address'] = 0x77
@@ -35,9 +38,7 @@ class Interface(BaseInterface):
 
                 # Convert hex string/int to actual hex
                 if isinstance(addr, str):
-                    addr = hex(int(addr, 16))
-                elif isinstance(addr, int):
-                    addr = hex(addr)
+                    addr = int(addr, 16)
 
                 conf['address'] = addr
 
