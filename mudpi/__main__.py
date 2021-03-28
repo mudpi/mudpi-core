@@ -275,7 +275,7 @@ def convert_old_config(config):
             if worker["type"].lower() == "i2c":
                 for sensor in worker.get('sensors', []):
                     config.config.setdefault("sensor", [])
-                    new_sensor = {'key': sensor["key"], 'interface': 'i2c'}
+                    new_sensor = {'key': sensor["key"], 'interface': 'bme680'}
                     if sensor.get("name"):
                         new_sensor['name']=sensor['name']
                     if sensor.get("address"):
@@ -342,6 +342,8 @@ def convert_old_config(config):
                 new_trigger['nested_source']=_trigger['nested_source']
             if _trigger.get("topic"):
                 new_trigger['topic']=_trigger['topic']
+            if _trigger.get("schedule"):
+                new_trigger['schedule']=_trigger['schedule']
             if _trigger.get("frequency"):
                 new_trigger['frequency']= _trigger['frequency']
             if _trigger.get("thresholds"):
@@ -404,6 +406,7 @@ def convert_old_config(config):
 
     # Server socket conversion
     if config.config.get("server"):
+        config.config["server"]['key'] = "socket_server"
         config.config["socket"] = [config.config["server"]]
         del config.config['server']
 
