@@ -23,19 +23,23 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the bme680 config """
-        if not config.get('address'):
-            # raise ConfigError('Missing `address` in BME680 config.')
-            config['address'] = 0x77
-        else:
-            addr = config['address']
+        if not isinstance(config, list):
+            config = [config]
 
-            # Convert hex string/int to actual hex
-            if isinstance(addr, str):
-                addr = hex(int(addr, 16))
-            elif isinstance(addr, int):
-                addr = hex(addr)
+        for conf in config:
+            if not conf.get('address'):
+                # raise ConfigError('Missing `address` in BME680 config.')
+                conf['address'] = 0x77
+            else:
+                addr = conf['address']
 
-            config['address'] = addr
+                # Convert hex string/int to actual hex
+                if isinstance(addr, str):
+                    addr = hex(int(addr, 16))
+                elif isinstance(addr, int):
+                    addr = hex(addr)
+
+                conf['address'] = addr
 
         return config
 
