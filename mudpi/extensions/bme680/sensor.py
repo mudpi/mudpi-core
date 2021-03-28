@@ -87,11 +87,11 @@ class BME680Sensor(Sensor):
 
     def update(self):
         """ Get data from BME680 device"""
-        temperature = round((self.sensor.temperature - 5) * 1.8 + 32, 2)
-        gas = self.sensor.gas
-        humidity = round(self.sensor.humidity, 1)
-        pressure = round(self.sensor.pressure, 2)
-        altitude = round(self.sensor.altitude, 3)
+        temperature = round((self._sensor.temperature - 5) * 1.8 + 32, 2)
+        gas = self._sensor.gas
+        humidity = round(self._sensor.humidity, 1)
+        pressure = round(self._sensor.pressure, 2)
+        altitude = round(self._sensor.altitude, 3)
 
         if humidity is not None and temperature is not None:
             readings = {
