@@ -287,7 +287,7 @@ def convert_old_config(config):
                     if worker.get("sleep_duration"):
                         new_sensor['update_interval']=worker['sleep_duration']
                     config.config['sensor'].append(new_sensor)
-            if worker["type"].lower() == "dislpay":
+            if worker["type"].lower() == "display":
                 for display in worker.get('displays', []):
                     config.config.setdefault("char_display", [])
                     new_display = {'key': sensor["key"], 'interface': 'i2c'}
