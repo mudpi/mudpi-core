@@ -290,7 +290,11 @@ def convert_old_config(config):
             if worker["type"].lower() == "display":
                 for display in worker.get('displays', []):
                     config.config.setdefault("char_display", [])
-                    new_display = {'key': display["key"], 'interface': 'i2c'}
+                    new_display = {'interface': 'i2c'}
+                    if display.get("key"):
+                        new_display['key']=display['key']
+                    else:
+                        new_display['key']=display['name'].replace(' ', '_').lower()
                     if display.get("name"):
                         new_display['name']=display['name']
                     if display.get("address"):
