@@ -78,7 +78,6 @@ class I2CCharDisplay(CharDisplay):
     def clear(self, data=None):
         """ Clear the display screen """
         self.lcd.clear()
-        Logger.log(LOG_LEVEL["debug"], 'Cleared the LCD Screen')
 
     def show(self, data={}):
         """ Show a message on the display """

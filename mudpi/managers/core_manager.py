@@ -263,3 +263,4 @@ class CoreManager:
     def shutdown(self):
         """ Shutdown MudPi and cleanup """
         self.mudpi.shutdown()
+        self.mudpi.unload_extensions()

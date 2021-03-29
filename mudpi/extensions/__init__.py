@@ -214,12 +214,17 @@ class Component:
 
         """ Variable suggestion to use for state """
         self._state = None
+        
+        """ Keep last event cached to prevent duplicate event fires """
+        self._last_event = {}
 
         # Developer _init so users don't need to call super().init()
         self._init()
 
         # Init hook for components
         self.init()
+
+        self.component_initialized()
 
     """ Properties 
     Override these depending on desired component functionality
@@ -281,6 +286,10 @@ class Component:
 
     def unload(self):
         """ Unload the component and cleanup """
+        pass
+
+    def restore_state(self, state):
+        """ Reload the previous state from state manager """
         pass
 
 

@@ -3,6 +3,7 @@ package-lock.json
 scripts/
 tests/
 img/
+build/
 mudpi.config
 *.log
 # Python compiled
@@ -127,4 +128,6 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-.idea
+# IDE configs
+.idea/
+.DS_Store

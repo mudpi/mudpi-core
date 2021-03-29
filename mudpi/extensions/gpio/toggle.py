@@ -54,11 +54,6 @@ class GPIOToggle(Toggle):
 
     """ Properties """
     @property
-    def state(self):
-        """ Return the state of the component (from memory, no IO!) """
-        return self.active
-
-    @property
     def pin(self):
         """ The GPIO pin """
         return self.config.get('pin')
@@ -92,10 +87,11 @@ class GPIOToggle(Toggle):
 
         return True
 
-    def restore_state(self, state={}):
+    def restore_state(self, state):
         """ This is called on start to 
             restore previous state """
-        self.gpio_pin.value = self.pin_state_on if state.get('state', False) else self.pin_state_off
+        self.active = state.state
+        self.gpio_pin.value = self.pin_state_on if self.active else self.pin_state_off
         return
 
 

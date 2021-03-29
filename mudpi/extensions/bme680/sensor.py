@@ -23,19 +23,24 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the bme680 config """
-        if not config.get('address'):
-            # raise ConfigError('Missing `address` in BME680 config.')
-            config['address'] = 0x77
-        else:
-            addr = config['address']
+        if not isinstance(config, list):
+            config = [config]
 
-            # Convert hex string/int to actual hex
-            if isinstance(addr, str):
-                addr = hex(int(addr, 16))
-            elif isinstance(addr, int):
-                addr = hex(addr)
+        for conf in config:
+            if not conf.get('key'):
+                raise ConfigError('Missing `key` in i2c display config.')
 
-            config['address'] = addr
+            if not conf.get('address'):
+                # raise ConfigError('Missing `address` in BME680 config.')
+                conf['address'] = 0x77
+            else:
+                addr = conf['address']
+
+                # Convert hex string/int to actual hex
+                if isinstance(addr, str):
+                    addr = int(addr, 16)
+
+                conf['address'] = addr
 
         return config
 
@@ -82,11 +87,11 @@ class BME680Sensor(Sensor):
 
     def update(self):
         """ Get data from BME680 device"""
-        temperature = round((self.sensor.temperature - 5) * 1.8 + 32, 2)
-        gas = self.sensor.gas
-        humidity = round(self.sensor.humidity, 1)
-        pressure = round(self.sensor.pressure, 2)
-        altitude = round(self.sensor.altitude, 3)
+        temperature = round((self._sensor.temperature - 5) * 1.8 + 32, 2)
+        gas = self._sensor.gas
+        humidity = round(self._sensor.humidity, 1)
+        pressure = round(self._sensor.pressure, 2)
+        altitude = round(self._sensor.altitude, 3)
 
         if humidity is not None and temperature is not None:
             readings = {
