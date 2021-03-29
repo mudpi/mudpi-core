@@ -41,6 +41,16 @@ class Config(object):
     def unit_system(self):
         return self.config.get('mudpi', {}).get('unit_system', 'imperial').lower()
 
+    @property
+    def latitude(self):
+        return self.config.get('mudpi', {}).get('latitude', 43)
+
+    @property
+    def longitude(self):
+        return self.config.get('mudpi', {}).get('longitude', -88)
+
+
+    """ Methods """
     def path(self, *path):
         """ Returns path relative to the config folder. """
         return os.path.join(self.config_path, *path)
@@ -190,8 +200,6 @@ class Config(object):
                 config_format = 'json'
             elif '.yaml' in file:
                 config_format = 'yaml'
-        else:
-            config_format = None
 
         return config_format
 

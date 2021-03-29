@@ -88,6 +88,12 @@ class CharDisplay(Component):
         """ Return number of columns """
         return int(self.config.get('columns', 16))
 
+    @property
+    def persist_display(self):
+        """ Keeps last message displayed when queue is empty """
+        return bool(self.config.get('persist_display', False))
+    
+
 
     """ Actions """
     def show(self, data=None): 
@@ -129,7 +135,6 @@ class CharDisplay(Component):
                 self.message_expired = True
 
             if self.message_expired:
-                # Get first time message after clear
                 self.cached_message = self.get_next_message()
 
             if self.current_message != self.cached_message.get('message', ''):
@@ -195,7 +200,9 @@ class CharDisplay(Component):
             self.message_expired = False
             self.reset_duration()
             return self.queue.pop(0)
-        return {'message': '', 'duration': self.default_duration}
+        self.cached_message['duration'] = 1
+        return self.cached_message if self.persist_display else \
+            {'message': '', 'duration': 1}
 
     def reset_duration(self):
         """ Reset the duration of the current state """
@@ -206,10 +213,15 @@ class CharDisplay(Component):
         """ Handle events from event system """
         _event = None
         try: 
-            _event = decode_event_data(event['data'])
-        except Exception as error:
             _event = decode_event_data(event)
+        except Exception as error:
+            _event = decode_event_data(event['data'])
 
+        if _event == self._last_event:
+            # Event already handled
+            return
+
+        self._last_event = _event
         if _event is not None:
             try:
                 if _event['event'] == 'Message':

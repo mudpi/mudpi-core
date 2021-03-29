@@ -18,7 +18,7 @@ class StateManager():
     def __init__(self, mudpi, redis_conf=None):
         self.mudpi = mudpi
         self.states = {}
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         host = '127.0.0.1'
         port = 6379
         try:
@@ -58,7 +58,8 @@ class StateManager():
         new_state = json.dumps(new_state)
         metadata = metadata or {}
 
-        with self._lock:
+        if new_state is not None:
+            self._lock.acquire()
             previous_state = self.states.get(component_id)
 
             state_exists = previous_state is not None
@@ -66,12 +67,14 @@ class StateManager():
             metadata_is_same = state_exists and previous_state.metadata == metadata
 
             if state_is_same and metadata_is_same:
+                self._lock.release()
                 return
 
             updated_at = previous_state.updated_at if state_is_same else None
 
             state = State(component_id, new_state, metadata, updated_at)
             self.states[component_id] = state
+            self._lock.release()
 
             if previous_state:
                 previous_state = previous_state.to_dict()

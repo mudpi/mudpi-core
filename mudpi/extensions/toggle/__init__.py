@@ -90,10 +90,10 @@ class Toggle(Component):
                     # Failsafe cutoff duration
                     self.turn_off()
 
-    def restore_state(self, state={}):
+    def restore_state(self, state):
         """ This is called on start to 
             restore previous state """
-        self._state = state.get('state', False)
+        self._active = state.state
         return
 
     def fire(self, data={}):

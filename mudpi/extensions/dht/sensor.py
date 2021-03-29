@@ -33,7 +33,7 @@ class Interface(BaseInterface):
             if not conf.get('pin'):
                 raise ConfigError('Missing `pin` in DHT config.')
 
-            if conf.get('model') not in DHTSensor.models:
+            if str(conf.get('model')) not in DHTSensor.models:
                 conf['model'] = '11'
                 Logger.log(
                     LOG_LEVEL["warning"],
@@ -100,18 +100,26 @@ class DHTSensor(Sensor):
         if self.type in self.models:
             self._dht_device = self.models[self.type]
 
-        try:
-            self._sensor = self._dht_device(self.pin_obj)
-        except Exception as error:
-            Logger.log(
-                LOG_LEVEL["error"],
-                'Sensor Initialize Error: DHT Failed to Init'
-            )
-            Logger.log(
-                LOG_LEVEL["debug"],
-                error
-            )
-            return False
+        self.check_dht()
+
+        return True
+
+    def check_dht(self):
+        """ Check if the DHT device is setup """
+        if self._sensor is None:
+            try:
+                self._sensor = self._dht_device(self.pin_obj)
+            except Exception as error:
+                Logger.log(
+                    LOG_LEVEL["error"],
+                    'Sensor Initialize Error: DHT Failed to Init'
+                )
+                self._sensor = None
+                Logger.log(
+                    LOG_LEVEL["debug"],
+                    error
+                )
+                return False
         return True
 
     def update(self):
@@ -120,35 +128,36 @@ class DHTSensor(Sensor):
         temperature_c = None
         _attempts = 0
 
-        while _attempts < self.read_attempts:
-            try:
-                # Calling temperature or humidity triggers measure()
-                temperature_c = self._sensor.temperature
-                humidity = self._sensor.humidity
-            except RuntimeError as error:
-                # Errors happen fairly often, DHT's are hard to read
-                Logger.log(LOG_LEVEL["error"], error)
-            except Exception as error:
-                Logger.log(
-                    LOG_LEVEL["error"],
-                    f'DHT Device Encountered an Error. Attempt {_attempts + 1}/{self.read_attempts}'
-                )
-                self._sensor.exit()
+        if self.check_dht():
+            while _attempts < self.read_attempts:
+                _attempts +=1
+                try:
+                    # Calling temperature or humidity triggers measure()
+                    temperature_c = self._sensor.temperature
+                    humidity = self._sensor.humidity
+                except RuntimeError as error:
+                    # Errors happen fairly often, DHT's are hard to read
+                    Logger.log(LOG_LEVEL["error"], error)
+                except Exception as error:
+                    Logger.log(
+                        LOG_LEVEL["error"],
+                        f'DHT Device Encountered an Error. Attempt {_attempts+1}/{self.read_attempts}'
+                    )
+                    self._sensor.exit()
+                    self._sensor = None
 
-            if humidity is not None and temperature_c is not None:
-                _temperature = temperature_c if self.mudpi.unit_system == METRIC_SYSTEM else (
-                            temperature_c * 1.8 + 32)
-                readings = {
-                    'temperature': round(_temperature, 2),
-                    'humidity': round(humidity, 2)
-                }
-                self._state = readings
-                return readings
-            else:
-                Logger.log(
-                    LOG_LEVEL["error"],
-                    f'DHT Reading was Invalid. Attempt {_attempts + 1}/{self.read_attempts}'
-                )
-            time.sleep(1)
-            _attempts += 1
+                if humidity is not None and temperature_c is not None:
+                    _temperature = temperature_c if self.mudpi.unit_system == METRIC_SYSTEM else (temperature_c * 1.8 + 32)
+                    readings = {
+                        'temperature': round(_temperature, 2),
+                        'humidity': round(humidity, 2)
+                    }
+                    self._state = readings
+                    return readings
+                else:
+                    Logger.log(
+                        LOG_LEVEL["error"],
+                        f'DHT Reading was Invalid. Attempt {_attempts+1}/{self.read_attempts}'
+                    )
+                time.sleep(1)
         return None
