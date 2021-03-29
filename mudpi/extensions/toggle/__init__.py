@@ -93,7 +93,7 @@ class Toggle(Component):
     def restore_state(self, state):
         """ This is called on start to 
             restore previous state """
-        self._state = state.state
+        self._active = state.state
         return
 
     def fire(self, data={}):
