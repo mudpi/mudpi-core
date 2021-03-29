@@ -332,7 +332,7 @@ class ExtensionImporter:
         # Call the extension init with the validated configs
         if self.extension.__class__.init == self.extension.__class__.__bases__[0].init:
             Logger.log(
-                LOG_LEVEL["debug"], f"Extension {self.namespace} did not define an `init()` method."
+                LOG_LEVEL["debug"], f"Notice: Extension {self.namespace} did not define an `init()` method."
             )
 
         Logger.log_formatted(
