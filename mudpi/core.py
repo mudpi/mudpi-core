@@ -223,6 +223,16 @@ class MudPi:
             extension.unload()
         return True
 
+    def restore_states(self):
+        """ Restore previous components states on first boot """
+        _comp_ids = self.components.ids()
+        for state_id in self.states.ids():
+            if state_id in _comp_ids:
+                comp = self.components.get(state_id)
+                comp.restore_state(self.states.get(state_id))
+                Logger.log(LOG_LEVEL["debug"], f"Restored State for {state_id}")
+
+
 
 class CoreState(enum.Enum):
     """ Enums for the current state of MudPi. """

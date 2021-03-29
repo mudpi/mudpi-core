@@ -96,11 +96,11 @@ class NanpyGPIOToggle(Toggle):
                     self._pin_setup = False
         return None
 
-    def restore_state(self, state={}):
+    def restore_state(self, state):
         """ This is called on start to 
             restore previous state """
         if self._pin_setup:
-            state = self.pin_state_on if state.get('state', False) else self.pin_state_off
+            state = self.pin_state_on if state.state else self.pin_state_off
             self.node.api.digitalWrite(self.pin, state)
         return
 

@@ -103,6 +103,10 @@ def main(args=None):
 
     Logger.log_formatted(LOG_LEVEL["warning"], "MudPi Fully Loaded", 'Complete', 'success')
 
+
+    Logger.log_formatted(LOG_LEVEL["info"], "Checking for Previous Component States", 'Pending', 'warning')
+    manager.mudpi.restore_states()
+    Logger.log_formatted(LOG_LEVEL["warning"], "Restored Previous Component States", 'Complete', 'success')
     #########################
     ### Start All Systems ###
     Logger.log(LOG_LEVEL["debug"], f'{" Start Systems ":_^{FONT_PADDING+8}}')

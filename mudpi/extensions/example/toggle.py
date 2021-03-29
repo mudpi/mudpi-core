@@ -35,10 +35,10 @@ class ExampleToggle(Toggle):
     """
 
     """ Methods """
-    def restore_state(self, state={}):
+    def restore_state(self, state):
         """ This is called on start to 
             restore previous state """
-        self._state = True if state.get('state', False) else False
+        self._state = True if state.state else False
         return
 
 

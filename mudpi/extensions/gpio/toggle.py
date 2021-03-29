@@ -92,10 +92,10 @@ class GPIOToggle(Toggle):
 
         return True
 
-    def restore_state(self, state={}):
+    def restore_state(self, state):
         """ This is called on start to 
             restore previous state """
-        self.gpio_pin.value = self.pin_state_on if state.get('state', False) else self.pin_state_off
+        self.gpio_pin.value = self.pin_state_on if state.state else self.pin_state_off
         return
 
 

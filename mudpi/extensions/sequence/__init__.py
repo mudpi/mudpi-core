@@ -364,6 +364,14 @@ class Sequence(Component):
         self._step_complete = True
         self._step_triggered = True
 
+    def restore_state(self, state):
+        """ Restore previous state """
+        _state = json.loads(state.state)
+        self.active = bool(_state["active"])
+        self._delay_complete = _state["delay_complete"]
+        self._step_triggered = _state["step_triggered"]
+        self._step_complete = _state["step_complete"]
+
     def handle_event(self, event):
         """ Process event data for the sequence """
         _event_data = decode_event_data(event)

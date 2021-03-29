@@ -224,6 +224,8 @@ class Component:
         # Init hook for components
         self.init()
 
+        self.component_initialized()
+
     """ Properties 
     Override these depending on desired component functionality
     """
@@ -284,6 +286,10 @@ class Component:
 
     def unload(self):
         """ Unload the component and cleanup """
+        pass
+
+    def restore_state(self, state):
+        """ Reload the previous state from state manager """
         pass
 
 
