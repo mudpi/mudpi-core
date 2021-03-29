@@ -740,23 +740,26 @@ def _install_extension_requirements(mudpi, extension):
         cache[extension.namespace] = extension
         return cache[extension.namespace]
 
+    requirement_cache = mudpi.cache.setdefault('requirement_installed', {})
     for requirement in extension.requirements:
-        if not utils.is_package_installed(requirement):
-            Logger.log_formatted(
-                LOG_LEVEL["info"],
-                f'{FONT_YELLOW}{extension.namespace.title()}{FONT_RESET} requirements', 
-                'Installing', 'notice'
-            )
-            Logger.log(
-                LOG_LEVEL["debug"],
-                f'Installing package {FONT_YELLOW}{requirement}{FONT_RESET}',
-            )
-            if not utils.install_package(requirement):
-                Logger.log(
-                    LOG_LEVEL["error"],
-                    f'Error installing <{extension.title()}> requirement: {FONT_YELLOW}{requirement}{FONT_RESET}'
+        if requirement not in requirement_cache:
+            if not utils.is_package_installed(requirement):
+                Logger.log_formatted(
+                    LOG_LEVEL["info"],
+                    f'{FONT_YELLOW}{extension.namespace.title()}{FONT_RESET} requirements', 
+                    'Installing', 'notice'
                 )
-                return False
+                Logger.log(
+                    LOG_LEVEL["debug"],
+                    f'Installing package {FONT_YELLOW}{requirement}{FONT_RESET}',
+                )
+                if not utils.install_package(requirement):
+                    Logger.log(
+                        LOG_LEVEL["error"],
+                        f'Error installing <{extension.title()}> requirement: {FONT_YELLOW}{requirement}{FONT_RESET}'
+                    )
+                    return False
+                requirement_cache[requirement] = True
     # extension.requirements_installed = True
     cache[extension.namespace] = extension
     return cache[extension.namespace]
