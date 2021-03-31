@@ -1,6 +1,6 @@
 import json
 from mudpi.exceptions import MudPiError
-
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 class Registry:
     """ Key-Value database for managing object instances """
@@ -128,10 +128,18 @@ class ActionRegistry(Registry):
         command = self.parse_call(action_call)
         action = self._registry.get(command['namespace'], {}).get(command['action'])
         if not action:
-            raise MudPiError("Call to action that doesn't exists!")
+            # raise MudPiError("Call to action that doesn't exists!")
+            Logger.log(
+                LOG_LEVEL["error"],
+                f'{FONT_YELLOW}Call to action {action_call} that doesn\'t exists!.{FONT_RESET}'
+            )
         validated_data = action.validate(action_data)
         if not validated_data and action_data:
-            raise MudPiError("Action data was not valid!")
+            # raise MudPiError("Action data was not valid!")
+            Logger.log(
+                LOG_LEVEL["error"],
+                f'{FONT_YELLOW}Action data was not valid for {action_call}{FONT_RESET}'
+            )
         self.mudpi.events.publish('core', {'event': 'ActionCall', 'action': action_call, 'data': action_data, 'namespace': command['namespace']})
         action(data=validated_data)
 
