@@ -4,8 +4,6 @@
     to connect and send data through to
     MudPi. 
 """
-import sys
-import json
 import time
 import socket
 import threading
@@ -92,7 +90,8 @@ class SocketServer(Worker):
             self.sock.bind((self.host, self.port))
         except socket.error as msg:
             Logger.log(LOG_LEVEL['error'], f'Failed to create socket. Error Code: {str(msg[0])} Error Message: {msg[1]}')
-            sys.exit()
+            return False
+        return True
 
     def work(self, func=None):
         while self.mudpi.is_prepared:

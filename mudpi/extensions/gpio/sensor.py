@@ -28,15 +28,6 @@ class Interface(BaseInterface):
         for conf in config:
             if not conf.get('pin'):
                 raise ConfigError('Missing `pin` in GPIO config.')
-
-            # TODO: change this to work with all the other pin options beyond D## and A##
-            if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
-                raise ConfigError(
-                    "Cannot detect pin type (Digital or analog), "
-                    "should be D## or A## for digital or analog. "
-                    "Please refer to "
-                    "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
-                )
             
         return config
 
@@ -77,6 +68,8 @@ class GPIOSensor(Sensor):
             self.is_digital = True
         elif re.match(r'A\d+$', pin):
             self.is_digital = False
+        else:
+            self.is_digital = True
 
         self.gpio = digitalio
 

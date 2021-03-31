@@ -4,7 +4,6 @@
     through the picamera library.
 """
 from picamera import PiCamera
-from mudpi.utils import decode_event_data
 from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.camera import Camera

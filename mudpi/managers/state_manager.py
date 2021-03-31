@@ -55,7 +55,7 @@ class StateManager():
             return
 
         component_id = component_id.lower()
-        new_state = json.dumps(new_state)
+        # new_state = json.dumps(new_state)
         metadata = metadata or {}
 
         if new_state is not None:
