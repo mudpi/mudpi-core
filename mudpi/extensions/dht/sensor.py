@@ -136,14 +136,13 @@ class DHTSensor(Sensor):
 
         if self.check_dht():
             while _attempts < self.read_attempts:
-                _attempts +=1
                 try:
                     # Calling temperature or humidity triggers measure()
                     temperature_c = self._sensor.temperature 
                     humidity = self._sensor.humidity
                 except RuntimeError as error:
                     # Errors happen fairly often, DHT's are hard to read
-                    Logger.log(LOG_LEVEL["error"], error)
+                    Logger.log(LOG_LEVEL["debug"], error)
                 except Exception as error:
                     Logger.log(
                         LOG_LEVEL["error"],
@@ -162,8 +161,9 @@ class DHTSensor(Sensor):
                     return readings
                 else:
                     Logger.log(
-                        LOG_LEVEL["error"],
+                        LOG_LEVEL["debug"],
                         f'DHT Reading was Invalid. Attempt {_attempts+1}/{self.read_attempts}'
                     )
-                time.sleep(1)
+                time.sleep(2.1)
+                _attempts +=1
         return None
