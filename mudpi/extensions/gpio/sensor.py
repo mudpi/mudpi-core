@@ -64,9 +64,9 @@ class GPIOSensor(Sensor):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.config['pin'])
 
-        if re.match(r'D\d+$', pin):
+        if re.match(r'D\d+$', self.pin):
             self.is_digital = True
-        elif re.match(r'A\d+$', pin):
+        elif re.match(r'A\d+$', self.pin):
             self.is_digital = False
         else:
             self.is_digital = True
