@@ -71,6 +71,9 @@ class GPIOControl(Control):
             else:
                 # Unknown resistor pull, defaulting to None
                 self.config['resistor'] = self._resistor = None
+        else:
+            # Unknown resistor pull, defaulting to None
+            self.config['resistor'] = self._resistor = None
 
         self._control_pin = self.gpio.DigitalInOut(self.pin_obj)
         self._control_pin.switch_to_input(pull=self._resistor)
