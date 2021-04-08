@@ -147,6 +147,9 @@ class CoreManager:
         #  Import and setup the extensions
         self.load_extensions(extensions_to_load, config)
 
+        # Cache important data like requirements installed
+        self.mudpi.states.cache()
+
         return self.mudpi.extensions.all()
 
     def load_extensions(self, extensions, config):

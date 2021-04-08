@@ -75,7 +75,7 @@ class ExtensionManager:
 
             if _interface.__class__.load == _interface.__class__.__bases__[0].load:
                 Logger.log(
-                    LOG_LEVEL["debug"], f"Extension {self.namespace} Interface {_interface_name} did not define load() method."
+                    LOG_LEVEL["debug"], f"Notice: Extension {self.namespace} Interface {_interface_name} did not define load() method."
                 )
             result = _interface.load(entry)
             if not result: 

@@ -39,6 +39,7 @@ class ExampleToggle(Toggle):
         """ This is called on start to 
             restore previous state """
         self.active = True if state.state else False
+        self.reset_duration()
         return
 
 

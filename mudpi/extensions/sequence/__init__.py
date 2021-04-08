@@ -4,7 +4,6 @@
     automations that can be fired in 
     a sequenctial order.
 """
-import json
 import time
 import datetime
 import threading
@@ -366,8 +365,8 @@ class Sequence(Component):
 
     def restore_state(self, state):
         """ Restore previous state """
-        _state = json.loads(state.state)
-        self.active = bool(_state["active"])
+        _state = state.state
+        self.active = _state["active"]
         self._delay_complete = _state["delay_complete"]
         self._step_triggered = _state["step_triggered"]
         self._step_complete = _state["step_complete"]
@@ -445,7 +444,7 @@ class Sequence(Component):
                 # Get state object from manager
                 state = self.mudpi.states.get(key)
                 if state is not None:
-                    _state = json.loads(state.state)
+                    _state = state.state #json.loads(state.state)
                     if threshold.get("nested_source") is not None:
                         nested_source = threshold['nested_source'].lower()
                         try:

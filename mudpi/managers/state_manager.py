@@ -55,7 +55,7 @@ class StateManager():
             return
 
         component_id = component_id.lower()
-        new_state = json.dumps(new_state)
+        # new_state = json.dumps(new_state)
         metadata = metadata or {}
 
         if new_state is not None:
@@ -110,6 +110,16 @@ class StateManager():
                 data = self.redis.get(f'{key}.state')
                 _state = State.from_json(data)
                 self.states[key] = _state
+
+        # Restore requirement cache
+        _cache = self.redis.get('requirement_installed')
+        if _cache:
+            self.mudpi.cache['requirement_installed'] = json.loads(_cache)
+
+    def cache(self):
+        """ Cache some important states and data for MudPi """
+        if self.mudpi.cache.get('requirement_installed'):
+            self.redis.set('requirement_installed', json.dumps(self.mudpi.cache['requirement_installed']))
 
 
 class State():
