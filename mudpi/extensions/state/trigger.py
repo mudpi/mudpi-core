@@ -4,7 +4,6 @@
     checks new state against any 
     thresholds if provided.
 """
-import json
 from mudpi.utils import decode_event_data
 from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
@@ -68,7 +67,7 @@ class StateTrigger(Trigger):
             try:
                 if _event_data['event'] == 'StateUpdated':
                     if _event_data['component_id'] == self.source:
-                        sensor_value = self._parse_data(json.loads(_event_data["new_state"]["state"]))
+                        sensor_value = self._parse_data(_event_data["new_state"]["state"])
                         if self.evaluate_thresholds(sensor_value):
                             self.active = True
                             if self._previous_state != self.active:

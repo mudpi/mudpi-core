@@ -103,6 +103,7 @@ class NanpyGPIOToggle(Toggle):
             super.restore_state()
             state = self.pin_state_on if state.state else self.pin_state_off
             self.node.api.digitalWrite(self.pin, state)
+        self.reset_duration()
         return
 
     

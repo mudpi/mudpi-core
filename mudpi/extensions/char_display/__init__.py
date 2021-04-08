@@ -6,7 +6,6 @@
 """
 import re
 import time
-import json
 from mudpi.utils import decode_event_data
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.extensions import Component, BaseExtension
@@ -164,7 +163,7 @@ class CharDisplay(Component):
             if '.' in code:
                 _parts = code.split('.')
                 if self.mudpi.states.id_exists(_parts[0]):
-                    data = json.loads(self.mudpi.states.get(_parts[0]).state)
+                    data = self.mudpi.states.get(_parts[0]).state
                     for key in _parts[1:]:
                         try:
                             data = data[key]
@@ -173,7 +172,7 @@ class CharDisplay(Component):
                             break
             else:
                 if self.mudpi.states.id_exists(code):
-                    data = json.loads(self.mudpi.states.get(code).state)
+                    data = self.mudpi.states.get(code).state
 
             if data is None:
                 data = ''

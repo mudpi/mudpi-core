@@ -36,14 +36,6 @@ class Interface(BaseInterface):
 
             conf['pin'] = str(conf['pin'])
 
-            if not re.match(r'D\d+$', conf['pin']) and not re.match(r'A\d+$', conf['pin']):
-                raise ConfigError(
-                    "Cannot detect pin type (Digital or analog), "
-                    "should be D## or A## for digital or analog. "
-                    "Please refer to "
-                    "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
-                )
-
         return config
 
 
@@ -68,6 +60,8 @@ class GPIOToggle(Toggle):
             self.is_digital = True
         elif re.match(r'A\d+$', self.pin):
             self.is_digital = False
+        else:
+            self.is_digital = True
 
         if self.invert_state:
             self.pin_state_on = False
@@ -92,6 +86,7 @@ class GPIOToggle(Toggle):
             restore previous state """
         self.active = state.state
         self.gpio_pin.value = self.pin_state_on if self.active else self.pin_state_off
+        self.reset_duration()
         return
 
 

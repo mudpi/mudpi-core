@@ -85,26 +85,53 @@ class SunSensor(Sensor):
             "day_length": self._day_length
         }
 
+    @property
+    def duration(self):
+        """ Return c
+        how long the current state has been applied in seconds """
+        self._current_duration = time.perf_counter() - self._duration_start
+        return round(self._current_duration, 4)
+
+    """ Methods """
+    def restore_state(self, state):
+        """ Retstore state to prevent calls after multiple restarts """
+        self._sunrise = state.state["sunrise"]
+        self._sunset = state.state["sunset"]
+        self._solar_noon = state.state["solar_noon"]
+        self._day_length = state.state["day_length"]
+        _last_update = datetime.datetime.strptime(state.updated_at, '%Y-%m-%d %H:%M:%S')
+        _time = datetime.datetime.now() - _last_update
+        _hours_past = _time.total_seconds() / (60 * 60)
+        if _hours_past < 4:
+            self._data_expired = False
+
+
     def init(self):
         """ Initialize the sun component """
         # Track state change
         self._prev_state = {}
+        self._data_expired = True
         self._sunrise = '00:00:00 AM'
         self._sunset = '00:00:00 AM'
         self._solar_noon = '00:00:00 AM'
         self._day_length = '00:00:00'
 
         # For duration tracking
-        self._duration_start = time.perf_counter()
+        self.reset_duration()
 
     def update(self):
         """ Get the data for the day """
-        _data = self.fetch_data()
-        if _data:
-            self._sunrise = self.parse_time(_data['results']['sunrise'])
-            self._sunset = self.parse_time(_data['results']['sunset'])
-            self._solar_noon = self.parse_time(_data['results']['solar_noon'])
-            self._day_length = _data['results']['day_length']
+        if self.duration > (60 * 60 * 4):
+            self._data_expired = True
+
+        if self._data_expired:
+            _data = self.fetch_data()
+            if _data:
+                self._sunrise = self.parse_time(_data['results']['sunrise'])
+                self._sunset = self.parse_time(_data['results']['sunset'])
+                self._solar_noon = self.parse_time(_data['results']['solar_noon'])
+                self._day_length = _data['results']['day_length']
+                self._data_expired = False
 
     def fetch_data(self):
         """ Make an API request for updated data """
@@ -128,3 +155,8 @@ class SunSensor(Sensor):
         _date = _date.replace(day=_today.day, year=_today.year, month=_today.month)
         # .strftime('%Y-%m-%d %I:%M:%S %p')
         return _date.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None).strftime('%Y-%m-%d %I:%M:%S %p')
+
+    def reset_duration(self):
+        """ Reset the duration of the current state """
+        self._duration_start = time.perf_counter()
+        return self._duration_start

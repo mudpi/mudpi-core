@@ -3,12 +3,8 @@
     Connects to a LCD character 
     display through a linux I2C.
 """
-import time
-import json
-import redis
 import board
 import busio
-import datetime
 from mudpi.extensions import BaseInterface
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.extensions.char_display import CharDisplay
