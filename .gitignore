@@ -4,6 +4,7 @@ scripts/
 tests/
 img/
 build/
+media/
 mudpi.config
 *.log
 # Python compiled
