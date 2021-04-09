@@ -196,6 +196,11 @@ class CoreManager:
 
     def debug_dump(self, cache_dump=False):
         """ Dump important data from MudPi instance for debugging mode """
+        Logger.log(
+            LOG_LEVEL["debug"],
+            f'{YELLOW_BACK}UNIT SYSTEM{FONT_RESET} {self.mudpi.unit_system} - {self.mudpi.config.unit_system}'
+        )
+
         if cache_dump:
             Logger.log(
                 LOG_LEVEL["debug"],
