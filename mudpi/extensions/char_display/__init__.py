@@ -39,7 +39,7 @@ class CharDisplay(Component):
     @property
     def id(self):
         """ Unique id or key """
-        return self.config.get('key')
+        return self.config.get('key').lower()
 
     @property
     def name(self):

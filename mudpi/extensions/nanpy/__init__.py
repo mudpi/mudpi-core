@@ -72,7 +72,7 @@ class Node(Worker):
 
     @property
     def key(self):
-        return self.config.get('key')
+        return self.config.get('key').lower()
     
     @property
     def ready(self):

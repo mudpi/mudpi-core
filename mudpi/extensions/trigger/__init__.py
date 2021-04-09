@@ -45,7 +45,7 @@ class Trigger(Component):
     @property
     def id(self):
         """ Unique id or key """
-        return self.config.get('key')
+        return self.config.get('key').lower()
 
     @property
     def name(self):
@@ -87,19 +87,13 @@ class Trigger(Component):
     @active.setter
     def active(self, value):
         """ Allows `self.active = False` while still being thread safe """
-        if bool(value):
+        if value:
             self._active.set()
         else:
             self._active.clear()
 
 
     """ Methods """
-    def init(self):
-        """ Register Trigger to cache after __init__ """
-        self.cache = self.mudpi.cache.setdefault(NAMESPACE, {})
-        trigger_cache = self.cache.setdefault('triggers', {})
-        trigger_cache[self.id] = self
-
     def check(self):
         """ Main trigger check loop to determine if 
             trigger should fire. """
@@ -228,6 +222,11 @@ class Trigger(Component):
 
         # Used to fire triggers `once` or `many`
         self._previous_state = False
+
+        # Register Trigger to cache
+        self.cache = self.mudpi.cache.setdefault(NAMESPACE, {})
+        trigger_cache = self.cache.setdefault('triggers', {})
+        trigger_cache[self.id] = self
 
 
 """ Helper """

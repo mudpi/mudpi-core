@@ -37,7 +37,7 @@ class Toggle(Component):
     @property
     def id(self):
         """ Unique id or key """
-        return self.config.get('key')
+        return self.config.get('key').lower()
 
     @property
     def name(self):
@@ -68,15 +68,15 @@ class Toggle(Component):
     @property
     def active(self):
         """ Thread save active boolean """
-        return self._active #self._active.is_set()
+        return self._active.is_set()
 
     @active.setter
     def active(self, value):
         """ Allows `self.active = False` while still being thread safe """
-        if bool(value):
-            self._active = True #self._active.set()
+        if value:
+            self._active.set()
         else:
-            self._active = False #self._active.clear()
+            self._active.clear()
 
 
     """ Methods """
@@ -146,4 +146,4 @@ class Toggle(Component):
         self._duration_start = time.perf_counter()
 
         # Thread safe bool for if sequence is active
-        self._active = False #threading.Event()
+        self._active = threading.Event()

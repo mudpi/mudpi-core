@@ -66,7 +66,7 @@ class Sequence(Component):
     @property
     def id(self):
         """ Unique id or key """
-        return self.config.get('key')
+        return self.config.get('key').lower()
 
     @property
     def name(self):
@@ -255,9 +255,9 @@ class Sequence(Component):
         self.fire({
             "event": "SequenceRestarted"
         })
-        Logger.log(
+        Logger.log_formatted(
             LOG_LEVEL["info"],
-            f'Sequence {FONT_CYAN}{self.name}{FONT_RESET} Restarted'
+            f'Sequence {FONT_CYAN}{self.name}{FONT_RESET}', 'Restarted', 'warning'
         )
 
     def reset(self, event_data=None):
@@ -267,9 +267,9 @@ class Sequence(Component):
         self.fire({
             "event": "SequenceReset"
         })
-        Logger.log(
+        Logger.log_formatted(
             LOG_LEVEL["info"],
-            f'Sequence {FONT_CYAN}{self.name}{FONT_RESET} Reset'
+            f'Sequence {FONT_CYAN}{self.name}{FONT_RESET}', 'Reset', 'warning'
         )
 
     def reset_step(self, event_data=None):
@@ -288,9 +288,9 @@ class Sequence(Component):
             self.fire({
                 "event": "SequenceStarted"
             })
-            Logger.log(
+            Logger.log_formatted(
                 LOG_LEVEL["info"],
-                f'Sequence {FONT_CYAN}{self.name}{FONT_RESET} Started'
+                f'Sequence {FONT_CYAN}{self.name}{FONT_RESET}', 'Started', 'success'
             )
 
     def stop(self, event_data=None):
@@ -302,9 +302,9 @@ class Sequence(Component):
             self.fire({
                 "event": "SequenceStopped"
             })
-            Logger.log(
+            Logger.log_formatted(
                 LOG_LEVEL["info"],
-                f'Sequence {FONT_CYAN}{self.name}{FONT_RESET} Stopped'
+                f'Sequence {FONT_CYAN}{self.name}{FONT_RESET}', 'Stopped', 'error'
             )
 
     def next_step(self, event_data=None):
@@ -331,9 +331,9 @@ class Sequence(Component):
                     # Last step of sequence completed
                     self.active = False
                     self.fire({"event": "SequenceEnded"})
-                    Logger.log(
+                    Logger.log_formatted(
                         LOG_LEVEL["info"],
-                        f'Sequence {FONT_CYAN}{self.name}{FONT_RESET} Completed'
+                        f'Sequence {FONT_CYAN}{self.name}{FONT_RESET}', 'Completed', 'success'
                     )
                 self.reset_duration()
 
@@ -385,31 +385,31 @@ class Sequence(Component):
                 if _event_data['event'] == 'SequenceNextStep':
                     self.advance_step()
                     Logger.log(
-                        LOG_LEVEL["info"],
+                        LOG_LEVEL["debug"],
                         f'Sequence {self.name} Next Step Triggered'
                     )
                 elif _event_data['event'] == 'SequencePreviousStep':
                     self.previous_step()
                     Logger.log(
-                        LOG_LEVEL["info"],
+                        LOG_LEVEL["debug"],
                         f'Sequence {self.name} Previous Step Triggered'
                     )
                 elif _event_data['event'] == 'SequenceStart':
                     self.start()
                     Logger.log(
-                        LOG_LEVEL["info"],
+                        LOG_LEVEL["debug"],
                         f'Sequence {self.name} Start Triggered'
                     )
                 elif _event_data['event'] == 'SequenceSkipStep':
                     self.skip_step()
                     Logger.log(
-                        LOG_LEVEL["info"],
+                        LOG_LEVEL["debug"],
                         f'Sequence {self.name} Skip Step Triggered'
                     )
                 elif _event_data['event'] == 'SequenceStop':
                     self.stop()
                     Logger.log(
-                        LOG_LEVEL["info"],
+                        LOG_LEVEL["debug"],
                         f'Sequence {self.name} Stop Triggered'
                     )
             except:
