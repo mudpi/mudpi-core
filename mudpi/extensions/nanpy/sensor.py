@@ -210,7 +210,7 @@ class NanpyDHTSensor(Sensor):
             try:
                 self.check_connection()
                 if self._dht:
-                    _temp_format = bool(self.mudpi.unit_system == IMPERIAL_SYSTEM)
+                    _temp_format = self.mudpi.unit_system == IMPERIAL_SYSTEM
                     temperature = self._dht.readTemperature(_temp_format)
                     humidity = self._dht.readHumidity()
                     data = {'temperature': round(temperature, 2),
