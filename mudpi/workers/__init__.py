@@ -27,12 +27,13 @@ class Worker:
         self._worker_available = threading.Event()
         self._thread = None
         self.init()
+        self.reset_duration()
         self.mudpi.workers.register(self.key, self)
 
     """ Properties """
     @property
     def key(self):
-        return self.config.get('key')
+        return self.config.get('key').lower()
 
     @property
     def update_interval(self):
@@ -77,7 +78,7 @@ class Worker:
                     if component.should_update:
                         component.update()
                         component.store_state()
-
+                self.reset_duration()
                 self._wait(self.update_interval)
         # # MudPi Shutting Down, Perform Cleanup Below
         Logger.log_formatted(LOG_LEVEL["debug"],
@@ -93,16 +94,16 @@ class Worker:
             while waiting. 
         """
         time_remaining = duration
-        while time_remaining > 0 and self.mudpi.is_prepared:
+        while time_remaining > 0 and self.mudpi.is_prepared and self.duration < duration:
             time.sleep(0.001)
             time_remaining -= 0.001
 
     """ Should be moved to Timer util """
     @property
-    def elapsed_time(self):
+    def duration(self):
         self.time_elapsed = time.perf_counter() - self.time_start
-        return self.time_elapsed
+        return round(self.time_elapsed, 4)
 
-    def reset_elapsed_time(self):
+    def reset_duration(self):
         self.time_start = time.perf_counter()
         pass
