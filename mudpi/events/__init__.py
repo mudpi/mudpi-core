@@ -6,6 +6,7 @@
     Available Adaptors: 'mqtt', 'redis'
     Default: redis
 """
+from uuid import uuid4
 from mudpi.events import adaptors
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 
@@ -62,6 +63,11 @@ class EventSystem():
 
     def publish(self, topic, data=None):
         """ Publish an event on an topic """
+        if data:
+            if isinstance(data, dict):
+                if 'uuid' not in data:
+                    data['uuid'] = str(uuid4())
+
         for key, adaptor in self.adaptors.items():
             adaptor.publish(topic, data)
         return True
