@@ -188,8 +188,7 @@ class CoreManager:
         """ Validate that config path was provided and a file """
         if not os.path.exists(config_path):
             raise ConfigNotFoundError(f"Config File Doesn't Exist at {config_path}")
-            return False
-        else: 
+        else:
             # No config file provided just a path
             pass
 

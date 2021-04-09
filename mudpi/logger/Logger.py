@@ -15,7 +15,7 @@ LOG_LEVEL = {
 
 
 class Logger:
-    logger = None
+    logger = logging.getLogger("mudpi_stream")
 
     def __init__(self, config: dict):
         if "logging" in config.keys():

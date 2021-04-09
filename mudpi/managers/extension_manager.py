@@ -124,7 +124,6 @@ class ExtensionManager:
 
         if self.config is None:
             raise MudPiError("Config was null in extension manager. Call `init(config)` first.")
-            return
 
         # Get the interface and extension
         interface, extension = self.importer.prepare_interface_and_import(interface_name)

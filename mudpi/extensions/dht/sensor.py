@@ -3,10 +3,11 @@
     Connects to a DHT device to get
     humidity and temperature readings. 
 """
-import re
 import time
-import board
+
 import adafruit_dht
+import board
+
 from mudpi.constants import METRIC_SYSTEM
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
@@ -32,21 +33,13 @@ class Interface(BaseInterface):
             if not conf.get('pin'):
                 raise ConfigError('Missing `pin` in DHT config.')
 
-            if not re.match(r'D\d+$', str(conf['pin'])) and not re.match(r'A\d+$', str(conf['pin'])):
-                raise ConfigError(
-                    "Cannot detect pin type (Digital or analog), "
-                    "should be Dxx or Axx for digital or analog. "
-                    "Please refer to "
-                    "https://github.com/adafruit/Adafruit_Blinka/tree/master/src/adafruit_blinka/board"
-                )
-
             if str(conf.get('model')) not in DHTSensor.models:
                 conf['model'] = '11'
                 Logger.log(
                     LOG_LEVEL["warning"],
                     'Sensor Model Error: Defaulting to DHT11'
                 )
-            
+
         return config
 
 
@@ -66,6 +59,7 @@ class DHTSensor(Sensor):
     }  # AM2302 = DHT22
 
     """ Properties """
+
     @property
     def id(self):
         """ Return a unique id for the component """
@@ -75,7 +69,7 @@ class DHTSensor(Sensor):
     def name(self):
         """ Return the display name of the component """
         return self.config.get('name') or f"{self.id.replace('_', ' ').title()}"
-    
+
     @property
     def state(self):
         """ Return the state of the component (from memory, no IO!) """
@@ -96,8 +90,8 @@ class DHTSensor(Sensor):
         """ Number of times to try sensor for good data """
         return int(self.config.get('read_attempts', self._read_attempts))
 
-
     """ Methods """
+
     def init(self):
         """ Connect to the device """
         self._sensor = None
@@ -107,7 +101,7 @@ class DHTSensor(Sensor):
             self._dht_device = self.models[self.type]
 
         self.check_dht()
-            
+
         return True
 
     def check_dht(self):
@@ -138,7 +132,7 @@ class DHTSensor(Sensor):
             while _attempts < self.read_attempts:
                 try:
                     # Calling temperature or humidity triggers measure()
-                    temperature_c = self._sensor.temperature 
+                    temperature_c = self._sensor.temperature
                     humidity = self._sensor.humidity
                 except RuntimeError as error:
                     # Errors happen fairly often, DHT's are hard to read

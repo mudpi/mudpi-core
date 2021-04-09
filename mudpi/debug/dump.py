@@ -107,9 +107,9 @@ def dumpall():
         for x in a.register.names:
             r = a.register.get(x)
             if r.size == 2:
-                v = '0x%04X' % (r.value)
+                v = '0x%04X' % r.value
             else:
-                v = '  0x%02X' % (r.value)
+                v = '  0x%02X' % r.value
     
             print('%-20s = %s @0x%2X (size:%s)' % (r.name, v, r.address, r.size))
 
