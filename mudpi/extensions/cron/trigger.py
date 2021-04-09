@@ -5,6 +5,7 @@
 """
 import time
 import pycron
+import datetime
 from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.trigger import Trigger
@@ -14,7 +15,7 @@ from mudpi.logger.Logger import Logger, LOG_LEVEL
 class Interface(BaseInterface):
 
     # Override the update time
-    update_interval = 60
+    update_interval = 10
     
     def load(self, config):
         """ Load cron trigger component from configs """
@@ -32,7 +33,7 @@ class Interface(BaseInterface):
             if not conf.get('schedule'):
                 Logger.log(
                     LOG_LEVEL["debug"],
-                    'Trigger: No `schedule`, defaulting to every 5mins'
+                    'Trigger: No `schedule`, defaulting to every 5 mins'
                 )
                 # raise ConfigError('Missing `schedule` in Trigger config.')
             
@@ -65,11 +66,11 @@ class CronTrigger(Trigger):
                         self.trigger()
                         self.active = True
                 else:
-                    self.active = False
+                    if self.active:
+                        self.active = False
             except Exception as error:
                 Logger.log(
                     LOG_LEVEL["error"],
                     "Error evaluating time trigger schedule."
                 )
         return
-
