@@ -83,6 +83,12 @@ class NanpyGPIOControl(Control):
         self.time_elapsed = time.perf_counter() - self.time_start
         return self.time_elapsed
 
+    @property
+    def state_changed(self):
+        """ Return if the state changed from previous state"""
+        return self.previous_state != self._state
+
+
     """ Methods """
     def init(self):
         """ Connect to the Parent Device """
@@ -137,8 +143,11 @@ class NanpyGPIOControl(Control):
                     if self.elapsed_time > UPDATE_THROTTLE:
                         self.fire()
                         self.reset_elapsed_time()
+                else:
+                    if self.state_changed:
+                        self.fire()
         elif self.type == 'switch':
-            if self._state == self.previous_state:
+            if not self.state_changed:
                 if self.elapsed_time > DEBOUNCE and not self._fired:
                     self.fire()
                     self._fired = True
@@ -146,7 +155,7 @@ class NanpyGPIOControl(Control):
             else:
                 self._fired = False
         elif self.type == 'potentiometer':
-            if self._state != self.previous_state:
+            if self.state_changed:
                 self.fire()
             
     def reset_elapsed_time(self):

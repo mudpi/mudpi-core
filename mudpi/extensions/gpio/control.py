@@ -34,6 +34,9 @@ class Interface(BaseInterface):
                 
             if conf.get('pin') is None:
                 raise ConfigError('Missing `pin` in GPIO config.')
+
+            if conf.get('debounce') is not None and conf.get('edge_detection') is None:
+                raise ConfigError('`debounce` detected without required `edge_detection` in GPIO config.')
         return config
 
 
@@ -46,7 +49,12 @@ class GPIOControl(Control):
     @property
     def state(self):
         """ Return the state of the component (from memory, no IO!) """
-        return self._state
+        return self._state if not self.invert_state else not self._state
+
+    @property
+    def state_changed(self):
+        """ Return if the state changed from previous state"""
+        return self.previous_state != self._state
 
 
     """ Methods """
@@ -54,7 +62,9 @@ class GPIOControl(Control):
         """ Connect to the device """
         self.pin_obj = getattr(board, self.pin)
         self.gpio = digitalio
-        self.previous_state = 0
+        self._state = 0
+        # Used to track changes
+        self.previous_state = self._state
 
         if re.match(r'D\d+$', self.pin):
             self.is_digital = True
@@ -93,35 +103,25 @@ class GPIOControl(Control):
     def update(self):
         """ Get data from GPIO connection"""
         data = None
+        self.previous_state = self.state
         if self.edge_detection is not None:
             self._control.update()
             if self.edge_detection == "both":
                 if self._control.fell or self._control.rose:
                     # Pressed or Released
-                    data = 1
+                    self._state = 1 if self._control_pin.value else 0
+                    # self.fire()
                 else:
-                    data = 0
+                    pass
+                    # self._state = 1 if self._control_pin.value else 0
             else:    # "fell" or "rose"
-                data = 1 if getattr(self._control, self.edge_detection) else 0
+                if getattr(self._control, self.edge_detection):
+                self._state = 1 if self._control_pin.value else 0
+                # self.fire()
         else:
-            data = 1 if self._control_pin.value else 0
-        self.previous_state = self._state
-        self._state = data
-        self.handle_state()
+            # No edge detection
+            self._state = 1 if self._control_pin.value else 0
+
+        if self.state_changed:
+            self.fire()
         return data
-
-    def handle_state(self):
-        """ Control logic depending on type of control """
-        if self.type == 'button':
-            if self._state:
-                if not self.invert_state:
-                    self.fire()
-            else:
-                if self.invert_state:
-                    self.fire()
-        elif self.type == 'switch':
-            # Switches use debounce ensuring we only fire once
-            if self._state:
-                # State changed since we are using edge detect
-                self.fire()
-

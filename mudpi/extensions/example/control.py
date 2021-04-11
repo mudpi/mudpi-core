@@ -55,6 +55,11 @@ class ExampleControl(Control):
             _chance = 25
         return _chance
 
+    @property
+    def state_changed(self):
+        """ Return if the state changed from previous state"""
+        return self.previous_state != self._state
+
 
     """ Methods """
     def init(self):
@@ -66,29 +71,38 @@ class ExampleControl(Control):
         # One time firing
         self._fired = False
 
+        # Used to track changes
+        self.previous_state = self._state
+
     def update(self):
         """ Check if control should flip state randomly """
         _state = self._state
         if random.randint(1, 100) <= self.update_chance:
             _state = not _state
+        self.previous_state = self._state
         self._state = _state
         self.handle_state()
 
     def handle_state(self):
         """ Control logic depending on type of control """
-        if self.type == 'button':
-            if self._state:
-                if not self.invert_state:
-                    self.fire()
-            else:
-                if self.invert_state:
-                    self.fire()
-        elif self.type == 'switch':
-            # Switches use debounce ensuring we only fire once
-            if self._state and not self._fired:
-                # State changed since we are using edge detect
+        if self.state_changed:
                 self.fire()
-                self._fired = True
-            else:
-                self._fired = False
+        else:
+            self._fired = False
+
+        # if self.type == 'button':
+        #     if self._state:
+        #         if not self.invert_state:
+        #             self.fire()
+        #     else:
+        #         if self.invert_state:
+        #             self.fire()
+        # elif self.type == 'switch':
+        #     # Switches use debounce ensuring we only fire once
+        #     if self._state and not self._fired:
+        #         # State changed since we are using edge detect
+        #         self.fire()
+        #         self._fired = True
+        #     else:
+        #         self._fired = False
 
