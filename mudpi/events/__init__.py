@@ -7,6 +7,7 @@
     Default: redis
 """
 from uuid import uuid4
+from copy import deepcopy
 from mudpi.events import adaptors
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 
@@ -65,11 +66,16 @@ class EventSystem():
         """ Publish an event on an topic """
         if data:
             if isinstance(data, dict):
-                if 'uuid' not in data:
-                    data['uuid'] = str(uuid4())
+                _data = deepcopy(data)
+                if 'uuid' not in _data:
+                    _data['uuid'] = str(uuid4())
+            else:
+                _data = data
+        else:
+            _data = data
 
         for key, adaptor in self.adaptors.items():
-            adaptor.publish(topic, data)
+            adaptor.publish(topic, _data)
         return True
 
     def subscribe_once(self, topic, callback):
