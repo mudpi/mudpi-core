@@ -76,8 +76,8 @@ class ToggleTrigger(Trigger):
                                 # Trigger not reset check if its multi fire
                                 if self.frequency == 'many':
                                     self.trigger(_event_data)
-                    else:
-                        self.active = False
+                        else:
+                            self.active = False
             except Exception as error:
                 Logger.log(LOG_LEVEL["error"],
                            f'Error evaluating thresholds for trigger {self.id}')
