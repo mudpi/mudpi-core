@@ -122,7 +122,7 @@ class RTSPCamera(Camera):
         self.open_stream()
 
         if self.cap.isOpened():
-            _,frame = self.cap.read()
+            _, frame = self.cap.read()
             self.cap.release() #releasing camera immediately after capturing picture
             if _ and frame is not None:
                 image_name = f'{os.path.join(self.path, self.filename)}.jpg'
