@@ -99,6 +99,7 @@ class GPIOToggle(Toggle):
             self.active = not self.active
             self.gpio_pin.value = self.pin_state_on if self.active else self.pin_state_off
             self.store_state()
+            self.fire()
 
     def turn_on(self, data={}):
         # Turn on GPIO if its not on
@@ -107,6 +108,7 @@ class GPIOToggle(Toggle):
                 self.gpio_pin.value = self.pin_state_on
                 self.active = True
                 self.store_state()
+                self.fire()
 
     def turn_off(self, data={}):
         # Turn off GPIO if its not off
@@ -115,3 +117,4 @@ class GPIOToggle(Toggle):
                 self.gpio_pin.value = self.pin_state_off
                 self.active = False
                 self.store_state()
+                self.fire()

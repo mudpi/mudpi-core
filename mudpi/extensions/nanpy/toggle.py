@@ -119,6 +119,7 @@ class NanpyGPIOToggle(Toggle):
                 self.node.api.digitalWrite(self.pin, state)
                 self.active = not self.active
                 self.store_state()
+                self.fire()
 
     def turn_on(self, data={}):
         # Turn on GPIO if its not on
@@ -129,6 +130,7 @@ class NanpyGPIOToggle(Toggle):
                     self.node.api.digitalWrite(self.pin, self.pin_state_on)
                     self.active = True
                     self.store_state()
+                    self.fire()
 
     def turn_off(self, data={}):
         # Turn off GPIO if its not off
@@ -139,3 +141,4 @@ class NanpyGPIOToggle(Toggle):
                     self.node.api.digitalWrite(self.pin, self.pin_state_off)
                     self.active = False
                     self.store_state()
+                    self.fire()

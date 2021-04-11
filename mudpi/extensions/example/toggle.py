@@ -49,6 +49,7 @@ class ExampleToggle(Toggle):
         if self.mudpi.is_prepared:
             self.active = not self.active
             self.store_state()
+            self.fire()
 
     def turn_on(self, data={}):
         # Turn on if its not on
@@ -56,6 +57,7 @@ class ExampleToggle(Toggle):
             if not self.active:
                 self.active = True
                 self.store_state()
+                self.fire()
 
     def turn_off(self, data={}):
         # Turn off if its not off
@@ -63,3 +65,4 @@ class ExampleToggle(Toggle):
             if self.active:
                 self.active = False
                 self.store_state()
+                self.fire()
