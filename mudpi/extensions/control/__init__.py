@@ -21,7 +21,6 @@ class Extension(BaseExtension):
         return True
 
 
-
 class Control(Component):
     """ Base Control
         Base class for all controls. 
@@ -89,3 +88,4 @@ class Control(Component):
             'invert_state': self.invert_state
         }
         self.mudpi.events.publish(NAMESPACE, event_data)
+        self._fired = True
