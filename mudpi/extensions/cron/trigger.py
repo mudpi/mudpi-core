@@ -15,7 +15,7 @@ from mudpi.logger.Logger import Logger, LOG_LEVEL
 class Interface(BaseInterface):
 
     # Override the update time
-    update_interval = 10
+    update_interval = 60
     
     def load(self, config):
         """ Load cron trigger component from configs """
@@ -62,8 +62,8 @@ class CronTrigger(Trigger):
         if self.mudpi.is_running:
             try:
                 if pycron.is_now(self.schedule):
+                    self.trigger()
                     if not self.active:
-                        self.trigger()
                         self.active = True
                 else:
                     if self.active:
