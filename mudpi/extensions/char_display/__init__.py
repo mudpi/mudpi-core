@@ -154,25 +154,25 @@ class CharDisplay(Component):
         short_codes = re.findall(r'\[(.*?) *\]', message)
 
         for code in short_codes:
-            data = None
+            _state = None
             if '.' in code:
                 _parts = code.split('.')
                 if self.mudpi.states.id_exists(_parts[0]):
-                    data = self.mudpi.states.get(_parts[0]).state
+                    _state = self.mudpi.states.get(_parts[0]).state
                     for key in _parts[1:]:
                         try:
-                            data = data[key]
+                            _state = _state[key]
                         except Exception as error:
-                            data = None
+                            _state = None
                             break
             else:
                 if self.mudpi.states.id_exists(code):
-                    data = self.mudpi.states.get(code).state
+                    _state = self.mudpi.states.get(code).state
 
-            if data is None:
-                data = ''
+            if _state is None:
+                _state = ''
 
-            message = str(message).replace('[' + code + ']', str(data))
+            message = str(message).replace('[' + code + ']', str(_state))
 
         new_message = {
             "message": message.replace("\\n", "\n"),
