@@ -59,7 +59,7 @@ class Control(Component):
     @property
     def edge_detection(self):
         """ Return if edge detection is used """
-        _edge_detection = self.config.get('edge_detection')
+        _edge_detection = self.config.get('edge_detection').lower()
         if _edge_detection is not None:
             if _edge_detection == "falling" or _edge_detection == "fell":
                 _edge_detection = "fell"
@@ -76,7 +76,7 @@ class Control(Component):
     
 
     """ Methods """
-    def fire(self):
+    def fire(self, data={}):
         """ Fire a control event """
         event_data = {
             'event': 'ControlUpdated',
@@ -87,5 +87,6 @@ class Control(Component):
             'state': self.state,
             'invert_state': self.invert_state
         }
+        event_data.update(data)
         self.mudpi.events.publish(NAMESPACE, event_data)
         self._fired = True
