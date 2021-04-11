@@ -4,6 +4,7 @@
     take analog or digital readings. 
 """
 import re
+import time
 import board
 import digitalio
 from adafruit_debouncer import Debouncer
@@ -11,6 +12,8 @@ from mudpi.extensions import BaseInterface
 from mudpi.extensions.control import Control
 from mudpi.exceptions import MudPiError, ConfigError
 
+
+UPDATE_THROTTLE = 2
 
 class Interface(BaseInterface):
 
@@ -56,6 +59,11 @@ class GPIOControl(Control):
         """ Return if the state changed from previous state"""
         return self.previous_state != self._state
 
+    @property
+    def elapsed_time(self):
+        self.time_elapsed = time.perf_counter() - self.time_start
+        return self.time_elapsed
+
 
     """ Methods """
     def init(self):
@@ -98,6 +106,8 @@ class GPIOControl(Control):
             if self.debounce is not None:
                 self._control.interval = self.debounce
 
+        self.reset_elapsed_time()
+
         return True
 
     def update(self):
@@ -110,18 +120,52 @@ class GPIOControl(Control):
                 if self._control.fell or self._control.rose:
                     # Pressed or Released
                     self._state = 1 if self._control_pin.value else 0
-                    # self.fire()
-                else:
-                    pass
-                    # self._state = 1 if self._control_pin.value else 0
+                    _event = "ControlUpdated" 
+                    if self._control.rose:
+                        if self.invert_state:
+                            _event = "ControlReleased"
+                        else:
+                            _event = "ControlPressed" 
+                    elif self._control.fell:
+                        if self.invert_state:
+                            _event = "ControlPressed"
+                        else:
+                            _event = "ControlReleased"
+                    self.fire({"event": _event})
             else:    # "fell" or "rose"
                 if getattr(self._control, self.edge_detection):
+                    _event = "ControlUpdated" 
+                    if self.edge_detection == "rose":
+                        if self.invert_state:
+                            _event = "ControlReleased"
+                        else:
+                            _event = "ControlPressed" 
+                    elif self.edge_detection == "fell":
+                        if self.invert_state:
+                            _event = "ControlPressed"
+                        else:
+                            _event = "ControlReleased"
+                    self.fire({"event": _event})
+
                 self._state = 1 if self._control_pin.value else 0
-                # self.fire()
         else:
             # No edge detection
             self._state = 1 if self._control_pin.value else 0
 
-        if self.state_changed:
-            self.fire()
+        if self.type == 'switch':
+            if self.state_changed:
+                self.fire()
+        elif self.type == 'button':
+            if self.state:
+                if self.elapsed_time > UPDATE_THROTTLE:
+                    self.fire()
+                    self.reset_elapsed_time()
+            else:
+                if self.state_changed:
+                    self.fire()
+
         return data
+
+    def reset_elapsed_time(self):
+        """ Reset duration tracker """
+        self.time_start = time.perf_counter()
