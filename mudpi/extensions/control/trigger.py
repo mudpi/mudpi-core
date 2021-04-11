@@ -4,6 +4,7 @@
     checks new state against any 
     thresholds if provided.
 """
+from . import NAMESPACE
 from mudpi.utils import decode_event_data
 from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
@@ -40,6 +41,18 @@ class ControlTrigger(Trigger):
 
     # Used for onetime subscribe
     _listening = False
+
+    # Type of events to listen to
+    _events = {
+        'default': "ControlUpdated",
+        'pressed': "ControlPressed",
+        'released': "ControlReleased"
+    }
+    
+    @property
+    def type(self):
+        """ Return Trigger Type """
+        return self.config.get("type", "default")
     
     
     def init(self):
@@ -48,7 +61,7 @@ class ControlTrigger(Trigger):
         if self.mudpi.is_prepared:
             if not self._listening:
                 # TODO: Eventually get a handler returned to unsub just this listener
-                self.mudpi.events.subscribe('control', self.handle_event)
+                self.mudpi.events.subscribe(NAMESPACE, self.handle_event)
                 self._listening = True
         return True
 
@@ -64,7 +77,7 @@ class ControlTrigger(Trigger):
         self._last_event = _event_data
         if _event_data.get('event'):
             try:
-                if _event_data['event'] == 'ControlUpdated':
+                if _event_data['event'] == self._events[self.type]:
                     if _event_data['component_id'] == self.source:
                         _value = self._parse_data(_event_data["state"])
                         if self.evaluate_thresholds(_value):
