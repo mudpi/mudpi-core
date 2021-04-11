@@ -7,6 +7,7 @@
 import time
 import datetime
 import threading
+from mudpi.utils import decode_event_data
 from mudpi.extensions import Component, BaseExtension
 
 
@@ -135,6 +136,37 @@ class Toggle(Component):
         self.active = False
         return self.active
 
+    def handle_event(self, event):
+        """ Handle events from event system """
+        _event = None
+        try: 
+            _event = decode_event_data(event)
+        except Exception as error:
+            _event = decode_event_data(event['data'])
+
+        if _event == self._last_event:
+            # Event already handled
+            return
+
+        self._last_event = _event
+        if _event is not None:
+            try:
+                if _event['event'] == 'Switch':
+                    if _event.get('data', None):
+                        if _event['data'].get('state', 0):
+                            self.turn_on()
+                        else:
+                            self.turn_off()
+                elif _event['event'] == 'Toggle':
+                    self.toggle()
+                elif _event['event'] == 'On':
+                    self.turn_on()
+                elif _event['event'] == 'Off':
+                    self.turn_off()
+            except Exception as error:
+                Logger.log(LOG_LEVEL["error"],
+                           f'Error handling event for {self.id}')
+
     """ Internal Methods 
     Do not override """
     def _init(self):
@@ -147,3 +179,9 @@ class Toggle(Component):
 
         # Thread safe bool for if sequence is active
         self._active = threading.Event()
+
+        # Prevent double event fires
+        self._last_event = None
+        
+        # Listen for events as well
+        self.mudpi.events.subscribe(NAMESPACE, self.handle_event)
