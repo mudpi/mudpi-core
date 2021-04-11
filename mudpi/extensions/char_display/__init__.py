@@ -93,7 +93,6 @@ class CharDisplay(Component):
         return bool(self.config.get('persist_display', False))
     
 
-
     """ Actions """
     def show(self, data=None): 
         """ Show a message on the screen """
@@ -113,7 +112,7 @@ class CharDisplay(Component):
 
     def clear_queue(self, data=None):
         """ Clear the message queue """
-        self.queue = []
+        self.queue.clear()
         Logger.log(LOG_LEVEL["debug"],
                    f'Cleared the Message Queue for {self.id}')
 
@@ -123,10 +122,6 @@ class CharDisplay(Component):
 
 
     """ Methods """
-    def init(self):
-        """ Setup the display to listen for events """
-        self.mudpi.events.subscribe(self.topic, self.handle_event)
-
     def update(self):
         """ Check if messages need to display from queue """
         if self.mudpi.is_prepared:
@@ -140,7 +135,7 @@ class CharDisplay(Component):
                 self.clear()
                 time.sleep(0.004) # time to finish clear
                 self.show(self.cached_message)
-                self.reset_duration()
+                # self.reset_duration()
                 # store message to only display once and prevent flickers
                 self.current_message = self.cached_message['message']
         else:
@@ -187,7 +182,17 @@ class CharDisplay(Component):
         if len(self.queue) >= self.message_limit:
             self.queue.pop(0)
 
-        self.queue.append(new_message)
+
+        if 'position' in data:
+            try:
+                _position = int(data['position'])
+            except Exception:
+                _position = self.message_limit-1
+            if _position > self.message_limit:
+                _position = self.message_limit-1
+            self.queue.insert(_position, new_message)
+        else:
+            self.queue.append(new_message)
 
         _event = {'event': 'MessageQueued', 'data': new_message}
         self.mudpi.events.publish(NAMESPACE, _event)
@@ -200,6 +205,8 @@ class CharDisplay(Component):
             self.reset_duration()
             return self.queue.pop(0)
         self.cached_message['duration'] = 1
+        self.message_expired = False
+        self.reset_duration()
         return self.cached_message if self.persist_display else \
             {'message': '', 'duration': 1}
 
@@ -225,8 +232,6 @@ class CharDisplay(Component):
             try:
                 if _event['event'] == 'Message':
                     if _event.get('data', None):
-                        _duration = _event['data'].get('duration', self.default_duration)
-                        _message = _event['data'].get('message', '')
                         self.add_message(_event['data'])
                 elif _event['event'] == 'Clear':
                     self.clear()
@@ -255,3 +260,8 @@ class CharDisplay(Component):
 
         # Duration tracking
         self._duration_start = time.perf_counter()
+
+        # Prevent double event fires
+        self._last_event = None
+
+        self.mudpi.events.subscribe(self.topic, self.handle_event)
