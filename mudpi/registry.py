@@ -1,5 +1,6 @@
 import json
 from mudpi.exceptions import MudPiError
+from mudpi.constants import FONT_YELLOW, FONT_RESET
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 
 class Registry:
