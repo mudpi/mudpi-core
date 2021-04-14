@@ -59,6 +59,11 @@ class GPIOSensor(Sensor):
         """ Classification further describing it, effects the data formatting """
         return self.config.get('classifier', 'general')
 
+    @property
+    def pin(self):
+        """ Return a pin for the component """
+        return self.config['pin']
+
 
     """ Methods """
     def init(self):
