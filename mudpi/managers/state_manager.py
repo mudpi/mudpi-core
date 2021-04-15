@@ -63,8 +63,8 @@ class StateManager():
             previous_state = self.states.get(component_id)
 
             state_exists = previous_state is not None
-            state_is_same = state_exists and previous_state.state == new_state
-            metadata_is_same = state_exists and previous_state.metadata == metadata
+            state_is_same = (state_exists and previous_state.state == new_state)
+            metadata_is_same = (state_exists and previous_state.metadata == metadata)
 
             if state_is_same and metadata_is_same:
                 self._lock.release()

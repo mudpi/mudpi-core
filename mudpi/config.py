@@ -164,7 +164,7 @@ class Config(object):
 
         config = config or self.config
         if format == 'json':
-            config = json.dumps(config, sort_keys=True, indent=4)
+            config = json.dumps(config, indent=4)
         elif format == 'yaml':
             config = yaml.dump(config)
         else:

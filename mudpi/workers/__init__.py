@@ -33,14 +33,22 @@ class Worker:
     """ Properties """
     @property
     def key(self):
+        """ Return a unique slug id """
         return self.config.get('key').lower()
 
     @property
+    def name(self):
+        """ A friendly display name """
+        return self.config.get('name') if self.config.get('name') else self.key.replace("_", " ").title()
+
+    @property
     def update_interval(self):
+        """ Time in seconds between each work cycle update """
         return self.config.get('update_interval', constants.DEFAULT_UPDATE_INTERVAL)
     
     @property
     def is_available(self):
+        """ Return if worker is available for work """
         return self._worker_available.is_set()
 
     @is_available.setter
@@ -56,6 +64,7 @@ class Worker:
         pass
 
     def run(self, func=None):
+        """ Create a thread and return it """
         if not self._thread:
             self._thread = threading.Thread(target=self.work, args=(func,))
             Logger.log_formatted(LOG_LEVEL["debug"],
