@@ -100,6 +100,14 @@ class MudPi:
             return True
         return False
 
+    def save_config(self, config_path=None):
+        """ Save Current MudPi Configurations """
+        config_path = config_path or self.config_path
+
+        if self.config.save_to_file(config_path):
+            return True
+        return False
+
     def load_core(self):
         """ Init the MudPi Core 
             - Load the State Machine
