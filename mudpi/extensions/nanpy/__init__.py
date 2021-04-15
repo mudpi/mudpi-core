@@ -67,7 +67,7 @@ class Node(Worker):
         self._node_ready = threading.Event()
         self._node_connected = threading.Event()
         self._run_once = None
-
+        self.reset_duration()
         self.mudpi.workers.register(self.key, self)
 
     @property
