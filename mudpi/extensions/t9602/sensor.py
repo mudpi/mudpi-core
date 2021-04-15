@@ -79,7 +79,17 @@ class T9602Sensor(Sensor):
 
     def update(self):
         """ Get data from T9602 device"""
-        data = self.bus.read_i2c_block_data(self.config['address'], 0, 4)
+        for trynb in range(5):  # 5 tries
+            try:
+                data = self.bus.read_i2c_block_data(self.config['address'], 0, 4)
+                break
+            except OSError:
+                Logger.log(
+                    LOG_LEVEL["info"],
+                    "Single reading error [t9602]. It happens, let's try again..."
+                )
+                time.sleep(2)
+
 
         humidity = (((data[0] & 0x3F) << 8) + data[1]) / 16384.0 * 100.0
         temperature_c = ((data[2] * 64) + (data[3] >> 2)) / 16384.0 * 165.0 - 40.0
