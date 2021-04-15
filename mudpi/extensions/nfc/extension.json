@@ -1,0 +1,9 @@
+{
+	"name": "NFC",
+	"namespace": "nfc",
+	"details": {
+		"description": "NFC tag and card reading support.",
+		"documentation": "https://mudpi.app/docs/extensions-nfc"
+	},
+	"requirements": ["nfcpy"]
+}
