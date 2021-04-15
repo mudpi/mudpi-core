@@ -27,7 +27,7 @@ class Interface(BaseInterface):
 
         for conf in config:
             if not conf.get('source'):
-                raise ConfigError('Missing `source` key in Sensor Trigger config.')
+                raise ConfigError('Missing `source` key in Toggle Trigger config.')
             
         return config
 
