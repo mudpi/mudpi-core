@@ -108,7 +108,7 @@ class Trigger(Component):
 
     def evaluate_thresholds(self, value):
         """ Check if conditions are met to fire trigger """
-        thresholds_passed = False
+        thresholds_passed = False if len(self.thresholds) > 0 else True
         for threshold in self.thresholds:
             comparison = threshold.get("comparison", "eq")
 
