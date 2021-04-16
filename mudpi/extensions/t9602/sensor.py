@@ -6,6 +6,7 @@
 import smbus
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.exceptions import MudPiError, ConfigError
 
 
