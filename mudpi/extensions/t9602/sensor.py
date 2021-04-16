@@ -4,8 +4,11 @@
     environment and climate readings.
 """
 import smbus
+
+from mudpi.constants import METRIC_SYSTEM
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.exceptions import MudPiError, ConfigError
 
 
@@ -98,8 +101,9 @@ class T9602Sensor(Sensor):
         temperature_c = round(temperature_c, 2)
 
         if humidity is not None and temperature_c is not None:
+            _temperature = temperature_c if self.mudpi.unit_system == METRIC_SYSTEM else (temperature_c * 1.8 + 32)
             readings = {
-                'temperature': temperature_c,
+                'temperature': _temperature,
                 'humidity': humidity
             }
             self._state = readings
