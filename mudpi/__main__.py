@@ -494,7 +494,7 @@ def convert_old_config(config):
                         new_toggle['address']=relay['address']
                     if relay.get("register"):
                         new_toggle['register']=relay['register']
-                    if relay.get("pin"):
+                    if relay.get("name"):
                         new_toggle['name']=relay['name']
                     if relay.get("topic"):
                         new_toggle['topic']=relay['topic']
