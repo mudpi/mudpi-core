@@ -325,6 +325,10 @@ def convert_old_config(config):
             new_toggle = {'key': relay["key"], 'interface': 'gpio'}
             if relay.get("pin"):
                 new_toggle['pin']=relay['pin']
+            if relay.get("address"):
+                new_toggle['address']=relay['address']
+            if relay.get("register"):
+                new_toggle['register']=relay['register']
             if relay.get("name"):
                 new_toggle['name']=relay['name']
             if relay.get("topic"):
@@ -486,7 +490,11 @@ def convert_old_config(config):
                         new_toggle['key']=relay['name'].replace(' ', '_').lower()
                     if relay.get("pin"):
                         new_toggle['pin']=relay['pin']
-                    if relay.get("name"):
+                    if relay.get("address"):
+                        new_toggle['address']=relay['address']
+                    if relay.get("register"):
+                        new_toggle['register']=relay['register']
+                    if relay.get("pin"):
                         new_toggle['name']=relay['name']
                     if relay.get("topic"):
                         new_toggle['topic']=relay['topic']
