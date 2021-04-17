@@ -122,12 +122,13 @@ class NanpyGPIOSensor(Sensor):
     def init(self):
         """ Connect to the Parent Device """
         self._state = None
-        self.node.api.pinMode(self.pin, self.node.api.INPUT)
+        self._pin_setup = False
         return True
 
     def update(self):
         """ Get data from GPIO through nanpy"""
         if self.node.connected:
+            self.check_connection()
             try:
                 data = None
                 if self.analog:
@@ -143,6 +144,13 @@ class NanpyGPIOSensor(Sensor):
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
         return None
+
+    def check_connection(self):
+        """ Check connection to node and gpio """
+        if self.node.connected:
+            if not self._pin_setup:
+                self.node.api.pinMode(self.pin, self.node.api.INPUT)
+                self._pin_setup = True
 
 class NanpyDHTSensor(Sensor):
     """ Nanpy DHT Sensor
