@@ -1,11 +1,14 @@
-""" 
+"""
     T9602 Sensor Interface
     Connects to a T9602 device to get
-    environment and climate readings. 
+    environment and climate readings.
 """
 import smbus
+
+from mudpi.constants import METRIC_SYSTEM
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
+from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.exceptions import MudPiError, ConfigError
 
 
@@ -20,19 +23,20 @@ class Interface(BaseInterface):
 
     def validate(self, config):
         """ Validate the T9602 config """
-        if not config.get('address'):
-            # raise ConfigError('Missing `address` in T9602 config.')
-            config['address'] = 0x28
-        else:
-            addr = config['address']
+        if not isinstance(config, list):
+            config = [config]
 
-            # Convert hex string/int to actual hex
-            if isinstance(addr, str):
-                addr = hex(int(addr, 16))
-            elif isinstance(addr, int):
-                addr = hex(addr)
+        for conf in config:
+            if not conf.get('address'):
+                # raise ConfigError('Missing `address` in T9602 config.')
+                conf['address'] = 0x28
+            else:
+                addr = conf['address']
 
-            config['address'] = addr
+                if isinstance(addr, str):
+                    addr = int(addr, 16)
+
+                conf['address'] = addr
 
         return config
 
@@ -53,7 +57,7 @@ class T9602Sensor(Sensor):
     def name(self):
         """ Return the display name of the component """
         return self.config.get('name') or f"{self.id.replace('_', ' ').title()}"
-    
+
     @property
     def state(self):
         """ Return the state of the component (from memory, no IO!) """
@@ -67,7 +71,7 @@ class T9602Sensor(Sensor):
 
     """ Methods """
     def connect(self):
-        """ Connect to the Device 
+        """ Connect to the Device
         This is the bus number : the 1 in "/dev/i2c-1"
         I enforced it to 1 because there is only one on Raspberry Pi.
         We might want to add this parameter in i2c sensor config in the future.
@@ -78,7 +82,17 @@ class T9602Sensor(Sensor):
 
     def update(self):
         """ Get data from T9602 device"""
-        data = self.bus.read_i2c_block_data(self.address, 0, 4)
+        for trynb in range(5):  # 5 tries
+            try:
+                data = self.bus.read_i2c_block_data(self.config['address'], 0, 4)
+                break
+            except OSError:
+                Logger.log(
+                    LOG_LEVEL["info"],
+                    "Single reading error [t9602]. It happens, let's try again..."
+                )
+                time.sleep(2)
+
 
         humidity = (((data[0] & 0x3F) << 8) + data[1]) / 16384.0 * 100.0
         temperature_c = ((data[2] * 64) + (data[3] >> 2)) / 16384.0 * 165.0 - 40.0
@@ -87,8 +101,9 @@ class T9602Sensor(Sensor):
         temperature_c = round(temperature_c, 2)
 
         if humidity is not None and temperature_c is not None:
+            _temperature = temperature_c if self.mudpi.unit_system == METRIC_SYSTEM else (temperature_c * 1.8 + 32)
             readings = {
-                'temperature': temperature_c,
+                'temperature': _temperature,
                 'humidity': humidity
             }
             self._state = readings
