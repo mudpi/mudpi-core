@@ -4,6 +4,7 @@
     environment and climate readings.
 """
 import smbus
+import time
 
 from mudpi.constants import METRIC_SYSTEM
 from mudpi.extensions import BaseInterface
