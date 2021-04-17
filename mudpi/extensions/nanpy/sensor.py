@@ -122,7 +122,7 @@ class NanpyGPIOSensor(Sensor):
     def init(self):
         """ Connect to the Parent Device """
         self._state = None
-        self.api.pinMode(self.pin, self.node.api.INPUT)
+        self.node.api.pinMode(self.pin, self.node.api.INPUT)
         return True
 
     def update(self):
