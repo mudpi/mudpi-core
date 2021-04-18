@@ -127,7 +127,7 @@ class NanpyGPIOControl(Control):
                     Logger.log_formatted(LOG_LEVEL["warning"],
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
-                    self._pin_setup = False
+                self._pin_setup = False
         return None
 
     def handle_state(self):

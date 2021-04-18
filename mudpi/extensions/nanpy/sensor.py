@@ -143,6 +143,7 @@ class NanpyGPIOSensor(Sensor):
                     Logger.log_formatted(LOG_LEVEL["warning"],
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
+                self._pin_setup = True
         return None
 
     def check_connection(self):
@@ -232,5 +233,5 @@ class NanpyDHTSensor(Sensor):
                     Logger.log_formatted(LOG_LEVEL["warning"],
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
-                    self._dht = None
+                self._dht = None
         return None

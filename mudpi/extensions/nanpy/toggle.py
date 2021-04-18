@@ -93,7 +93,7 @@ class NanpyGPIOToggle(Toggle):
                     Logger.log_formatted(LOG_LEVEL["warning"],
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
-                    self._pin_setup = False
+                self._pin_setup = False
         return None
 
     def restore_state(self, state):
@@ -102,6 +102,7 @@ class NanpyGPIOToggle(Toggle):
         if self._pin_setup:
             super.restore_state()
             state = self.pin_state_on if state.state else self.pin_state_off
+            self.active = True if state else False
             self.node.api.digitalWrite(self.pin, state)
         self.reset_duration()
         return
@@ -115,9 +116,9 @@ class NanpyGPIOToggle(Toggle):
             # to avoid false state being provided in the event fired.
             if self.node.connected:
                 self.check_connection()
-                state = self.pin_state_on if not self.active else self.pin_state_off
-                self.node.api.digitalWrite(self.pin, state)
                 self.active = not self.active
+                state = self.pin_state_on if self.active else self.pin_state_off
+                self.node.api.digitalWrite(self.pin, state)
                 self.store_state()
                 self.fire()
 

@@ -125,6 +125,7 @@ class NanpyCharDisplay(CharDisplay):
                     Logger.log_formatted(LOG_LEVEL["warning"],
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
+                self._lcd = None
         return None
 
     """ Actions """
