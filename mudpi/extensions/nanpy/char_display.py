@@ -111,6 +111,8 @@ class NanpyCharDisplay(CharDisplay):
                             self.config.get('pin_3', 11), 
                             self.config.get('pin_4', 12)]
                     self._lcd = Lcd(pins, [self.columns, self.rows], connection=connection)
+        else:
+            self._lcd = None
 
     def update(self):
         """ Control LCD display nanpy"""

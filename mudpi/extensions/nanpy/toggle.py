@@ -94,6 +94,8 @@ class NanpyGPIOToggle(Toggle):
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
                 self._pin_setup = False
+        else:
+            self._pin_setup = False
         return None
 
     def restore_state(self, state):

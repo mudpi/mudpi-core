@@ -144,6 +144,8 @@ class NanpyGPIOSensor(Sensor):
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
                 self._pin_setup = True
+        else:
+            self._pin_setup = False
         return None
 
     def check_connection(self):
@@ -234,4 +236,6 @@ class NanpyDHTSensor(Sensor):
                            f'{self.node.key} -> Broken Connection', 'Timeout', 'notice')
                     self.node.reset_connection()
                 self._dht = None
+        else:
+            self._dht = False
         return None
