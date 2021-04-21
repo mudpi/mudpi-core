@@ -61,6 +61,11 @@ class Toggle(Component):
         return self.config.get('max_duration')
 
     @property
+    def topic(self):
+        """ Topic toggle should listen on """
+        return self.config.get('topic', f"{NAMESPACE}/{self.id}")
+
+    @property
     def duration(self):
         """ Return how long the current state has been applied in seconds """
         self._current_duration = time.perf_counter() - self._duration_start
@@ -184,4 +189,4 @@ class Toggle(Component):
         self._last_event = None
         
         # Listen for events as well
-        self.mudpi.events.subscribe(NAMESPACE, self.handle_event)
+        self.mudpi.events.subscribe(self.topic, self.handle_event)
