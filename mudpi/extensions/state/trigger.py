@@ -4,6 +4,7 @@
     checks new state against any 
     thresholds if provided.
 """
+import json
 from mudpi.utils import decode_event_data
 from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
@@ -46,7 +47,10 @@ class StateTrigger(Trigger):
     def init(self):
         """ Listen to the state for changes """
         super().init()
+
+        # Used for onetime subscribe
         self._listening = False
+
         if self.mudpi.is_prepared:
             if not self._listening:
                 # TODO: Eventually get a handler returned to unsub just this listener
@@ -91,5 +95,10 @@ class StateTrigger(Trigger):
 
     def _parse_data(self, data):
         """ Get nested data if set otherwise return the data """
-        return data if not self.nested_source else data.get(self.nested_source, None)
-
+        try:
+            data = json.loads(data)
+        except Exception as error:
+            pass
+        if isinstance(data, dict):
+            return data if not self.nested_source else data.get(self.nested_source, None)
+        return data
