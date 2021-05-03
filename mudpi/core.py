@@ -239,6 +239,8 @@ class MudPi:
                 comp = self.components.get(state_id)
                 comp.restore_state(self.states.get(state_id))
                 Logger.log(LOG_LEVEL["debug"], f"Restored State for {state_id}")
+            else:
+                self.states.remove(state_id)
 
 
 
