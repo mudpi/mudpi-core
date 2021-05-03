@@ -103,6 +103,8 @@ class StateManager():
         """ Restore states from Redis 
             Resumes state of previous run if system has not cleared memory. 
         """
+        self.redis.set('started_at', str(datetime.datetime.now()))
+        
         keys = self.redis.get('state_keys')
         if keys:
             keys = json.loads(keys)
