@@ -1,0 +1,90 @@
+{
+    "mudpi": {
+        "name": "MudPi Testbench",
+        "debug": true,
+        "unit_system": "imperial",
+        "location": {
+            "latitude": 42.526,
+            "longitude": -89.043
+        },
+        "events": {
+            "redis": {
+                "host": "127.0.0.1",
+                "port": 6379
+            },
+            "mqtt": {
+                "host": "localhost",
+                "username": "admin",
+                "password": "admin"
+            }
+        }
+    },
+    "nfc": {
+        "key": "nfc_usb_reader",
+        "model": "ACR122U",
+        "beep_enabled": true,
+        "tracking": true,
+        "persist_records": true,
+        "save_tags": true,
+        "writing": true,
+        "address": "usb:072f:2200",
+        "store_logs": true,
+        "log_length": 10,
+        "default_records": [
+            {
+                "type": "text",
+                "data": "MudPi Secret Card",
+                "position": 0
+            },
+            {
+                "type": "uri",
+                "data": "https://mudpi.app/docs/extension-nfc",
+                "position": 1
+            }
+        ],
+        "tags": {
+            "0471c0012e3403": {
+                "tag_id": "0471c0012e3403",
+                "capacity": 492,
+                "used_capacity": 215,
+                "writeable": true,
+                "readable": true,
+                "count": 0,
+                "tag_uid": "676d6956-98a1-4d77-904c-a1b2f12f9a38",
+                "ndef": [
+                    "MudPi Secret Access Card",
+                    "https://mudpi.app/docs/extension-nfc",
+                    "Secret Data Card Unlocked ",
+                    "Agent: Drake G",
+                    "last_scan:2021-04-15 09:25:20"
+                ],
+                "default_records": [
+                    {
+                        "type": "text",
+                        "data": "MudPi Secret Access Card",
+                        "position": 0
+                    },
+                    {
+                        "type": "uri",
+                        "data": "https://mudpi.app/docs/extension-nfc",
+                        "position": 1
+                    }
+                ]
+            },
+            "0471aa01fd3403": {
+                "tag_id": "0471aa01fd3403",
+                "capacity": 492,
+                "used_capacity": 154,
+                "writeable": true,
+                "readable": true,
+                "tag_uid": "ed870f4d-1939-4810-9059-46a10e7269cf",
+                "count": 0,
+                "ndef": [
+                    "MudPi Secret Card",
+                    "https://mudpi.app/docs/extension-nfc",
+                    "last_scan:2021-04-15 01:32:42"
+                ]
+            }
+        }
+    }
+}
