@@ -83,6 +83,11 @@ class Node(Worker):
     def connected(self):
         """ Return if node is connected to MudPi """
         return self._node_connected.is_set()
+
+    @property
+    def name(self):
+        """ Friendly name of control """
+        return self.config.get('name') or f"{self.key.replace('_', ' ').title()}"
     
     def work(self, func=None):
         # Node reconnection cycle
@@ -137,7 +142,7 @@ class Node(Worker):
                 while attempts > 0 and self.mudpi.is_running:
                     try:
                         Logger.log_formatted(LOG_LEVEL["debug"],
-                                   f'{self.config["name"]} -> Wifi ', 'Connecting', 'notice')
+                                   f'{self.name} -> Wifi ', 'Connecting', 'notice')
                         attempts -= 1
                         conn = SocketManager(
                             host=str(self.config.get('address', 'mudpi-nanpy.local')))
@@ -146,25 +151,25 @@ class Node(Worker):
                     except (SocketManagerError, BrokenPipeError, ConnectionResetError,
                     socket.timeout) as e:
                         Logger.log_formatted(LOG_LEVEL["warning"],
-                                   f'{self.config["name"]} -> Failed Connection ', 'Timeout', 'notice')
+                                   f'{self.name} -> Failed Connection ', 'Timeout', 'notice')
                         if attempts > 0:
                             Logger.log_formatted(LOG_LEVEL["info"],
-                                   f'{self.config["name"]} -> Preparing Reconnect ', 'Pending', 'notice')
+                                   f'{self.name} -> Preparing Reconnect ', 'Pending', 'notice')
                         else:
                             Logger.log_formatted(LOG_LEVEL["error"],
-                                   f'{self.config["name"]} -> Connection Attempts ', 'Failed', 'error')
+                                   f'{self.name} -> Connection Attempts ', 'Failed', 'error')
                         conn = None
                         self.reset_connection()
                         self._wait(5)
                     except (OSError, KeyError) as e:
                         Logger.log(LOG_LEVEL["error"],
-                                   f"[{self.config['name']}] Node Not Found. (Is it online?)")
+                                   f"[{self.name}] Node Not Found. (Is it online?)")
                         conn = None
                         self.reset_connection()
                         self._wait(5)
                     else:
                         Logger.log_formatted(LOG_LEVEL["info"],
-                                   f"{self.config['name']} -> Wifi Connection ", 'Connected', 'success')
+                                   f"{self.name} -> Wifi Connection ", 'Connected', 'success')
                         break
             else:
                 while attempts > 0 and self.mudpi.is_running:
@@ -174,20 +179,20 @@ class Node(Worker):
                         self.api = ArduinoApi(connection=conn)
                     except SerialManagerError:
                         Logger.log_formatted(LOG_LEVEL["warning"],
-                                   f"{self.config['name']} -> Connecting ", 'Timeout', 'notice')
+                                   f"{self.name} -> Connecting ", 'Timeout', 'notice')
                         if attempts > 0:
                             Logger.log_formatted(LOG_LEVEL["info"],
-                                       f'{self.config["name"]} -> Preparing Reconnect ', 'Pending', 'notice')
+                                       f'{self.name} -> Preparing Reconnect ', 'Pending', 'notice')
                         else:
                             Logger.log_formatted(LOG_LEVEL["error"],
-                                       f'{self.config["name"]} -> Connection Attempts ', 'Failed', 'error')
+                                       f'{self.name} -> Connection Attempts ', 'Failed', 'error')
                         self.reset_connection()
                         conn = None
                         self._wait(5)
                     else:
                         if conn is not None:
                             Logger.log_formatted(LOG_LEVEL["info"],
-                                       f'[{self.config["name"]}] -> Serial Connection ', 'Connected', 'success')
+                                       f'[{self.name}] -> Serial Connection ', 'Connected', 'success')
                         break
         if conn is not None:
             self.connection = conn
