@@ -23,9 +23,12 @@ class MQTTAdaptor(Adaptor):
 
         host = self.config.get('host', "localhost")
         # port = self.config.get('port', 1883)
-        # TODO: Add authentication support
         self.connection = mqtt.Client(f'mudpi-{random.randint(0, 100)}')
         self.connection.on_connect = on_conn
+        username = self.config.get('username')
+        password = self.config.get('password')
+        if all([username, password]):
+            self.connection.username_pw_set(username, password)
         self.connection.connect(host)
         while not self.connected:
             self.get_message()

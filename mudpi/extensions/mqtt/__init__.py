@@ -38,6 +38,10 @@ class Extension(BaseExtension):
 
                 self.connections[conf['key']]['client'] = mqtt.Client(f'mudpi-{conf["key"]}')
                 self.connections[conf['key']]['client'].on_connect = on_conn
+                username = conf.get('username')
+                password = conf.get('password')
+                if all([username, password]):
+                    self.connections[conf['key']]['client'].username_pw_set(username, password)
                 self.connections[conf['key']]['client'].connect(host, port=port)
 
                 while not self.connections[conf['key']]['connected']:
@@ -66,6 +70,13 @@ class Extension(BaseExtension):
             port = conf.get('port')
             if port is None:
                 conf['port'] = 1883
+
+            username = conf.get('username')
+            password = conf.get('password')
+            if any([username, password]) and not all([username, password]):
+                raise ConfigError('A username and password must both be provided.')
+
+
         return config
 
     def unload(self):
