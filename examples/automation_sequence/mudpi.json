@@ -1,0 +1,177 @@
+{
+    "mudpi": {
+        "name": "MudPi Sequence Example",
+        "debug": true,
+        "location": {
+            "latitude": 40.26,
+            "longitude": 9.043
+        }
+    },
+    "trigger": [
+        {
+            "interface": "state",
+            "source": "example_soil",
+            "key": "soil_dry",
+            "name": "Dry Soil",
+            "frequency": "once",
+            "actions": [
+                ".example_toggle.turn_on"
+            ],
+            "thresholds": [
+                {
+                    "comparison": "gte",
+                    "value": 450
+                }
+            ]
+        },
+        {
+            "interface": "state",
+            "source": "example_soil",
+            "key": "soil_wet_state_example",
+            "name": "Wet Soil",
+            "frequency": "once",
+            "actions": [
+                ".example_toggle.turn_off"
+            ],
+            "thresholds": [
+                {
+                    "comparison": "lte",
+                    "value": 449
+                }
+            ]
+        },
+        {
+            "interface": "sensor",
+            "source": "example_soil",
+            "key": "soil_wet_sensor_example",
+            "name": "Wet Soil",
+            "frequency": "once",
+            "actions": [
+                ".example_toggle.turn_off"
+            ],
+            "thresholds": [
+                {
+                    "comparison": "lte",
+                    "value": 449
+                }
+            ]
+        },
+        {
+            "interface": "cron",
+            "key": "every_2_min",
+            "name": "Every 2 Mins",
+            "schedule": "*/2 * * * *",
+            "actions": [
+                ".example_sequence.next_step"
+            ]
+        }
+    ],
+    "action": [
+        {
+            "type": "event",
+            "name": "Test Event 1",
+            "key": "test_1",
+            "topic": "test",
+            "action": {
+                "event": "Test",
+                "data": "Step 1 Reached"
+            }
+        },
+        {
+            "type": "event",
+            "name": "Test Event 2",
+            "key": "test_2",
+            "topic": "test",
+            "action": {
+                "event": "Test",
+                "data": "Step 2 Reached"
+            }
+        },
+        {
+            "type": "event",
+            "name": "Test Event 3",
+            "key": "test_3",
+            "topic": "test",
+            "action": {
+                "event": "Test",
+                "data": "Step 3 Reached"
+            }
+        },
+        {
+            "type": "event",
+            "name": "Test Event 4",
+            "key": "test_4",
+            "topic": "test",
+            "action": {
+                "event": "Test",
+                "data": "Step 4 Reached"
+            }
+        }
+    ],
+    "sequence": [
+        {
+            "name": "Example Sequence",
+            "key": "example_sequence",
+            "sequence": [
+                {
+                    "actions": [
+                        ".example_pump.turn_on",
+                        ".test_1"
+                    ],
+                    "duration": 3
+                },
+                {
+                    "actions": [
+                        ".example_pump.turn_off",
+                        ".test_2"
+                    ],
+                    "duration": 3
+                },
+                {
+                    "actions": [
+                        ".example_pump.turn_on",
+                        ".test_3"
+                    ],
+                    "duration": 10,
+                    "thresholds": [
+                        {
+                            "source": "example_soil",
+                            "comparison": "gte",
+                            "value": 400
+                        }
+                    ]
+                },
+                {
+                    "actions": [
+                        ".example_toggle.turn_on",
+                        ".test_4"
+                    ]
+                },
+                {
+                    "actions": [
+                        ".example_pump.turn_off"
+                    ],
+                    "duration": 10
+                }
+            ]
+        }
+    ],
+    "sensor": [
+        {
+            "interface": "example",
+            "key": "example_soil",
+            "data": 750,
+            "update_interval": 10
+        }
+    ],
+    "toggle": [
+        {
+            "key": "example_pump",
+            "interface": "example"
+        },
+        {
+            "key": "example_toggle",
+            "interface": "example"
+        }
+    ]
+}
