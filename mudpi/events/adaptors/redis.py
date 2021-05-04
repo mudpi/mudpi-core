@@ -13,7 +13,8 @@ class RedisAdaptor(Adaptor):
         """ Make redis connection and setup pubsub """
         host = self.config.get('host', '127.0.0.1')
         port = self.config.get('port', 6379)
-        self.connection = redis.Redis(host=host, port=port)
+        password = self.config.get('password')
+        self.connection = redis.Redis(host=host, port=port, password=password)
         self.pubsub = self.connection.pubsub()
         return True
 

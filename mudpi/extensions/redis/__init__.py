@@ -23,8 +23,9 @@ class Extension(BaseExtension):
         for conf in config:
             host = conf.get('host', '127.0.0.1')
             port = conf.get('port', 6379)
+            password = conf.get('password')
             if conf['key'] not in self.connections:
-                self.connections[conf['key']] = redis.Redis(host=host, port=port)
+                self.connections[conf['key']] = redis.Redis(host=host, port=port, password=password)
 
         return True
 
