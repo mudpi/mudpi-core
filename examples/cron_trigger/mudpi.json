@@ -1,53 +1,24 @@
 {
 "mudpi": {   
-    "name": "MudPi Testbench",
+    "name": "MudPi Cron Example",
     "debug": false,
-    "unit_system": "imperial",
     "location": {
-        "latitude":42.526,
-        "longitude":-89.043
-    },
-    "events": {
-        "redis": {
-            "host": "127.0.0.1",
-            "port": 6379
-        },
-        "mqtt": {
-            "host": "localhost",
-            "username": "admin",
-            "password": "admin"
-        }
+        "latitude":4,
+        "longitude":-8.0
     }
 },
 "trigger": [
     {
         "interface": "cron",
-        "key": "display_temp_every_2_mins",
-        "name": "Display Temperature 2 Mins",
+        "key": "toggle_every_2_mins",
+        "name": "Toggle Every 2 Mins",
         "schedule": "*/2 * * * *",
-        "actions": [".example_message", ".example_sequence.next_step"]
-    },
-    {
-        "interface": "cron",
-        "key": "display_last_boot_every_10min",
-        "name": "Display Last Boot Time",
-        "schedule": "*/5 * * * *",
-        "actions": ["display_last_boot"],
-        "sequences": ["toggle.turn_on"]
+        "actions": [".example_pump.toggle"]
     }
 ],
-"action": [
+"toggle": [
     {
-        "type": "event",
-        "name": "Display Example Message",
-        "key": "example_message",
-        "action": {"event":"Message", "data": {"message": "Example Message\nHello!", "duration":10}},
-        "topic": "char_display/example_display_1"
-    }
-],
-"char_display": [
-    {
-        "key": "example_display_1",
+        "key": "example_pump",
         "interface": "example"
     }
 ]
