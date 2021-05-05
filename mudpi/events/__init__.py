@@ -23,13 +23,8 @@ class EventSystem():
         self.adaptors = {}
         self._load_adaptors()
 
-    def _load_adaptors(self):
-        for key, config in self.config.items():
-            if key in adaptors.Adaptor.adaptors:
-                self.adaptors[key] = adaptors.Adaptor.adaptors[key](config)
-                self.topics[key] = []
-
     def connect(self):
+        """ Setup connections for all adaptors """
         connection_data = {}
         for key, adaptor in self.adaptors.items():
             Logger.log_formatted(
@@ -44,6 +39,7 @@ class EventSystem():
         return connection_data
 
     def disconnect(self):
+        """ Disconnect all adaptors """
         for key, adaptor in self.adaptors.items():
             adaptor.disconnect()
         return True
@@ -94,3 +90,15 @@ class EventSystem():
         """ Return all the events subscribed to [List] """
         return self.topics
 
+
+    def _load_adaptors(self):
+        """ Load all the adaptors """
+        if self.config:
+            for key, config in self.config.items():
+                if key in adaptors.Adaptor.adaptors:
+                    self.adaptors[key] = adaptors.Adaptor.adaptors[key](config)
+                    self.topics[key] = []
+        else:
+            # Default adaptor
+            self.adaptors['redis'] = adaptors.Adaptor.adaptors['redis']({"host": "127.0.0.1", "port": 6379})
+            self.topics['redis'] = []
