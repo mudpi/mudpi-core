@@ -145,7 +145,8 @@
                     "actions": [
                         ".example_toggle.turn_on",
                         ".test_4"
-                    ]
+                    ],
+                    "duration": 10
                 },
                 {
                     "actions": [
@@ -160,7 +161,7 @@
         {
             "interface": "example",
             "key": "example_soil",
-            "data": 750,
+            "data": 350,
             "update_interval": 10
         }
     ],
