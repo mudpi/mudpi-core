@@ -4,6 +4,7 @@
     automations that can be fired in 
     a sequenctial order.
 """
+import json
 import time
 import datetime
 import threading
@@ -441,55 +442,62 @@ class Sequence(Component):
         if self.current_step.get('thresholds') is not None:
             for threshold in self.current_step.get('thresholds', []):
                 key = threshold.get("source")
+
                 # Get state object from manager
                 state = self.mudpi.states.get(key)
+
                 if state is not None:
-                    _state = state.state #json.loads(state.state)
-                    if threshold.get("nested_source") is not None:
-                        nested_source = threshold['nested_source'].lower()
-                        try:
-                            value = _state.get(nested_source)
-                        except:
-                            value = _state
-                    else:
-                        value = _state
-                        # state = json.loads(state.decode('utf-8'))
+                    _state = state.state
+
+                    value = self._parse_data(_state, threshold.get("nested_source"))
+
+                    try:
+                        value = int(value)
+                    except Exception as error:
+                        value = value
+
                     comparison = threshold.get("comparison", "eq")
-                    if comparison == "eq":
-                        if value == threshold["value"]:
-                            thresholds_passed = True
-                        else:
-                            thresholds_passed = False
-                    elif comparison == "ne":
-                        if value != threshold["value"]:
-                            thresholds_passed = True
-                        else:
-                            thresholds_passed = False
-                    elif comparison == "gt":
-                        if value > threshold["value"]:
-                            thresholds_passed = True
-                        else:
-                            thresholds_passed = False
-                    elif comparison == "gte":
-                        if value >= threshold["value"]:
-                            thresholds_passed = True
-                        else:
-                            thresholds_passed = False
-                    elif comparison == "lt":
-                        if value < threshold["value"]:
-                            thresholds_passed = True
-                        else:
-                            thresholds_passed = False
-                    elif comparison == "lte":
-                        if value <= threshold["value"]:
-                            thresholds_passed = True
-                        else:
-                            thresholds_passed = False
-                    elif comparison == "ex":
-                        if value is not None:
-                            thresholds_passed = True
-                        else:
-                            thresholds_passed = False
+                    try:
+                        if comparison == "eq":
+                            if value == threshold["value"]:
+                                thresholds_passed = True
+                            else:
+                                thresholds_passed = False
+                        elif comparison == "ne":
+                            if value != threshold["value"]:
+                                thresholds_passed = True
+                            else:
+                                thresholds_passed = False
+                        elif comparison == "gt":
+                            if value > threshold["value"]:
+                                thresholds_passed = True
+                            else:
+                                thresholds_passed = False
+                        elif comparison == "gte":
+                            if value >= threshold["value"]:
+                                thresholds_passed = True
+                            else:
+                                thresholds_passed = False
+                        elif comparison == "lt":
+                            if value < threshold["value"]:
+                                thresholds_passed = True
+                            else:
+                                thresholds_passed = False
+                        elif comparison == "lte":
+                            if value <= threshold["value"]:
+                                thresholds_passed = True
+                            else:
+                                thresholds_passed = False
+                        elif comparison == "ex":
+                            if value is not None:
+                                thresholds_passed = True
+                            else:
+                                thresholds_passed = False
+                    except Exception as e:
+                        Logger.log(
+                            LOG_LEVEL["error"],
+                           f"Error evaluating threshold for sequence {self.id} \n{e}")
+                        thresholds_passed = False
                 else:
                 # Data was null 
                     comparison = threshold.get("comparison", "eq")
@@ -504,3 +512,13 @@ class Sequence(Component):
             # No thresholds for this step, proceed.
             thresholds_passed = True
         return thresholds_passed
+
+    def _parse_data(self, data, nested_source=None):
+        """ Get nested data if set otherwise return the data """
+        try:
+            data = json.loads(data)
+        except Exception as error:
+            pass
+        if isinstance(data, dict):
+            return data if not nested_source else data.get(nested_source.lower(), None)
+        return data
