@@ -43,11 +43,11 @@ class Config(object):
 
     @property
     def latitude(self):
-        return self.config.get('mudpi', {}).get('latitude', 43)
+        return self.config.get('mudpi', {}).get('location', {}).get('latitude', 43)
 
     @property
     def longitude(self):
-        return self.config.get('mudpi', {}).get('longitude', -88)
+        return self.config.get('mudpi', {}).get('location', {}).get('longitude', -88)
 
 
     """ Methods """
