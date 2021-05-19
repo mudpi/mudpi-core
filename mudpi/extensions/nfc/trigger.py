@@ -3,6 +3,7 @@
     Monitors NFC for scans and
     listens to specific NFC events.
 """
+from . import NAMESPACE
 from mudpi.utils import decode_event_data
 from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
@@ -26,7 +27,8 @@ class Interface(BaseInterface):
 
         for conf in config:
             if not conf.get('source'):
-                raise ConfigError('Missing `source` key in NFC Trigger config.')
+                # raise ConfigError('Missing `source` key in NFC Trigger config.')
+                pass
             
         return config
 
@@ -42,7 +44,7 @@ class NFCTrigger(Trigger):
 
     # Type of events to listen to
     _events = {
-        'default': "NFCTagScanned",
+        'tag_scanned': "NFCTagScanned",
         'new_tag': "NFCNewTagScanned"
         'removed': "NFCTagRemoved"
     }
@@ -50,7 +52,7 @@ class NFCTrigger(Trigger):
     @property
     def type(self):
         """ Return Trigger Type """
-        return self.config.get("type", "default")
+        return self.config.get("type", "tag_scanned")
     
     
     def init(self):
@@ -76,7 +78,7 @@ class NFCTrigger(Trigger):
         if _event_data.get('event'):
             try:
                 if _event_data['event'] == self._events[self.type]:
-                    if _event_data['tag_id'] == self.source:
+                    if _event_data['tag_id'] == self.source or _event_data['key'] == self.source:
                         _value = self._parse_data(_event_data)
                         if self.evaluate_thresholds(_value):
                             self.active = True

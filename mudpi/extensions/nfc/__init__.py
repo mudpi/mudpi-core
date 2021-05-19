@@ -229,15 +229,23 @@ class NFCReader(Worker):
             Logger.log(LOG_LEVEL["info"],
                 f"Existing NFC Tag Scanned: {FONT_CYAN}{tag_serial}{FONT_RESET}")
 
+            # Check if UID is registered
             if self._tags[tag_serial].get('tag_uid'):
                 if tag_uid:
                     if tag_uid != self._tags[tag_serial]['tag_uid']:
+                        event_data = {'event': 'NFCTagUIDMismatch', "existing_tag_uid": self._tags[tag_serial]['tag_uid']}
+                        event_data.update(_tag_data)
+                        self.fire(event_data)
                         Logger.log(LOG_LEVEL["debug"],
-                            f"WARNING! Tag Data UID Mismatch for tag: {FONT_CYAN}{tag_serial}{FONT_RESET}")
+                            f"WARNING: Tag Data UID Mismatch for tag: {FONT_CYAN}{tag_serial}{FONT_RESET}")
                 else:
-                        Logger.log(LOG_LEVEL["debug"],
-                            f"WARNING! Tag UID Preregistered but Missing for tag: {FONT_CYAN}{tag_serial}{FONT_RESET}")
+                    event_data = {'event': 'NFCTagUIDMissing', "existing_tag_uid": self._tags[tag_serial]['tag_uid']}
+                    event_data.update(_tag_data)
+                    self.fire(event_data)
+                    Logger.log(LOG_LEVEL["debug"],
+                        f"Notice: Tag UID registered but Missing on tag: {FONT_CYAN}{tag_serial}{FONT_RESET}")
 
+        # Register the UID and check for duplicates
         if tag_uid:
             if tag_uid not in self._uids:
                 self._uids[tag_uid] = {'tags': [tag_serial]}
@@ -246,13 +254,16 @@ class NFCReader(Worker):
                 if tag_serial not in _prev_tags:
                     self._uids[tag_uid]['tags'].append(tag_serial)
                     if len(_prev_tags) > 2:
+                        event_data = {'event': 'NFCDuplicateUID', "existing_tag_id": self._tags[tag_serial]['tag_uid']}
+                        event_data.update(_tag_data)
+                        self.fire(event_data)
                         Logger.log(LOG_LEVEL["debug"],
-                            f"WARNING! Same Tag UID found in multiple tags: {FONT_CYAN}{_prev_tags}{FONT_RESET}")
+                            f"WARNING: Same Tag UID found in multiple tags: {FONT_CYAN}{_prev_tags}{FONT_RESET}")
 
+        # Handle the ndef records and tracking info
         if not tag.ndef:
             if self.tracking:
-                self.write(tag, self.add_default_records())
-                
+                self.write(tag, self.add_default_records())       
         else:
             if tag.ndef.records:
                 for record in tag.ndef.records:
@@ -279,12 +290,17 @@ class NFCReader(Worker):
                 _defaults = self.add_default_records(records, tag_serial)
                 self.write(tag, _defaults)
 
+        # Create a UUID if one was not set
         if tag_uid is None:
             if self.writing:
                 Logger.log(LOG_LEVEL["debug"],
                     f"No Tag UID Found for Tag: {FONT_CYAN}{tag_serial}{FONT_RESET}. A new one was generated and saved.")
-                self._tags[tag_serial] = self.parse_tag(tag)
-                self._tags[tag_serial]['tag_uid'] = self.last_uid
+                _tag_data = self.parse_tag(tag)
+                _tag_data['tag_uid'] = self.last_uid
+                self._tags[tag_serial] = _tag_data
+                event_data = {'event': 'NFCNewUIDCreated'}
+                event_data.update(_tag_data)
+                self.fire(event_data)
                 if self.save_tags:
                     self.config.setdefault('tags', {})[tag_serial].update(self._tags[tag_serial])
                     self.mudpi.save_config()
@@ -293,14 +309,14 @@ class NFCReader(Worker):
                     f"No Tag UID Found for Tag: {FONT_CYAN}{tag_serial}{FONT_RESET}. A new one can not be saved because `writing` is disabled.")
 
         if self.store_logs:
-            _tag_log = {'tag_id':tag_serial, 
-                'tag_uid':tag_uid, 
+            _tag_log = {'tag_id': tag_serial, 
+                'tag_uid': tag_uid, 
                 'count': count,
                 'updated_at': str(datetime.datetime.now().replace(microsecond=0)) }
             self._logs.append(_tag_log)
             if len(self._logs) > self.log_length:
                 self._logs.pop(0)
-            self.store_logs()
+            self.store_current_logs()
         return True
 
     def write(self, tag, records=[]):
@@ -379,18 +395,16 @@ class NFCReader(Worker):
         if _to_remove:
             for record in _to_remove:
                 records.remove(record)
-                       
-        if self.tracking:
-            if not _has_count:
-                
-                records.append(ndef.TextRecord("count:0"))
 
         if not _has_uid:
             self.last_uid = uid = str(uuid4())
             records.append(ndef.TextRecord(f"uid:{uid}"))
 
         if self.tracking:
-            records.append(ndef.TextRecord(f"last_scan:{str(datetime.datetime.now().replace(microsecond=0))}"))
+            if not _has_count:
+                records.append(ndef.TextRecord("count:0"))
+
+            records.append(ndef.TextRecord(f"last_scan:{datetime.datetime.now().replace(microsecond=0).strftime('%Y-%m-%d %H:%M:%S')}"))
     
         return records
 
@@ -410,6 +424,7 @@ class NFCReader(Worker):
         _event_data = {
             'event': 'NFCTagScanned',
             'reader_id': self.key,
+            'key': self.key,
             'updated_at': str(datetime.datetime.now().replace(microsecond=0))
         }
         _event_data.update(data)
@@ -457,11 +472,9 @@ class NFCReader(Worker):
             _ndef_records.append(record)
         if _ndef_data:
             _data['ndef'] = _ndef_data
-        # if _ndef_records:
-        #     _data['ndef_records'] = _ndef_records
         return _data
 
-    def store_logs(self):
+    def store_current_logs(self):
         """ Stores the current logs into the MudPi state manager """
         if not self.store_logs:
             return
