@@ -19,6 +19,17 @@
             }
         }
     },
+    "sensor": [
+        {
+            "key": "nfc_tag_1",
+            "interface": "nfc",
+            "name": "MudPi NFC Tag 1",
+            "tag_uid": "676d6956-98a1-4d77-904c-a1b2f12f9a38",
+            "tag_id": "0471c0012e3403",
+            "reader_id": "nfc_usb_reader",
+            "security": 0
+        }
+    ],
     "nfc": {
         "key": "nfc_usb_reader",
         "model": "ACR122U",
