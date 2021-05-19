@@ -4,6 +4,7 @@
     by events or state changed. Thresholds can 
     be set to define more specific paramerters.
 """
+import json
 import datetime
 import threading
 from mudpi.logger.Logger import Logger, LOG_LEVEL
@@ -110,34 +111,74 @@ class Trigger(Component):
         """ Check if conditions are met to fire trigger """
         thresholds_passed = False if len(self.thresholds) > 0 else True
         for threshold in self.thresholds:
+            if threshold.get("type", None) is not None:
+                _type = str(threshold["type"])
+                if _type not in ["int", "float", "str", "datetime", "list", "dict", "json"]:
+                    _type = "int"
+                try:
+                    if _type == "int":
+                        _threshold_value = int(threshold["value"])
+                    if _type == "float":
+                        _threshold_value = float(threshold["value"])
+                    if _type == "str":
+                        _threshold_value = str(threshold["value"])
+                    if _type == "list" or _type == "dict" or _type == "json":
+                        _threshold_value = json.loads(threshold["value"])
+                    if _type == "datetime":
+                        _format = threshold.get("format", "%I:%M %p")
+                        _threshold_value = datetime.datetime.strptime(threshold["value"], _format)
+                except Exception as error:
+                    Logger.log(LOG_LEVEL["error"],
+                       f"Error formatting threshold value to {_type}. \n{error}")
+
+            if threshold.get("source_type", None) is not None:
+                _source_type = str(threshold["source_type"])
+                if _source_type not in ["int", "float", "str", "datetime", "list", "dict", "json"]:
+                    _source_type = "int"
+                try:
+                    if _source_type == "int":
+                        value = int(value)
+                    if _source_type == "float":
+                        value = float(value)
+                    if _source_type == "str":
+                        value = str(value)
+                    if _source_type == "list" or _source_type == "dict" or _source_type == "json":
+                        value = json.loads(value)
+                    if _source_type == "datetime":
+                        _source_format = threshold.get("source_format", "%I:%M %p")
+                        value = datetime.datetime.strptime(value, _source_format)
+                except Exception as error:
+                    Logger.log(LOG_LEVEL["error"],
+                       f"Error formatting threshold value to {_source_type}. \n{error}")
+
             comparison = threshold.get("comparison", "eq")
 
-            if comparison == "eq":
+            if comparison == "eq" or comparison == "==":
                 if value == threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-            elif comparison == "ne":
+            elif comparison == "ne" or comparison == "!=":
                 if value != threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-            elif comparison == "gt":
+            elif comparison == "gt" or comparison == ">":
                 if value > threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-            elif comparison == "gte":
+            elif comparison == "gte" or comparison == ">=":
                 if value >= threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-            elif comparison == "lt":
+            elif comparison == "lt" or comparison == "<":
                 if value < threshold["value"]:
                     thresholds_passed = True
                 else:
                     thresholds_passed = False
-            elif comparison == "lte":
+            elif comparison == "lte" or comparison == "<=":
                 if value <= threshold["value"]:
                     thresholds_passed = True
                 else:
@@ -256,3 +297,11 @@ def split_trigger_configs(config):
             _triggers.append(conf)
 
     return (_triggers, _groups)
+
+
+""" Helper """
+def is_time_between(start_time, end_time, check_time):
+    if start_time < end_time:
+        return check_time >= start_time and check_time <= end_time
+    else: #Over midnight
+        return check_time >= start_time or check_time <= end_time

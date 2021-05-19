@@ -441,8 +441,8 @@ class Sequence(Component):
         thresholds_passed = False
         if self.current_step.get('thresholds') is not None:
             for threshold in self.current_step.get('thresholds', []):
-                key = threshold.get("source")
 
+                key = threshold.get("source")
                 # Get state object from manager
                 state = self.mudpi.states.get(key)
 
@@ -451,10 +451,44 @@ class Sequence(Component):
 
                     value = self._parse_data(_state, threshold.get("nested_source"))
 
+                    if threshold.get("type", None) is not None:
+                        _type = str(threshold["type"])
+                        if _type not in ["int", "float", "str", "datetime", "list", "dict", "json"]:
+                            _type = "int"
+                        try:
+                            if _type == "int":
+                                _threshold_value = int(threshold["value"])
+                            if _type == "float":
+                                _threshold_value = float(threshold["value"])
+                            if _type == "str":
+                                _threshold_value = str(threshold["value"])
+                            if _type == "list" or _type == "dict" or _type == "json":
+                                _threshold_value = json.loads(threshold["value"])
+                            if _type == "datetime":
+                                _format = threshold.get("format", "%I:%M %p")
+                                _threshold_value = datetime.datetime.strptime(threshold["value"], _format)
+                        except Exception as error:
+                            Logger.log(LOG_LEVEL["error"],
+                               f"Error formatting threshold value to {_type}. \n{error}")
+
+                    _source_type = str(threshold.get("source_type", "int"))
+                    if _source_type not in ["int", "float", "str", "datetime", "list", "dict", "json"]:
+                        _source_type = "int"
                     try:
-                        value = int(value)
+                        if _source_type == "int":
+                            value = int(value)
+                        if _source_type == "float":
+                            value = float(value)
+                        if _source_type == "str":
+                            value = str(value)
+                        if _source_type == "list" or _source_type == "dict" or _source_type == "json":
+                            value = json.loads(value)
+                        if _source_type == "datetime":
+                            _source_format = threshold.get("source_format", "%I:%M %p")
+                            value = datetime.datetime.strptime(value, _source_format)
                     except Exception as error:
-                        value = value
+                        Logger.log(LOG_LEVEL["error"],
+                           f"Error formatting threshold value to {_source_type}. \n{error}")
 
                     comparison = threshold.get("comparison", "eq")
                     try:
