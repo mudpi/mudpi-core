@@ -1,0 +1,47 @@
+{
+    "mudpi": {
+        "name": "MudPi Sun Example",
+        "debug": true,
+        "unit_system": "imperial",
+        "location": {
+            "latitude": 40,
+            "longitude": -80
+        },
+        "events": {
+            "redis": {
+                "host": "127.0.0.1",
+                "port": 6379
+            },
+            "mqtt": {
+                "host": "localhost"
+            }
+        }
+    },
+    "trigger": [
+        {
+            "interface": "state",
+            "source": "sun",
+            "nested_source": "past_sunrise",
+            "key": "sunrise_trigger",
+            "name": "Trigger at Sunrise",
+            "frequency": "once",
+            "actions": [
+                ".example_pump.turn_on"
+            ],
+            "thresholds": [
+                {
+                    "comparison": "eq",
+                    "value": true
+                }
+            ]
+        }
+    ],
+    "sensor": [
+        {
+            "interface": "sun",
+            "key": "sun",
+            "latitude": 43.0,
+            "longitude": -88.0
+        }
+    ]
+}
