@@ -79,13 +79,18 @@ class NFCSensor(Sensor):
 
     @property
     def serial(self):
-        """ Return tag serial id """
+        """ Return tag serial id to filter events by """
         return self.config.get('tag_id', None)
 
     @property
     def uid(self):
-        """ Return tag uuid """
+        """ Return tag uuid to filter events by """
         return self.config.get('tag_uid', None)
+
+    @property
+    def uid(self):
+        """ Return reader_id to filter events by """
+        return self.config.get('reader_id', None)
     
     @property
     def state(self):
@@ -195,7 +200,7 @@ class NFCSensor(Sensor):
         self._last_scan = None
         self._last_reader = None
         self._ndef = []
-        self.locked = False
+        self._locked = False
         self._security_check = ''
         self._present = False
 
@@ -230,6 +235,10 @@ class NFCSensor(Sensor):
 
         if self.uid:
             if _event_data['tag_uid'] != self.uid:
+                return
+
+        if self.reader_id:
+            if _event_data['reader_id'] != self.reader_id:
                 return
 
         if self.locked:
