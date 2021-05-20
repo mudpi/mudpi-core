@@ -4,8 +4,6 @@
     tags and reading data from them 
 """
 import time
-import json
-import redis
 from . import NAMESPACE
 from mudpi.utils import decode_event_data
 from mudpi.extensions import BaseInterface
@@ -132,6 +130,16 @@ class NFCSensor(Sensor):
     def used_capacity(self):
         """ Return the used capacity of the tag """
         return int(self._used_capacity)
+
+    @property
+    def writeable(self):
+        """ Return if card is writeable """
+        return self._writeable
+
+    @property
+    def readable(self):
+        """ Return if card is readable """
+        return self._readable
 
     @property
     def count(self):
