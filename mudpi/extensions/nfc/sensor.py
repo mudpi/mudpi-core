@@ -97,7 +97,8 @@ class NFCSensor(Sensor):
             "writeable": self.writeable,
             "readable": self.readable,
             "is_present": self.is_present,
-            "scan_count": self.scan_count
+            "scan_count": self.scan_count,
+            "locked": self.locked
         }
         if self.ndef: 
             _state['ndef'] = self.ndef
@@ -246,6 +247,7 @@ class NFCSensor(Sensor):
             try:
                 if _event_data['event'] == 'NFCTagScanned':
                     self._scan_count += 1
+                    self._present = True
                     self.update_tag(_event_data)
                     Logger.log(
                         LOG_LEVEL["debug"],
@@ -253,12 +255,14 @@ class NFCSensor(Sensor):
                     )
                 elif _event_data['event'] == 'NFCNewTagScanned':
                     self._scan_count += 1
+                    self._present = True
                     self.update_tag(_event_data)
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Tag {self.name} Scanned for First Time'
                     )
                 elif _event_data['event'] == 'NFCTagRemoved':
+                    self._present = False
                     self.update_tag(_event_data)
                     Logger.log(
                         LOG_LEVEL["debug"],
