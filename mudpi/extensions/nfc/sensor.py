@@ -27,12 +27,6 @@ class Interface(BaseInterface):
         sensor = NFCSensor(self.mudpi, config)
         if sensor:
             self.add_component(sensor)
-
-        ##### DEBUG TESTS ######
-        print(dir(self))
-        print("MANAGER")
-        print(self.extension.manager)
-        ######
         
         self.extension.manager.register_component_actions('unlock', action='unlock')
         self.extension.manager.register_component_actions('lock', action='lock')
@@ -88,7 +82,7 @@ class NFCSensor(Sensor):
         return self.config.get('tag_uid', None)
 
     @property
-    def uid(self):
+    def reader_id(self):
         """ Return reader_id to filter events by """
         return self.config.get('reader_id', None)
     
