@@ -205,7 +205,7 @@ class NFCSensor(Sensor):
         self._present = False
 
         # Used for onetime subscribe
-        _listening = False
+        self._listening = False
 
         # For duration tracking
         self._duration_start = time.perf_counter()
