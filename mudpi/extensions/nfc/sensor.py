@@ -25,9 +25,6 @@ class Interface(BaseInterface):
         sensor = NFCSensor(self.mudpi, config)
         if sensor:
             self.add_component(sensor)
-        
-        self.extension.manager.register_component_actions('unlock', action='unlock')
-        self.extension.manager.register_component_actions('lock', action='lock')
         return True
 
     def validate(self, config):
@@ -49,8 +46,13 @@ class Interface(BaseInterface):
                     if record.get('data') is None:
                         raise ConfigError('A record in default_records is missing the `data` property.')
 
-
         return config
+
+    def register_actions(self):
+        """ Register any interface actions """
+        self.register_component_actions('unlock', action='unlock')
+        self.register_component_actions('lock', action='lock')
+        self.register_component_actions('clear_warning', action='clear_warning')
 
 
 class NFCSensor(Sensor):
@@ -271,13 +273,11 @@ class NFCSensor(Sensor):
                     )
                 elif _event_data['event'] == 'NFCTagRemoved':
                     self._present = False
-                    self.update_tag(_event_data)
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Tag {self.name} Removed'
                     )
                 elif _event_data['event'] == 'NFCTagUIDMismatch':
-                    self.update_tag(_event_data)
                     if self.security > 0:
                         self._security_check = 'UID Mismatch'
                         if self.security > 1:
@@ -287,7 +287,6 @@ class NFCSensor(Sensor):
                             f'Security Warning: Tag {self.name} UID Mismatches Saved One'
                         )
                 elif _event_data['event'] == 'NFCTagUIDMissing':
-                    self.update_tag(_event_data)
                     if self.security > 0:
                         self._security_check = 'UID Missing'
                         Logger.log(
@@ -295,7 +294,6 @@ class NFCSensor(Sensor):
                             f'Tag {self.name} UID Missing on Tag'
                         )
                 elif _event_data['event'] == 'NFCDuplicateUID':
-                    self.update_tag(_event_data)
                     if self.security > 0:
                         self._security_check = 'Duplicate UID'
                         if self.security > 1:
@@ -315,14 +313,6 @@ class NFCSensor(Sensor):
                     LOG_LEVEL["info"],
                     f"Error Decoding Event for Sequence {self.id}"
                 )
-
-    def unlock(self):
-        """ Unlock the card """
-        self._locked = False
-
-    def lock(self):
-        """ lock the card """
-        self._locked = True
 
     def update_tag(self, data):
         """ Update the tag sensor with data from a scan event """
@@ -356,3 +346,17 @@ class NFCSensor(Sensor):
             self._ndef = data['ndef']
 
         return self
+
+
+    """ Actions """
+    def unlock(self, data=None):
+        """ Unlock the card """
+        self._locked = False
+
+    def lock(self, data=None):
+        """ lock the card """
+        self._locked = True
+
+    def clear_warning(self, data=None):
+        """ Clear any security warning """
+        self._security_check = ''
