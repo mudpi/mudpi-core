@@ -240,13 +240,13 @@ class CoreManager:
             )
             Logger.log(
                 LOG_LEVEL["debug"],
-                f"{'COMPONENT':<16}   {'ID':<16}   NAME\n{'':-<60}"
+                f"{'COMPONENT':<16}   {'ID':<32}   NAMESPACE\n{'':-<60}"
             )
             for namespace, comps in self.mudpi.components.items():
                 for comp in comps.values():
                     Logger.log(
                         LOG_LEVEL["debug"],
-                        f"{comp.__class__.__name__:<16} | {comp.id:<16} | {comp.name}"
+                        f"{comp.__class__.__name__:<16} | {comp.id:<32} | {namespace}"
                     )
 
         if self.mudpi.actions.all():
