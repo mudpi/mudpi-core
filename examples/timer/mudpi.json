@@ -1,0 +1,67 @@
+{
+    "mudpi": {
+        "name": "MudPi Timer Example",
+        "debug": true,
+        "unit_system": "imperial",
+        "location": {
+            "latitude": 30,
+            "longitude": -89
+        },
+        "events": {
+            "redis": {
+                "host": "127.0.0.1",
+                "port": 6379
+            },
+            "mqtt": {
+                "host": "localhost"
+            }
+        }
+    },
+    "trigger": [
+        {
+            "interface": "state",
+            "source": "example_1",
+            "key": "trigger_timer_start",
+            "name": "Start Example Timer",
+            "frequency": "once",
+            "actions": [
+                ".trigger_timer_1.start"
+            ],
+            "thresholds": [
+                {
+                    "comparison": "gte",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "interface": "timer",
+            "key": "trigger_timer_1",
+            "name": "Example Trigger Timer",
+            "frequency": "many",
+            "duration": 10,
+            "actions": [
+                "sensor.timer.start"
+            ]
+        }
+    ],
+    "sensor": [
+        {
+            "interface": "example",
+            "update_interval": 10,
+            "key": "example_1",
+            "data": 5
+        },
+        {
+            "interface": "timer",
+            "key": "timer_10s",
+            "duration": 10
+        },
+        {
+            "interface": "timer",
+            "key": "countdown_timer_10s",
+            "duration": 10,
+            "invert_count": true
+        }
+    ]
+}
