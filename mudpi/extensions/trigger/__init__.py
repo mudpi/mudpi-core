@@ -34,6 +34,7 @@ class Extension(BaseExtension):
             self.manager.load_interfaces(_groups)
 
         self.manager.register_component_actions('trigger', action='trigger')
+        self.manager.register_interface_actions() # Manually call since load_interfaces is False
         return True
 
 
@@ -68,7 +69,7 @@ class Trigger(Component):
         """ Set if should fire continuously while active 
             Options: `once` or `many`
         """
-        return self.config.get('frequency', 'once')
+        return str(self.config.get('frequency', 'once')).lower()
 
     @property
     def thresholds(self):
@@ -235,9 +236,9 @@ class Trigger(Component):
                     if not isinstance(_action_data, dict):
                         _action_data = {'data': _action_data} 
                     value.update(_action_data)
-                if self.mudpi.actions.exists(action):
+                if self.mudpi.actions.exists(_action):
                     _data = value or {}
-                    self.mudpi.actions.call(action, action_data=_data)
+                    self.mudpi.actions.call(_action, action_data=_data)
 
         except Exception as e:
             Logger.log(LOG_LEVEL["error"],
