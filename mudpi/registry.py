@@ -61,6 +61,17 @@ class ComponentRegistry(Registry):
         """ Get all the components for a given namespace """
         return self._registry.setdefault(namespace, {})
 
+    def for_interface(self, interface=None):
+        """ Get all the components for a given interface """
+        try:
+            components = [ component 
+            for components in self._registry.values()
+            for _id, component in components.items() 
+            if component.interface in interface ]
+        except Exception as error:
+            components = []
+        return components
+
     def exists(self, component_ids):
         """ Return if key exists in the registry """
         return any([ exists for components in self._registry.values()
@@ -113,9 +124,14 @@ class ActionRegistry(Registry):
             action_call = action_call.replace('.', '', 1)
             parsed_action['action'] = action_call
         elif '.' in action_call:
-            parts = action_call.split('.', 1)
-            parsed_action['namespace'] = parts[0]
-            parsed_action['action'] = parts[1]
+            parts = action_call.split('.')
+            if len(parts) > 2:
+                parsed_action['namespace'] = f'{parts[0]}.{parts[1]}'
+                parsed_action['action'] = parts[2]
+            else:
+                parts = action_call.split('.', 1)
+                parsed_action['namespace'] = parts[0]
+                parsed_action['action'] = parts[1]
         else:
             parsed_action['namespace'] = None
             parsed_action['action'] = action_call

@@ -42,6 +42,7 @@ class ExtensionManager:
         self.config = config
         if load_interfaces:
             self.load_interfaces(config)
+            self.register_interface_actions()
 
     def load_interfaces(self, config):
         """ Load interfaces from config """
@@ -204,6 +205,11 @@ class ExtensionManager:
                 continue
 
         self.mudpi.actions.register(action_key, handle_namespace_action, self.namespace)
+
+    def register_interface_actions(self):
+        """ Register any actions on an interface level """
+        for interface in self.interfaces.values():
+            interface.register_actions()
 
     def __repr__(self):
         """ Representation of the manager. (Handy for debugging) """

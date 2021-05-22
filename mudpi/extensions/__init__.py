@@ -130,6 +130,12 @@ class BaseInterface:
         """
         return config
 
+    def register_actions(self):
+        """ Register any actions on an interface
+            level. This is called after interfaces
+            load to allow all components to register.
+        """
+        return True
 
     """ INTERNAL METHODS: DO NOT OVERRIDE! 
         These methods and properties are used internally.
@@ -159,6 +165,8 @@ class BaseInterface:
                     LOG_LEVEL["debug"], f"Interface {self.namespace}:{self.type} component id ({component.id}) already registered."
                 )
                 return False
+            component.namespace = self.namespace
+            component.interface = self.type
             self.worker.components[component.id] = self.mudpi.components.register(component.id, component, self.namespace)
             component.component_registered(mudpi=self.mudpi, interface=self)
             return True
@@ -170,6 +178,59 @@ class BaseInterface:
     def load_worker(self):
         """ Load a worker for any interface components """
         return Worker(self.mudpi, {'key': self.key, 'update_interval': self.update_interval})
+
+
+    def register_component_actions(self, action_key, action):
+        """ Register action for component. 
+            If no components specified it calls 
+            all components for this interface
+        """
+
+        def handle_namespace_action(data=None):
+            """ Wrapper for action call to delegate to components """
+            _components = []
+            _ids = []
+            if data:
+                try:
+                    _ids = data.get('components', [])
+                except Exception as error:
+                    _ids = []
+            if _ids:
+                for _id in _ids:
+                    component = self.mudpi.components.get(_id)
+                    if component:
+                        _components.append(component)
+            else:
+                _components = [ _comp 
+                    for _comp in self.mudpi.components.for_namespace(self.namespace).values() 
+                    if _comp.interface == self.type ]
+
+            for component in _components:
+                try:
+                    func = getattr(component, action)
+                    if callable(func):
+                        if data:
+                            func(data)
+                        else:
+                            func()
+                except Exception as error:
+                    continue
+            return True
+
+        _comps = [ _comp 
+                    for _comp in self.mudpi.components.for_namespace(self.namespace).values() 
+                    if _comp.interface == self.type ]
+
+        for component in _comps:
+            try:
+                func = getattr(component, action)
+                if callable(func):
+                    # Register component only global action
+                    self.mudpi.actions.register(f'{component.id}.{action_key}', func)
+            except Exception as error:
+                continue
+
+        self.mudpi.actions.register(action_key, handle_namespace_action, f'{self.namespace}.{self.type}')
 
     def __repr__(self):
         """ Debug display of extension. """
