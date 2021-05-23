@@ -6,6 +6,8 @@
 import time
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.sensor import Sensor
+from mudpi.logger.Logger import Logger, LOG_LEVEL
+from mudpi.constants import FONT_RESET, FONT_MAGENTA
 
 
 class Interface(BaseInterface):
@@ -24,6 +26,7 @@ class Interface(BaseInterface):
         self.register_component_actions('stop', action='stop')
         self.register_component_actions('reset', action='reset')
         self.register_component_actions('pause', action='pause')
+        self.register_component_actions('restart', action='restart')
 
 
 class TimerSensor(Sensor):
@@ -76,7 +79,7 @@ class TimerSensor(Sensor):
     @property
     def duration(self):
         if self.active:
-            self.time_elapsed = time.perf_counter() - self.time_start
+            self.time_elapsed = (time.perf_counter() - self.time_start) + self._pause_offset
         return round(self.time_elapsed, 2) if not self.invert_count else round((self.max_duration - self.time_elapsed), 2)
 
     @property
@@ -90,14 +93,15 @@ class TimerSensor(Sensor):
         """ Init the timer component """
         self._active = False
         self.time_elapsed = 0
+        self._pause_offset = 0
         self.reset_duration()
 
     def update(self):
         """ Get timer data """
         if self.duration >= self.max_duration and not self.invert_count:
-            self._active = False
+            self.stop()
         elif self.duration <= 0 and self.invert_count:
-            self._active = False
+            self.stop()
         return True
 
     def reset_duration(self):
@@ -112,18 +116,42 @@ class TimerSensor(Sensor):
         if not self.active:
             self.reset_duration()
             self._active = True
+            if self._pause_offset == 0:
+                Logger.log(
+                    LOG_LEVEL["debug"],
+                    f'Timer Sensor {FONT_MAGENTA}{self.name}{FONT_RESET} Started'
+                )
+            else:
+                Logger.log(
+                    LOG_LEVEL["debug"],
+                    f'Timer Sensor {FONT_MAGENTA}{self.name}{FONT_RESET} Resumed'
+                )
 
     def pause(self, data=None):
         """ Pause the timer """
         if self.active:
             self._active = False
+            self._pause_offset = 0
+            self.reset_duration()
 
     def stop(self, data=None):
         """ Stop the timer """
         if self.active:
             self._active = False
-            self.reset_duration()
+            self.reset()
+            Logger.log(
+                LOG_LEVEL["debug"],
+                f'Timer Sensor {FONT_MAGENTA}{self.name}{FONT_RESET} Stopped'
+            )
 
     def reset(self, data=None):
         """ Reset the timer """
         self.reset_duration()
+        self._pause_offset = 0
+
+    def restart(self, data=None):
+        """ Restart the timer """
+        self.reset()
+        self.start()
+        return self
+

@@ -9,6 +9,7 @@ from mudpi.utils import decode_event_data
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.trigger import Trigger
 from mudpi.logger.Logger import Logger, LOG_LEVEL
+from mudpi.constants import FONT_RESET, FONT_MAGENTA
 
 
 class Interface(BaseInterface):
@@ -36,6 +37,7 @@ class Interface(BaseInterface):
         self.register_component_actions('stop', action='stop')
         self.register_component_actions('pause', action='pause')
         self.register_component_actions('reset', action='reset')
+        self.register_component_actions('restart', action='restart')
 
 
 class TimerTrigger(Trigger):
@@ -68,7 +70,7 @@ class TimerTrigger(Trigger):
     @property
     def duration(self):
         if self.active:
-            self.time_elapsed = time.perf_counter() - self.time_start
+            self.time_elapsed = (time.perf_counter() - self.time_start) + self._pause_offset
         return round(self.time_elapsed, 2)
 
 
@@ -79,6 +81,7 @@ class TimerTrigger(Trigger):
         self._active = False
         self.time_elapsed = 0
         self._last_event = None
+        self._pause_offset = 0
         self.reset_duration()
 
         if self.mudpi.is_prepared:
@@ -115,25 +118,31 @@ class TimerTrigger(Trigger):
                     self.start()
                     Logger.log(
                         LOG_LEVEL["debug"],
-                        f'Timer Trigger {self.name} Started'
+                        f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Started'
                     )
                 elif _event_data['event'] == 'TimerStop':
                     self.stop()
                     Logger.log(
                         LOG_LEVEL["debug"],
-                        f'Timer Trigger {self.name} Stopped'
+                        f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Stopped'
                     )
                 elif _event_data['event'] == 'TimerReset':
                     self.reset()
                     Logger.log(
                         LOG_LEVEL["debug"],
-                        f'Timer Trigger {self.name} Reset'
+                        f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Reset'
+                    )
+                elif _event_data['event'] == 'TimerRestart':
+                    self.restart()
+                    Logger.log(
+                        LOG_LEVEL["debug"],
+                        f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Restarted'
                     )
                 elif _event_data['event'] == 'TimerPause':
                     self.pause()
                     Logger.log(
                         LOG_LEVEL["debug"],
-                        f'Timer Triger {self.name} Paused'
+                        f'Timer Triger {FONT_MAGENTA}{self.name}{FONT_RESET} Paused'
                     )
             except:
                 Logger.log(
@@ -145,29 +154,51 @@ class TimerTrigger(Trigger):
     """ Actions """
     def start(self, data=None):
         """ Start the timer """
-        if not self.active or self.frequency == 'many':
-            self.reset_duration()
+        if not self.active:
+            if self.frequency == 'many':
+                self.reset()
+            else:
+                self.reset_duration()
             self._active = True
-            Logger.log(
-                LOG_LEVEL["debug"],
-                f'Timer Trigger {self.name} Started'
-            )
+            if self._pause_offset == 0:
+                Logger.log(
+                    LOG_LEVEL["debug"],
+                    f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Started'
+                )
+            else:
+                Logger.log(
+                    LOG_LEVEL["debug"],
+                    f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Resumed'
+                )
+        return self
 
     def pause(self, data=None):
         """ Pause the timer """
         if self.active:
             self._active = False
+            self._pause_offset = self.duration
+            self.reset_duration()
+        return self
 
     def stop(self, data=None):
         """ Stop the timer """
         if self.active:
-            self.reset_duration()
+            self.reset()
             self._active = False
             Logger.log(
                 LOG_LEVEL["debug"],
-                f'Timer Trigger {self.name} Stopped'
+                f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Stopped'
             )
+        return self
 
     def reset(self, data=None):
         """ Reset the timer """
         self.reset_duration()
+        self._pause_offset = 0
+        return self
+
+    def restart(self, data=None):
+        """ Restart the timer """
+        self.reset()
+        self.start()
+        return self
