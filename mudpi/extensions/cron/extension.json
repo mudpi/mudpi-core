@@ -1,0 +1,9 @@
+{
+	"name": "Cron",
+	"namespace": "cron",
+	"details": {
+		"description": "Cron job schedule support for components.",
+		"documentation": "https://mudpi.app/docs/triggers"
+	},
+	"requirements": ["pycron"]
+}

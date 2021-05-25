@@ -1,0 +1,9 @@
+{
+	"name": "Controls",
+	"namespace": "control",
+	"details": {
+		"description": "Take physical input from user such as button, switch, etc.",
+		"documentation": "https://mudpi.app/docs/controls"
+	},
+	"requirements": []
+}

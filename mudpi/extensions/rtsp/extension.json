@@ -1,0 +1,9 @@
+{
+	"name": "RTSP Stream",
+	"namespace": "rtsp",
+	"details": {
+		"description": "Capture images and videos from rtsp / http.",
+		"documentation": "https://mudpi.app/docs/rtsp"
+	},
+	"requirements": ["opencv-python"]
+}

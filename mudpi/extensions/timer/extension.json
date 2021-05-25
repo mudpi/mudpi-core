@@ -1,0 +1,8 @@
+{
+	"name": "Timer",
+	"namespace": "timer",
+	"details": {
+		"description": "Timer components to track elapsed time."
+	},
+	"requirements": []
+}

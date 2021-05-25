@@ -1,0 +1,25 @@
+{
+"mudpi": {   
+    "name": "MudPi Cron Example",
+    "debug": false,
+    "location": {
+        "latitude":4,
+        "longitude":-8.0
+    }
+},
+"trigger": [
+    {
+        "interface": "cron",
+        "key": "toggle_every_2_mins",
+        "name": "Toggle Every 2 Mins",
+        "schedule": "*/2 * * * *",
+        "actions": [".example_pump.toggle"]
+    }
+],
+"toggle": [
+    {
+        "key": "example_pump",
+        "interface": "example"
+    }
+]
+}

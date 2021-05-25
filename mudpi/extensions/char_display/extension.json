@@ -1,0 +1,9 @@
+{
+	"name": "LCD Character Displays",
+	"namespace": "char_display",
+	"details": {
+		"description": "Display messages through LCD displays.",
+		"documentation": "https://mudpi.app/docs/lcd_displays"
+	},
+	"requirements": []
+}

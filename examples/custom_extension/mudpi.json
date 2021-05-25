@@ -1,0 +1,11 @@
+{
+"mudpi": {   
+    "name": "MudPi Custom Extension Example",
+    "debug": false,
+},
+"grow": [
+    {
+    "hello":"world",
+    "test": 123
+    }
+]}

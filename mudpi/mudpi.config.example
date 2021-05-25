@@ -1,0 +1,37 @@
+{
+"mudpi": {   
+    "name": "MudPi Example",
+    "debug": false,
+    "unit_system": "imperial",
+    "location": {
+        "latitude":12.526,
+        "longitude":-33.043
+    },
+    "events": {
+        "redis": {
+            "host": "127.0.0.1",
+            "port": 6379
+        }
+    }
+},
+"sensor": [
+    {
+        "interface": "example",
+        "update_interval": 10,
+        "key": "example_one",
+        "data": 3, 
+        "classifier": "light"
+    },
+    {   
+        "interface": "example",
+        "key": "example_two",
+        "update_interval": 3,
+        "data": 20, 
+        "classifier": "power"
+    },
+    {   
+        "interface": "example",
+        "key": "example_three",
+        "data": 5 
+    }
+]}
