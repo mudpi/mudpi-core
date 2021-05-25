@@ -81,6 +81,8 @@ class SunTrigger(Trigger):
 
         if state is not None:
             _state = state.state
+        else:
+            _state = None
 
         if _state:
             try:
