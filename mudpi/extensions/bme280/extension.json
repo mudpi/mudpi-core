@@ -1,0 +1,9 @@
+{
+	"name": "BME280 Environment Sensor",
+	"namespace": "bme280",
+	"details": {
+		"description": "Provides interface for BME280 sensors to take environment readings.",
+		"documentation": "https://mudpi.app/docs/sensors/bme280"
+	},
+	"requirements": ["adafruit-blinka", "adafruit-circuitpython-bme280"]
+}
