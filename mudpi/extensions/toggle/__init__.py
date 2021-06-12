@@ -95,6 +95,7 @@ class Toggle(Component):
                 if self.duration > self.max_duration:
                     # Failsafe cutoff duration
                     self.turn_off()
+                    self.reset_duration()
 
     def restore_state(self, state):
         """ This is called on start to 
