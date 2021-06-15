@@ -1,0 +1,8 @@
+{
+	"name": "Open Weather Map API",
+	"namespace": "owmapi",
+	"details": {
+		"description": "Get current, historical, forecast weather details via open weather map api."
+	},
+	"requirements": ["statistics"]
+}
