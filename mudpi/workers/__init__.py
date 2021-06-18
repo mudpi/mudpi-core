@@ -81,14 +81,18 @@ class Worker:
         """
         while self.mudpi.is_prepared:
             if self.mudpi.is_running:
-                if callable(func):
-                    func()
-                for key, component in self.components.items():
-                    if component.should_update:
-                        component.update()
-                        component.store_state()
-                self.reset_duration()
-                self._wait(self.update_interval)
+                try:
+                    if callable(func):
+                        func()
+                    for key, component in self.components.items():
+                        if component.should_update and component.available:
+                            component.update()
+                            component.store_state()
+                    self.reset_duration()
+                    self._wait(self.update_interval)
+                except Exception as error:
+                    Logger.log(LOG_LEVEL["error"],
+                        f"Worker {self.key} Error During Work Cycle - {error}")
         # # MudPi Shutting Down, Perform Cleanup Below
         Logger.log_formatted(LOG_LEVEL["debug"],
                    f"Worker {self.key} ", "Stopping", "notice")

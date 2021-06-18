@@ -6,7 +6,6 @@
 import os
 import cv2
 import time
-from mudpi.utils import decode_event_data
 from mudpi.exceptions import ConfigError
 from mudpi.extensions import BaseInterface
 from mudpi.extensions.camera import Camera

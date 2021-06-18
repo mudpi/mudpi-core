@@ -279,6 +279,9 @@ class Component:
         """ Keep last event cached to prevent duplicate event fires """
         self._last_event = {}
 
+        """ Used for component Enable/Disable """
+        self._available = True
+
         # Developer _init so users don't need to call super().init()
         self._init()
 
@@ -315,7 +318,7 @@ class Component:
     @property
     def available(self):
         """ Return if the component is available """
-        return True
+        return self._available
 
     @property
     def should_update(self):
@@ -326,6 +329,18 @@ class Component:
     def classifier(self):
         """ Classification further describing it, effects the data formatting """
         return None
+
+    @property
+    def json_attributes(self):
+        """ Return a list of attribute keys to export in json """
+        return [
+            'id',
+            'name',
+            'state',
+            'available',
+            'should_update',
+            'classifier'
+        ]
 
 
     """ Methods """
@@ -398,6 +413,24 @@ class Component:
             additional_data.update({'classifier': self.classifier})
 
         data = self.mudpi.states.set(self.id, self.state, additional_data)
+
+    def to_json(self):
+        """ Returns a dict to be json encoded of component data """
+        component_json = {}
+        _core_attributes = [
+            'id',
+            'name',
+            'state',
+            'available',
+            'should_update',
+            'classifier'
+        ]
+        attributes = _core_attributes + self.json_attributes
+        # for attribute in self.json_attributes:
+        #     component_json[attribute] = getattr(self, attribute)
+        for attribute, data in self.config.items():
+            component_json[attribute] = data
+        return component_json
 
     def __repr__(self):
         """ Returns the instance representation for debugging. """
