@@ -8,6 +8,8 @@ import time
 import datetime
 import threading
 from mudpi.utils import decode_event_data
+from mudpi.logger.Logger import Logger, LOG_LEVEL
+from mudpi.constants import FONT_YELLOW, FONT_RESET
 from mudpi.extensions import Component, BaseExtension
 
 
@@ -106,13 +108,14 @@ class Toggle(Component):
         """ Fire a toggle event """
         event_data = {
             'event': 'ToggleUpdated',
-            'component_id': self.id,
-            'name': self.name,
-            'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
-            'state': self.state,
-            'invert_state': self.invert_state
-        }
-        event_data.update(data)
+            'data': {
+                'component_id': self.id,
+                'name': self.name,
+                'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
+                'state': self.state,
+                'invert_state': self.invert_state
+        }}
+        event_data['data'].update(data)
         self.mudpi.events.publish(NAMESPACE, event_data)
 
     def reset_duration(self):
@@ -147,13 +150,14 @@ class Toggle(Component):
         try: 
             _event = decode_event_data(event)
         except Exception as error:
-            _event = decode_event_data(event['data'])
-
+            _event = event
+            
         if _event == self._last_event:
             # Event already handled
             return
 
         self._last_event = _event
+        _event_data = _event.get("data", {})
         if _event is not None:
             try:
                 if _event['event'] == 'Switch':
@@ -170,7 +174,7 @@ class Toggle(Component):
                     self.turn_off()
             except Exception as error:
                 Logger.log(LOG_LEVEL["error"],
-                           f'Error handling event for {self.id}')
+                           f'Error handling event for {self.id} - {error}')
 
     """ Internal Methods 
     Do not override """

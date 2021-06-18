@@ -226,13 +226,14 @@ class NFCSensor(Sensor):
 
     def handle_event(self, event):
         """ Process event data for the NFC tag """
-        _event_data = decode_event_data(event)
+        _event = decode_event_data(event)
 
-        if _event_data == self._last_event:
+        if _event == self._last_event:
             # Event already handled
             return
 
-        self._last_event = _event_data
+        self._last_event = _event
+        _event_data = _event.get('data', {})
 
         if self.serial:
             if _event_data['tag_id'] != self.serial:
@@ -253,9 +254,9 @@ class NFCSensor(Sensor):
             )
             return
 
-        if _event_data.get('event'):
+        if _event.get('event'):
             try:
-                if _event_data['event'] == 'NFCTagScanned':
+                if _event['event'] == 'NFCTagScanned':
                     self._scan_count += 1
                     self._present = True
                     self.update_tag(_event_data)
@@ -263,7 +264,7 @@ class NFCSensor(Sensor):
                         LOG_LEVEL["debug"],
                         f'Tag {self.name} Scanned'
                     )
-                elif _event_data['event'] == 'NFCNewTagScanned':
+                elif _event['event'] == 'NFCNewTagScanned':
                     self._scan_count += 1
                     self._present = True
                     self.update_tag(_event_data)
@@ -271,13 +272,13 @@ class NFCSensor(Sensor):
                         LOG_LEVEL["debug"],
                         f'Tag {self.name} Scanned for First Time'
                     )
-                elif _event_data['event'] == 'NFCTagRemoved':
+                elif _event['event'] == 'NFCTagRemoved':
                     self._present = False
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Tag {self.name} Removed'
                     )
-                elif _event_data['event'] == 'NFCTagUIDMismatch':
+                elif _event['event'] == 'NFCTagUIDMismatch':
                     if self.security > 0:
                         self._security_check = 'UID Mismatch'
                         if self.security > 1:
@@ -286,14 +287,14 @@ class NFCSensor(Sensor):
                             LOG_LEVEL["warning"],
                             f'Security Warning: Tag {self.name} UID Mismatches Saved One'
                         )
-                elif _event_data['event'] == 'NFCTagUIDMissing':
+                elif _event['event'] == 'NFCTagUIDMissing':
                     if self.security > 0:
                         self._security_check = 'UID Missing'
                         Logger.log(
                             LOG_LEVEL["debug"],
                             f'Tag {self.name} UID Missing on Tag'
                         )
-                elif _event_data['event'] == 'NFCDuplicateUID':
+                elif _event['event'] == 'NFCDuplicateUID':
                     if self.security > 0:
                         self._security_check = 'Duplicate UID'
                         if self.security > 1:
@@ -302,7 +303,7 @@ class NFCSensor(Sensor):
                             LOG_LEVEL["debug"],
                             f'Tag {self.name} has UID found on multiple tags!'
                         )
-                elif _event_data['event'] == 'NFCNewUIDCreated':
+                elif _event['event'] == 'NFCNewUIDCreated':
                     self.update_tag(_event_data)
                     Logger.log(
                         LOG_LEVEL["debug"],

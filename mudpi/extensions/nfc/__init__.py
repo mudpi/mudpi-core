@@ -423,11 +423,12 @@ class NFCReader(Worker):
         """ Fire a control event """
         _event_data = {
             'event': 'NFCTagScanned',
-            'reader_id': self.key,
-            'key': self.key,
-            'updated_at': str(datetime.datetime.now().replace(microsecond=0))
-        }
-        _event_data.update(data)
+            'data': {
+                'reader_id': self.key,
+                'key': self.key,
+                'updated_at': str(datetime.datetime.now().replace(microsecond=0))
+        }}
+        _event_data['data'].update(data)
         self.mudpi.events.publish(NAMESPACE, _event_data)
         return True
 

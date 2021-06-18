@@ -108,6 +108,8 @@ def main(args=None):
     manager.mudpi.restore_states()
     Logger.log_formatted(LOG_LEVEL["warning"], "Restored Previous Component States", 'Complete', 'success')
 
+    # Final Boot Operations
+    manager.mudpi.finalize_boot()
 
     #########################
     ### Start All Systems ###
@@ -135,8 +137,13 @@ def main(args=None):
             # Keep messages being processed
             manager.mudpi.events.get_message()
             current_clock = datetime.datetime.now().replace(microsecond=0)
-            manager.mudpi.events.publish('clock', {"clock":current_clock.strftime("%m-%d-%Y %H-%M-%S"), 
-                "date":str(current_clock.date()), "time": str(current_clock.time())})
+            manager.mudpi.events.publish('clock', 
+                {   "event": "TimeUpdate",
+                    "data": {
+                        "clock":current_clock.strftime("%m-%d-%Y %H-%M-%S"), 
+                        "date":str(current_clock.date()),
+                        "time": str(current_clock.time())
+                }})
             for i in range(10):
                 time.sleep(0.1)
                 manager.mudpi.events.get_message()

@@ -92,6 +92,20 @@ class CharDisplay(Component):
         """ Keeps last message displayed when queue is empty """
         return bool(self.config.get('persist_display', False))
     
+    @property
+    def json_attributes(self):
+        """ Return a list of attribute keys to export in json """
+        return [
+            'default_duration',
+            'max_duration',
+            'message_limit',
+            'topic',
+            'rows',
+            'columns',
+            'persist_display',
+            'current_message',
+            'message_expired'
+        ]
 
     """ Actions """
     def show(self, data=None): 

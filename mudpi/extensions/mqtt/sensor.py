@@ -122,10 +122,12 @@ class MQTTSensor(Sensor):
             if self.expired:
                 self.mudpi.events.publish('sensor', {
                     'event': 'StateExpired', 
-                    'component_id': self.id,
-                    'expires': self.expires,
-                    'previous_state': self.state,
-                    'type': self.type})
+                    'data': {
+                        'component_id': self.id,
+                        'expires': self.expires,
+                        'previous_state': self.state,
+                        'type': self.type
+                }})
                 self._state = None
             if self._prev_state != self._state:
                 self.reset_duration()

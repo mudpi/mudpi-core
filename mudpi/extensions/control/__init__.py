@@ -59,8 +59,9 @@ class Control(Component):
     @property
     def edge_detection(self):
         """ Return if edge detection is used """
-        _edge_detection = self.config.get('edge_detection').lower()
+        _edge_detection = self.config.get('edge_detection')
         if _edge_detection is not None:
+            _edge_detection = _edge_detection.lower()
             if _edge_detection == "falling" or _edge_detection == "fell":
                 _edge_detection = "fell"
             elif _edge_detection == "rising" or _edge_detection == "rose":
@@ -73,6 +74,18 @@ class Control(Component):
     def invert_state(self):
         """ Set to True to make OFF state fire events instead of ON state """
         return self.config.get('invert_state', False)
+
+    @property
+    def json_attributes(self):
+        """ Return a list of attribute keys to export in json """
+        return [
+            'pin',
+            'resistor',
+            'debounce',
+            'type',
+            'edge_detection',
+            'invert_state'
+        ]
     
 
     """ Methods """
@@ -80,13 +93,14 @@ class Control(Component):
         """ Fire a control event """
         event_data = {
             'event': 'ControlUpdated',
-            'component_id': self.id,
-            'type': self.type,
-            'name': self.name,
-            'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
-            'state': self.state,
-            'invert_state': self.invert_state
-        }
-        event_data.update(data)
+            'data': {
+                'component_id': self.id,
+                'type': self.type,
+                'name': self.name,
+                'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
+                'state': self.state,
+                'invert_state': self.invert_state
+        }}
+        event_data['data'].update(data)
         self.mudpi.events.publish(NAMESPACE, event_data)
         self._fired = True

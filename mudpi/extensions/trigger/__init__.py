@@ -211,13 +211,14 @@ class Trigger(Component):
         """ Fire an event """
         event_data = {
             'event': 'TriggerFired',
-            'id': self.id,
-            'name': self.name,
-            'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
-            'state': self.state,
-            'source': self.source,
-        }
-        event_data.update(data)
+            'data': {
+                'id': self.id,
+                'name': self.name,
+                'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
+                'state': self.state,
+                'source': self.source
+        }}
+        event_data['data'].update(data)
         self.mudpi.events.publish(NAMESPACE, event_data)
 
     def trigger(self, value={}):

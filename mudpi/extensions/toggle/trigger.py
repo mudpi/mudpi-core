@@ -55,16 +55,18 @@ class ToggleTrigger(Trigger):
     
     def handle_event(self, event):
         """ Handle the event data from the event system """
-        _event_data = decode_event_data(event)
+        _event = decode_event_data(event)
 
-        if _event_data == self._last_event:
+        if _event == self._last_event:
             # Event already handled
             return
 
-        self._last_event = _event_data
-        if _event_data.get('event'):
+        self._last_event = _event
+        _event_data = _event.get('data', {})
+        
+        if _event.get('event'):
             try:
-                if _event_data['event'] == 'ToggleUpdated':
+                if _event['event'] == 'ToggleUpdated':
                     if _event_data['component_id'] == self.source:
                         sensor_value = self._parse_data(_event_data["state"])
                         if self.evaluate_thresholds(sensor_value):

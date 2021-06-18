@@ -233,14 +233,15 @@ class Sequence(Component):
         """ Fire a control event """
         event_data = {
             'event': 'SequenceUpdated',
-            'component_id': self.id,
-            'name': self.name,
-            'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
-            'state': self.active,
-            'step': self._current_step,
-            'total_steps': self.total_steps
-        }
-        event_data.update(data)
+            'data': {
+                'component_id': self.id,
+                'name': self.name,
+                'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
+                'state': self.active,
+                'step': self._current_step,
+                'total_steps': self.total_steps
+        }}
+        event_data['data'].update(data)
         self.mudpi.events.publish(NAMESPACE, event_data)
 
     def reset_duration(self):
@@ -374,40 +375,42 @@ class Sequence(Component):
 
     def handle_event(self, event):
         """ Process event data for the sequence """
-        _event_data = decode_event_data(event)
+        _event = decode_event_data(event)
 
-        if _event_data == self._last_event:
+        if _event == self._last_event:
             # Event already handled
             return
 
-        self._last_event = _event_data
-        if _event_data.get('event'):
+        self._last_event = _event
+        _event_data = _event.get('data', {})
+        
+        if _event.get('event'):
             try:
-                if _event_data['event'] == 'SequenceNextStep':
+                if _event['event'] == 'SequenceNextStep':
                     self.advance_step()
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Sequence {self.name} Next Step Triggered'
                     )
-                elif _event_data['event'] == 'SequencePreviousStep':
+                elif _event['event'] == 'SequencePreviousStep':
                     self.previous_step()
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Sequence {self.name} Previous Step Triggered'
                     )
-                elif _event_data['event'] == 'SequenceStart':
+                elif _event['event'] == 'SequenceStart':
                     self.start()
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Sequence {self.name} Start Triggered'
                     )
-                elif _event_data['event'] == 'SequenceSkipStep':
+                elif _event['event'] == 'SequenceSkipStep':
                     self.skip_step()
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Sequence {self.name} Skip Step Triggered'
                     )
-                elif _event_data['event'] == 'SequenceStop':
+                elif _event['event'] == 'SequenceStop':
                     self.stop()
                     Logger.log(
                         LOG_LEVEL["debug"],
@@ -432,7 +435,7 @@ class Sequence(Component):
         except Exception as e:
             Logger.log(
                 LOG_LEVEL["error"],
-               f"Error triggering sequence action {self.id} ", e)
+               f"Error triggering sequence action {self.id} \n{e}")
         self._step_triggered = True
         return
 

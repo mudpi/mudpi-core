@@ -3,6 +3,7 @@ import json
 import socket
 import inspect
 import subprocess
+from copy import deepcopy
 from mudpi.extensions import Component, BaseExtension, BaseInterface
 
 def get_ip():
@@ -25,20 +26,26 @@ def get_module_classes(module_name):
 
 
 def decode_event_data(message):
-        if isinstance(message, dict):
-            # print('Dict Found')
-            return message
-        elif isinstance(message.decode('utf-8'), str):
-            try:
-                temp = json.loads(message.decode('utf-8'))
-                # print('Json Found')
-                return temp
-            except Exception as error:
-                # print('Json Error. Str Found')
-                return message.decode('utf-8') #{'event': 'Unknown', 'data': message}
-        else:
-            # print('Failed to detect type')
+    """ Attempt to decode event formatted data """
+    try:
+        message = message.decode('utf-8')
+    except Exception as error:
+        pass
+
+    if isinstance(message, dict):
+        # print('Dict Found')
+        return message
+    elif isinstance(message, str):
+        try:
+            temp = json.loads(message)
+            # print('Json Found')
+            return temp
+        except Exception as error:
+            # print('Json Error. Str Found')
             return {'event': 'Unknown', 'data': message}
+    else:
+        # print('Failed to detect type')
+        return {'event': 'Unknown', 'data': message}
 
 
 def install_package(package, upgrade=False, target=None):

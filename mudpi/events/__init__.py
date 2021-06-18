@@ -8,6 +8,7 @@
 """
 from uuid import uuid4
 from copy import deepcopy
+from datetime import datetime
 from mudpi.events import adaptors
 from mudpi.logger.Logger import Logger, LOG_LEVEL
 
@@ -59,19 +60,42 @@ class EventSystem():
         return True
 
     def publish(self, topic, data=None):
-        """ Publish an event on an topic """
+        """ Publish an event on an topic 
+            Format: {event: "EventName": data: {...} }
+        """
         if data:
+            event = {}
             if isinstance(data, dict):
                 _data = deepcopy(data)
                 if 'uuid' not in _data:
-                    _data['uuid'] = str(uuid4())
+                    event['uuid'] = data['uuid'] = str(uuid4())
+                else:
+                    event['uuid'] = _data['uuid']
+
+                if 'event' not in _data:
+                    event['event'] = "Unknown"
+                else:
+                    event['event'] = _data['event']
+                    del _data['event']
+
+                event['updated_at'] = str(datetime.now().replace(microsecond=0))
+
+                if 'data' not in _data:
+                    event['data'] = _data
+                else:
+                    if isinstance(_data['data'], dict):
+                        _data_data = deepcopy(_data['data'])
+                    else:
+                        _data_data = { 'data': _data['data'] }
+                    del _data['data']
+                    event['data'] = {**_data_data, **_data}
             else:
-                _data = data
+                 event['data'] = data
         else:
-            _data = data
+             event['data'] = data
 
         for key, adaptor in self.adaptors.items():
-            adaptor.publish(topic, _data)
+            adaptor.publish(topic, event)
         return True
 
     def subscribe_once(self, topic, callback):

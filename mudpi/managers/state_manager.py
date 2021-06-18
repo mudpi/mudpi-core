@@ -80,10 +80,11 @@ class StateManager():
                 previous_state = previous_state.to_dict()
             event_data = {
                 'event': 'StateUpdated',
-                'component_id': component_id,
-                'previous_state': previous_state,
-                'new_state': state.to_dict()
-            }
+                'data': {
+                    'component_id': component_id,
+                    'previous_state': previous_state,
+                    'new_state': state.to_dict()
+            }}
 
             self.mudpi.events.publish('state', event_data)
             self.redis.set(f'{component_id}.state', json.dumps(state.to_dict()))
@@ -110,8 +111,12 @@ class StateManager():
             keys = json.loads(keys)
             for key in keys:
                 data = self.redis.get(f'{key}.state')
-                _state = State.from_json(data)
-                self.states[key] = _state
+                if data:
+                    try:
+                        _state = State.from_json(data)
+                        self.states[key] = _state
+                    except Exception as error:
+                        pass
 
         # Restore requirement cache
         _cache = self.redis.get('requirement_installed')

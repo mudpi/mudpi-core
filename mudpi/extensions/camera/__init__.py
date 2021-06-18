@@ -136,19 +136,40 @@ class Camera(Component):
         """ Return number of seconds for recording """
         return self.config.get('record_duration', 5)
 
+    @property
+    def json_attributes(self):
+        """ Return a list of attribute keys to export in json """
+        return [
+            'filename',
+            'file_suffix',
+            'count_start',
+            'max_count',
+            'height',
+            'width',
+            'resolution',
+            'path',
+            'sequential_naming',
+            'framerate',
+            'topic',
+            'record_duration',
+            'image_count',
+            'last_image'
+        ]
+
 
     """ Methods """
     def fire(self, data={}):
         """ Fire a control event """
         event_data = {
             'event': 'CameraUpdated',
-            'component_id': self.id,
-            'name': self.name,
-            'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
-            'state': self.state,
-            'last_image': self.last_image,
-        }
-        event_data.update(data)
+            'data': {
+                'component_id': self.id,
+                'name': self.name,
+                'updated_at': str(datetime.datetime.now().replace(microsecond=0)),
+                'state': self.state,
+                'last_image': self.last_image
+        }}
+        event_data['data'].update(data)
         self.mudpi.events.publish(NAMESPACE, event_data)
 
     def reset_duration(self):

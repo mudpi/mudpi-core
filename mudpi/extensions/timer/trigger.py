@@ -105,40 +105,42 @@ class TimerTrigger(Trigger):
 
     def handle_event(self, event):
         """ Process event data for the timer """
-        _event_data = decode_event_data(event)
+        _event = decode_event_data(event)
 
-        if _event_data == self._last_event:
+        if _event == self._last_event:
             # Event already handled
             return
 
-        self._last_event = _event_data
-        if _event_data.get('event'):
+        self._last_event = _event
+        _event_data = _event.get('data', {})
+        
+        if _event.get('event'):
             try:
-                if _event_data['event'] == 'TimerStart':
+                if _event['event'] == 'TimerStart':
                     self.start()
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Started'
                     )
-                elif _event_data['event'] == 'TimerStop':
+                elif _event['event'] == 'TimerStop':
                     self.stop()
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Stopped'
                     )
-                elif _event_data['event'] == 'TimerReset':
+                elif _event['event'] == 'TimerReset':
                     self.reset()
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Reset'
                     )
-                elif _event_data['event'] == 'TimerRestart':
+                elif _event['event'] == 'TimerRestart':
                     self.restart()
                     Logger.log(
                         LOG_LEVEL["debug"],
                         f'Timer Trigger {FONT_MAGENTA}{self.name}{FONT_RESET} Restarted'
                     )
-                elif _event_data['event'] == 'TimerPause':
+                elif _event['event'] == 'TimerPause':
                     self.pause()
                     Logger.log(
                         LOG_LEVEL["debug"],

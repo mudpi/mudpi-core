@@ -68,27 +68,29 @@ class ControlTrigger(Trigger):
     """ Methods """
     def handle_event(self, event):
         """ Handle the event data from the event system """
-        _event_data = decode_event_data(event)
+        _event = decode_event_data(event)
 
-        if _event_data == self._last_event:
+        if _event == self._last_event:
             # Event already handled
             return
 
-        self._last_event = _event_data
-        if _event_data.get('event'):
+        self._last_event = _event
+        _event_data = _event.get('data',{})
+        
+        if _event.get('event'):
             try:
-                if _event_data['event'] == self._events[self.type]:
+                if _event['event'] == self._events[self.type]:
                     if _event_data['component_id'] == self.source:
                         _value = self._parse_data(_event_data["state"])
                         if self.evaluate_thresholds(_value):
                             self.active = True
                             if self._previous_state != self.active:
                                 # Trigger is reset, Fire
-                                self.trigger(_event_data)
+                                self.trigger(_event)
                             else:
                                 # Trigger not reset check if its multi fire
                                 if self.frequency == 'many':
-                                    self.trigger(_event_data)
+                                    self.trigger(_event)
                         else:
                             self.active = False
             except Exception as error:

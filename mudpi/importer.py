@@ -355,7 +355,7 @@ class ExtensionImporter:
             return False
 
         self.mudpi.extensions.register(self.namespace, self.extension)
-        self.mudpi.events.publish('core', {'event': 'ExtensionRegistered', 'namespace': self.namespace})
+        self.mudpi.events.publish('core', {'event': 'ExtensionRegistered', 'data': { 'namespace': self.namespace }})
         # Call extension post registry hook
         self.extension.extension_registered(importer=self, validated_config=validated_config)
         return self.extension

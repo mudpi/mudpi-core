@@ -149,10 +149,12 @@ class RedisSensor(Sensor):
             if self.expired:
                 self.mudpi.events.publish('sensor', {
                     'event': 'StateExpired', 
-                    'component_id': self.id,
-                    'expires': self.expires,
-                    'previous_state': self.state,
-                    'type': self.type})
+                    'data': {
+                        'component_id': self.id,
+                        'expires': self.expires,
+                        'previous_state': self.state,
+                        'type': self.type
+                }})
                 self._state = None
             if self._prev_state != self._state:
                 self.reset_duration()
@@ -161,16 +163,16 @@ class RedisSensor(Sensor):
 
     def handle_event(self, event={}):
         """ Handle event from redis pubsub """
-        data = decode_event_data(event['data'])
-        if data is not None:
-            try:
+        try:
+            data = decode_event_data(event['data'])
+            if data is not None:
                 # _event_data = self.last_event = decode_event_data(data)
                 self._state = data
-            except:
-                Logger.log(
-                    LOG_LEVEL["info"],
-                    f"Error Decoding Event for Redis Sensor {self.id}"
-                )
+        except:
+            Logger.log(
+                LOG_LEVEL["info"],
+                f"Error Decoding Event for Redis Sensor {self.id}"
+            )
 
     def reset_duration(self):
         """ Reset the duration of the current state """

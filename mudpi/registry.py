@@ -1,7 +1,8 @@
 import json
 from mudpi.exceptions import MudPiError
-from mudpi.constants import FONT_YELLOW, FONT_RESET
+from mudpi.utils import decode_event_data
 from mudpi.logger.Logger import Logger, LOG_LEVEL
+from mudpi.constants import FONT_YELLOW, FONT_RESET
 
 class Registry:
     """ Key-Value database for managing object instances """
@@ -33,7 +34,7 @@ class Registry:
     def register(self, key, value):
         """ Registers the value into the registry """
         if key not in self._registry:
-            self.mudpi.events.publish(self.name, {'event': 'Registered', 'action': key})
+            self.mudpi.events.publish(self.name, {'event': 'Registered', 'data': { 'action': key }})
         self._registry[key] = value
         return value
 
@@ -82,7 +83,9 @@ class ComponentRegistry(Registry):
         """ Registers the component into the registry """
         namespace_registry = self._registry.setdefault(namespace, {})
         if component_id not in namespace_registry:
-            self.mudpi.events.publish('core', {'event': 'ComponentRegistered', 'component': component_id, 'namespace': namespace})
+            self.mudpi.events.publish('core', {
+                'event': 'ComponentRegistered', 
+                'data': { 'component': component_id, 'namespace': namespace }})
         namespace_registry[component_id] = component
         return component
 
@@ -92,17 +95,34 @@ class ComponentRegistry(Registry):
             for components in self._registry.values()
             for component in components.values() ]
 
+    def cache_string(self):
+        """ Return string to store in cache for frontend """
+        return [ f'{namespace}:{component.id}'
+            for namespace, components in self._registry.items()
+            for component in components.values() ]
+
 
 class ActionRegistry(Registry):
     """ Database of actions available to MudPi from 
         user configs or components. 
         None = global
     """
+    def __init__(self, mudpi, name):
+        self.mudpi = mudpi
+        self.name = name
+        self._registry = {}
+        self._last_event = None
+
     def register(self, action_key, func, namespace=None, validator=None):
         """ Register the action under the specified namespace. """
         namespace_registry = self._registry.setdefault(namespace, {})
         if action_key not in namespace_registry:
-            self.mudpi.events.publish('core', {'event': 'ActionRegistered', 'action': action_key, 'namespace': namespace})
+            self.mudpi.events.publish('core', 
+                {'event': 'ActionRegistered', 
+                'data': {
+                    'action': action_key, 
+                    'namespace': namespace 
+                }})
         namespace_registry[action_key] = Action(func, validator)
 
     def for_namespace(self, namespace=None):
@@ -150,6 +170,7 @@ class ActionRegistry(Registry):
                 LOG_LEVEL["error"],
                 f'{FONT_YELLOW}Call to action {action_call} that doesn\'t exists!.{FONT_RESET}'
             )
+            return
         validated_data = action.validate(action_data)
         if not validated_data and action_data:
             # raise MudPiError("Action data was not valid!")
@@ -157,20 +178,44 @@ class ActionRegistry(Registry):
                 LOG_LEVEL["error"],
                 f'{FONT_YELLOW}Action data was not valid for {action_call}{FONT_RESET}'
             )
-        self.mudpi.events.publish('core', {'event': 'ActionCall', 'action': action_call, 'data': action_data, 'namespace': command['namespace']})
+            return
+        self.mudpi.events.publish('core', 
+            {   'event': 'ActionCall',
+                'data': {
+                    'action': action_call, 
+                    'data': action_data, 
+                    'namespace': command['namespace']
+            }})
         action(data=validated_data)
 
 
     def handle_call(self, event_data={}):
         """ Handle an Action call from event bus """
-        if event_data:
-            try:
-                _data = json.loads(event_data.get('data', {}))
-            except Exception:
-                _data = event_data
-            action = _data.get('action')
-            if action:
-                return self.call(action, _data.get('data', {}))
+        try:
+            _event = decode_event_data(event_data)
+
+            if _event == self._last_event:
+                # Event already handled
+                return
+
+            self._last_event = _event
+            _event_data = _event.get('data', {})
+
+            if _event:
+                action = _event_data.get('action')
+                if action:
+                    return self.call(action, _event_data.get('data', {}))
+        except Exception as error:
+            Logger.log(
+                LOG_LEVEL["error"],
+                f'{FONT_YELLOW}Action error during call{FONT_RESET}'
+            )
+            Logger.log(
+                LOG_LEVEL["debug"],
+                f'{FONT_YELLOW}{event_data}{FONT_RESET}'
+            )
+            return
+
 
 class Action:
     """ A callback associated with a string """
