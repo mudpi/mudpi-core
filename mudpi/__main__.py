@@ -254,11 +254,15 @@ def convert_old_config(config):
             if worker["type"].lower() == "sensor":
                 for sensor in worker.get('sensors', []):
                     config.config.setdefault("sensor", [])
-                    new_sensor = {'key': sensor["key"], 'interface': 'gpio', 'classifier': sensor["type"].lower()}
+                    new_sensor = {'interface': 'gpio', 'classifier': sensor["type"].lower()}
                     if sensor['type'].lower() == 'humidity':
                         new_sensor['interface'] = 'dht'
                     if sensor.get("name"):
                         new_sensor['name']=sensor['name']
+                    if sensor.get("key"):
+                        new_sensor['key']=sensor['key']
+                    else:
+                        new_sensor['key']=sensor['name'].replace(' ', '_').lower()
                     if sensor.get("pin"):
                         new_sensor['pin']=sensor['pin']
                     if sensor.get("model"):
@@ -271,9 +275,13 @@ def convert_old_config(config):
             if worker["type"].lower() == "control":
                 for control in worker.get('controls', []):
                     config.config.setdefault("control", [])
-                    new_control = {'key': control["key"], 'interface': 'gpio', 'type': control["type"].lower()}
+                    new_control = {'interface': 'gpio', 'type': control["type"].lower()}
                     if control.get("name"):
                         new_control['name']=control['name']
+                    if control.get("key"):
+                        new_control['key']=control['key']
+                    else:
+                        new_control['key']=control['name'].replace(' ', '_').lower()
                     if control.get("pin"):
                         new_control['pin']=control['pin']
                     if control.get("topic"):
@@ -290,9 +298,13 @@ def convert_old_config(config):
             if worker["type"].lower() == "i2c":
                 for sensor in worker.get('sensors', []):
                     config.config.setdefault("sensor", [])
-                    new_sensor = {'key': sensor["key"], 'interface': 'bme680'}
+                    new_sensor = {'interface': 'bme680'}
                     if sensor.get("name"):
                         new_sensor['name']=sensor['name']
+                    if sensor.get("key"):
+                        new_sensor['key']=sensor['key']
+                    else:
+                        new_sensor['key']=sensor['name'].replace(' ', '_').lower()
                     if sensor.get("address"):
                         new_sensor['address']=sensor['address']
                     if sensor.get("model"):
@@ -331,7 +343,7 @@ def convert_old_config(config):
     if config.config.get("relays"):
         for relay in list(config.config["relays"]):
             config.config.setdefault("toggle", [])
-            new_toggle = {'key': relay["key"], 'interface': 'gpio'}
+            new_toggle = {'interface': 'gpio'}
             if relay.get("pin"):
                 new_toggle['pin']=relay['pin']
             if relay.get("address"):
@@ -340,6 +352,10 @@ def convert_old_config(config):
                 new_toggle['register']=relay['register']
             if relay.get("name"):
                 new_toggle['name']=relay['name']
+            if relay.get("key"):
+                new_toggle['key']=relay['key']
+            else:
+                new_toggle['key']=relay['name'].replace(' ', '_').lower()
             if relay.get("topic"):
                 new_toggle['topic']=relay['topic']
             if relay.get("normally_open"):
@@ -361,9 +377,13 @@ def convert_old_config(config):
             _type = _trigger["type"].lower()
             if _type == 'time':
                 _type = 'cron'
-            new_trigger = {'key': _trigger["key"], 'interface': _type}
+            new_trigger = {'interface': _type}
             if _trigger.get("name"):
                 new_trigger['name']=_trigger['name']
+            if _trigger.get("key"):
+                new_trigger['key']=_trigger['key']
+            else:
+                new_trigger['key']=_trigger['name'].replace(' ', '_').lower()
             if _trigger.get("source"):
                 new_trigger['source']=_trigger['source']
             if _trigger.get("nested_source"):
