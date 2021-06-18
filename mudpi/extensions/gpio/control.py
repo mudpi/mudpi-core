@@ -39,7 +39,10 @@ class Interface(BaseInterface):
                 raise ConfigError('Missing `pin` in GPIO config.')
 
             if conf.get('debounce') is not None and conf.get('edge_detection') is None:
-                raise ConfigError('`debounce` detected without required `edge_detection` in GPIO config.')
+                if conf.get('type','button') == 'switch':
+                    conf['edge_detection'] = 'both'
+                else:
+                    raise ConfigError('`debounce` detected without required `edge_detection` in GPIO config.')
         return config
 
 
