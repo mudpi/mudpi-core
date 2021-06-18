@@ -1,6 +1,7 @@
 import os
 import enum 
 import time
+import json
 import threading
 
 from mudpi import importer
@@ -242,6 +243,20 @@ class MudPi:
             else:
                 self.states.remove(state_id)
 
+    def finalize_boot(self):
+        """ Run post boot operations like caching data 
+            and resource cleanup """
+
+        # Cache components 
+        # TODO: make cache_manager
+        self.states.redis.set("mudpi_component_ids", json.dumps(self.components.cache_string()))
+        components = {}
+        for namespace, _components in self.components.items():
+            for _id, _component in _components.items():
+                _json = _component.to_json()
+                _json['namespace'] = namespace
+                components[_component.id] = _json
+        self.states.redis.set("mudpi_components", json.dumps(components))
 
 
 class CoreState(enum.Enum):
