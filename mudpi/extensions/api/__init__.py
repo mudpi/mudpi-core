@@ -69,12 +69,8 @@ class Api(Worker):
         self._lock = threading.Lock()
         self._api_ready = threading.Event()
 
-        self.reset_duration()
-
-        self.api.route('/ping', ['GET', 'POST'], self.ping)
-        self.api.route('/test/<msg>', ['GET', 'POST'], self.test)
-        self.api.route('/example', ['GET', 'POST'], self.example)
         self.mudpi.workers.register(self.key, self)
+        self._api_ready.set()
 
     @property
     def key(self):
@@ -105,29 +101,22 @@ class Api(Worker):
         """ Api debug mode """
         return self.config.get('debug', False)
 
+    @property
+    def disabled(self):
+        """ Disable the api """
+        return self.config.get('disabled', False)
 
-    def ping(self):
-        return "pong"
 
     def register_route(self, route, func, methods=['GET']):
         """ Register a route on the api """
         self.api.route(route, method=methods)(func)
         return self.api
 
-    def test(self, msg='example'):
-        return msg
-
-    def example(self, data=None):
-        if data is None:
-            data = 'default'
-        return data
-    
     def work(self, func=None):
         delay_multiplier = 1
-        while self.mudpi.is_prepared:
-            self.api.run(host='localhost', port=self.port, debug=self.debug, server=self.server)
-            if self.mudpi.is_running:
-                self.wait(1)
+        if self.mudpi.is_prepared:
+            if not self.disabled:
+                self.api.run(host='localhost', port=self.port, debug=self.debug, server=self.server)
             
         # MudPi Shutting Down, Perform Cleanup Below
         Logger.log_formatted(LOG_LEVEL["debug"],

@@ -11,7 +11,7 @@ from mudpi.logger.Logger import Logger, LOG_LEVEL
 from mudpi.managers.state_manager import StateManager
 from mudpi.exceptions import ConfigNotFoundError, ConfigFormatError
 from mudpi.registry import Registry, ActionRegistry, ComponentRegistry
-from mudpi.constants import DEFAULT_CONFIG_FILE, IMPERIAL_SYSTEM, METRIC_SYSTEM
+from mudpi.constants import DEFAULT_CONFIG_FILE, IMPERIAL_SYSTEM, METRIC_SYSTEM, __version__
 
 class MudPi:
     """ 
@@ -35,7 +35,9 @@ class MudPi:
             # Event to signal system to shutdown
             'mudpi_running': threading.Event(),
             # Event to tell workers to begin working
-            "core_running": threading.Event()
+            "core_running": threading.Event(),
+            # Event to override MudPi and shutdown
+            "shutdown_override": threading.Event()
         }
 
         # Setup the registries
@@ -267,9 +269,13 @@ class MudPi:
     def core_loaded(self):
         """ Called after the core is loaded. All core systems and
             extensions are available. """
+        self.api.register_route('/', self.get_mudpi)
         self.api.register_route('/config', self.get_config)
         self.api.register_route('/core/state', self.core_state)
-        self.api.register_route('/core/cache-components', self.finalize_boot)
+        self.api.register_route('/core/stop', self.stop)
+        self.api.register_route('/core/start', self.start)
+        self.api.register_route('/core/shutdown', self.get_shutdown)
+        self.api.register_route('/core/cache-components', self.cache_components)
         self.api.register_route('/components', self.get_components)
         self.api.register_route('/workers', self.get_workers)
         self.api.register_route('/states', self.get_states)
@@ -306,7 +312,6 @@ class MudPi:
 
     def get_state(self, component_id=None):
         """ Get all states. Used for api """
-        print(component_id)
         _state = None
         if component_id:
             if self.states.id_exists(component_id):
@@ -325,6 +330,15 @@ class MudPi:
 
         return actions
 
+    def get_shutdown(self):
+        """ Override main thread and shutdown mudpi """
+        self.thread_events['shutdown_override'].set()
+        self.shutdown()
+        self.unload_extensions()
+
+    def get_mudpi(self):
+        """ Handle the default route of the api """
+        return __version__
 
 
 class CoreState(enum.Enum):

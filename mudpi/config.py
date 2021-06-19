@@ -63,6 +63,10 @@ class Config(object):
             "unit_system": self.config.get('mudpi', {}).get('unit_system', "imperial"),
         }
         self.config['mudpi'] = core_config
+        self.config['api'] = {
+            "port": self.config.get('api', {}).get('port', 8080),
+            "debug": self.config.get('api', {}).get('debug', False)
+        }
 
     def to_dict(self):
         """ Return Config as Dict """
@@ -117,6 +121,7 @@ class Config(object):
                 if config:
                     self.config = config
                     self.config_path = os.path.split(file)[0]
+                self.set_defaults()
                 return config
         except FileNotFoundError:
             print(
