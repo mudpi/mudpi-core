@@ -1,8 +1,9 @@
 {
-	"name": "Timer",
+	"name": "Timers",
 	"namespace": "timer",
 	"details": {
-		"description": "Timer components to track elapsed time."
+		"description": "Timer components to track elapsed time.",
+		"documentation": "https://mudpi.app/docs/extension-timer"
 	},
 	"requirements": []
 }

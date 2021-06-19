@@ -3,7 +3,7 @@
 	"namespace": "trigger",
 	"details": {
 		"description": "Causes actions based on events or state changes.",
-		"documentation": "https://mudpi.app/docs/triggers"
+		"documentation": "https://mudpi.app/docs/configuration-triggers"
 	},
 	"requirements": []
 }

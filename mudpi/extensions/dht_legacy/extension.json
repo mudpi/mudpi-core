@@ -2,8 +2,8 @@
 	"name": "Digital Humidity Temperature (DHT) [Legacy]",
 	"namespace": "dht_legacy",
 	"details": {
-		"description": "Provides interface for DHT sensors to take climate readings (using depricated library).",
-		"documentation": "https://mudpi.app/docs/extensions/dht"
+		"description": "Adds support for DHT sensors to take climate readings (using depricated library).",
+		"documentation": "https://mudpi.app/docs/extension-dht-legacy"
 	},
 	"requirements": ["Adafruit_DHT"]
 }

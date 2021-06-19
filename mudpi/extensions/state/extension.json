@@ -1,9 +1,9 @@
 {
-	"name": "State Manager",
+	"name": "State Components",
 	"namespace": "state",
 	"details": {
-		"description": "Interfaces to core Mudpi state manager",
-		"documentation": "https://mudpi.app/docs/states"
+		"description": "Adds components that interface to the core Mudpi state manager",
+		"documentation": "https://mudpi.app/docs/extension-state"
 	},
 	"requirements": []
 }

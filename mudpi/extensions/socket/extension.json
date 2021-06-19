@@ -2,8 +2,8 @@
 	"name": "Socket Server",
 	"namespace": "socket",
 	"details": {
-		"description": "Simple socket server to interface with MudPi",
-		"documentation": "https://mudpi.app/docs/socket"
+		"description": "Simple socket server to relay events with MudPi",
+		"documentation": "https://mudpi.app/docs/extension-socket"
 	},
 	"requirements": []
 }

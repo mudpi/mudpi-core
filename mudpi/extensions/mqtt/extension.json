@@ -2,8 +2,8 @@
 	"name": "MQTT",
 	"namespace": "mqtt",
 	"details": {
-		"description": "MQTT support for components.",
-		"documentation": "https://mudpi.app/docs/mqtt"
+		"description": "Adds MQTT support for components.",
+		"documentation": "https://mudpi.app/docs/extension-mqtt"
 	},
 	"requirements": ["paho-mqtt"]
 }

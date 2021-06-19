@@ -2,8 +2,8 @@
 	"name": "Automation Sequences",
 	"namespace": "sequence",
 	"details": {
-		"description": "Fire multiple actions in sequential order.",
-		"documentation": "https://mudpi.app/docs/sequences"
+		"description": "Fire multiple actions in sequential order with optional delays between steps.",
+		"documentation": "https://mudpi.app/docs/extension-sequence"
 	},
 	"requirements": []
 }

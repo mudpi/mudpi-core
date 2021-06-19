@@ -2,8 +2,8 @@
 	"name": "GPIO (Linux)",
 	"namespace": "gpio",
 	"details": {
-		"description": "Interfaces using linux board GPIO.",
-		"documentation": "https://mudpi.app/docs/gpio"
+		"description": "Control a linux board GPIO pins.",
+		"documentation": "https://mudpi.app/docs/extension-gpio"
 	},
 	"requirements": ["adafruit-blinka", "adafruit-circuitpython-debouncer"]
 }

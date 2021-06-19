@@ -1,9 +1,9 @@
 {
-	"name": "Sun Schedule",
+	"name": "Sun",
 	"namespace": "sun",
 	"details": {
 		"description": "Sun tracking for sunrise and sunset",
-		"documentation": "https://mudpi.app/docs/extensions/sun"
+		"documentation": "https://mudpi.app/docs/extension-sun"
 	},
 	"requirements": ["requests"]
 }

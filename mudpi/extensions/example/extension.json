@@ -2,7 +2,8 @@
 	"name": "Example",
 	"namespace": "example",
 	"details": {
-		"description": "Example components for testing and demontstration."
+		"description": "Example components for testing and demontstration.",
+		"documentation": "https://mudpi.app/docs/extension-example"
 	},
 	"requirements": []
 }

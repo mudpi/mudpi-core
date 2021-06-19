@@ -3,7 +3,7 @@
 	"namespace": "bme680",
 	"details": {
 		"description": "Provides interface for BME680 sensors to take environment readings.",
-		"documentation": "https://mudpi.app/docs/sensors/bme680"
+		"documentation": "https://mudpi.app/docs/extension-bme680"
 	},
 	"requirements": ["adafruit-blinka", "adafruit-circuitpython-bme680"]
 }

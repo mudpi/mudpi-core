@@ -3,7 +3,7 @@
 	"namespace": "redis",
 	"details": {
 		"description": "Redis support for components.",
-		"documentation": "https://mudpi.app/docs/redis"
+		"documentation": "https://mudpi.app/docs/extension-redis"
 	},
 	"requirements": ["redis"]
 }

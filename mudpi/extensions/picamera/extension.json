@@ -3,7 +3,7 @@
 	"namespace": "picamera",
 	"details": {
 		"description": "Camera module for Raspberry Pi",
-		"documentation": "https://mudpi.app/docs/camera/picamera"
+		"documentation": "https://mudpi.app/docs/camera/extension-picamera"
 	},
 	"requirements": ["picamera"]
 }

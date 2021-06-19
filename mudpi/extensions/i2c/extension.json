@@ -2,8 +2,8 @@
 	"name": "I2C Components",
 	"namespace": "i2c",
 	"details": {
-		"description": "Provideds I2C Support for Extensions.",
-		"documentation": "https://mudpi.app/docs/lcd_displays"
+		"description": "Adds I2C Support for Extensions.",
+		"documentation": "https://mudpi.app/docs/extension-i2c"
 	},
 	"requirements": ["adafruit-blinka", "git+https://github.com/olixr/Adafruit_CircuitPython_CharLCD.git#egg=adafruit-circuitpython-charlcd"]
 }

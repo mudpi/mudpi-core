@@ -2,7 +2,7 @@
 	"name": "Controls",
 	"namespace": "control",
 	"details": {
-		"description": "Take physical input from user such as button, switch, etc.",
+		"description": "Take physical input from user such as button, switch or potentiometers.",
 		"documentation": "https://mudpi.app/docs/controls"
 	},
 	"requirements": []

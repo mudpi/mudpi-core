@@ -2,7 +2,8 @@
 	"name": "API",
 	"namespace": "api",
 	"details": {
-		"description": "A simple API to interface with core systems."
+		"description": "A simple API to interface with core systems and get MudPi data.",
+		"documentation": "https://mudpi.app/docs/extension-api"
 	},
 	"requirements": ["bottle"]
 }

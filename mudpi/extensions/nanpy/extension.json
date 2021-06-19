@@ -3,7 +3,7 @@
 	"namespace": "nanpy",
 	"details": {
 		"description": "Control arduino and ESP boards through serial/wifi.",
-		"documentation": "https://mudpi.app/docs/nodes"
+		"documentation": "https://mudpi.app/docs/extension-nanpy"
 	},
 	"requirements": ["https://github.com/olixr/nanpy/archive/master.zip"]
 }
