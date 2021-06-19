@@ -44,6 +44,9 @@ class MudPi:
         self.workers = Registry(self, 'workers')
         self.actions = ActionRegistry(self, 'actions')
 
+        # API
+        self.api = None
+
         # System is Running
         self.thread_events['mudpi_running'].set()
         time.sleep(0.1)
@@ -162,7 +165,6 @@ class MudPi:
             # Error core not loaded call `load_core()` first
             return
 
-
         self.events.publish('core', {'event': 'Starting'})
         self.state = CoreState.starting
         self.thread_events['core_running'].set()
@@ -186,6 +188,7 @@ class MudPi:
         self.unload_extensions()
         self.thread_events['mudpi_running'].clear()
         self.state = CoreState.not_running
+        self.api.close()
 
         _closed_threads = []
         # First pass of threads to find out which ones are slower
@@ -246,8 +249,10 @@ class MudPi:
     def finalize_boot(self):
         """ Run post boot operations like caching data 
             and resource cleanup """
+        self.cache_components()
 
-        # Cache components 
+    def cache_components(self):
+        """ Cache all the current components """
         # TODO: make cache_manager
         self.states.redis.set("mudpi_component_ids", json.dumps(self.components.cache_string()))
         components = {}
@@ -257,6 +262,69 @@ class MudPi:
                 _json['namespace'] = namespace
                 components[_component.id] = _json
         self.states.redis.set("mudpi_components", json.dumps(components))
+        return components
+
+    def core_loaded(self):
+        """ Called after the core is loaded. All core systems and
+            extensions are available. """
+        self.api.register_route('/config', self.get_config)
+        self.api.register_route('/core/state', self.core_state)
+        self.api.register_route('/core/cache-components', self.finalize_boot)
+        self.api.register_route('/components', self.get_components)
+        self.api.register_route('/workers', self.get_workers)
+        self.api.register_route('/states', self.get_states)
+        self.api.register_route('/states/<component_id>', self.get_state)
+        self.api.register_route('/actions', self.get_actions)
+
+
+    """ API METHODS """
+    def get_config(self):
+        """ Return the config of the core. Used for api """
+        return self.config.config
+
+    def core_state(self):
+        """ Return the state of the core. Used for api """
+        return str(self.state)
+
+    def get_components(self):
+        """ Get all components. Used for api """
+        return self.cache_components()
+
+    def get_workers(self):
+        """ Get all workers Used for api """
+        _workers = {}
+        for _id, worker in self.workers.items():
+            _workers[_id] = worker.to_json()
+        return _workers
+
+    def get_states(self):
+        """ Get all states. Used for api """
+        _states = {}
+        for _id, _state in self.states.states.items():
+            _states[_id] = _state.to_dict()
+        return _states
+
+    def get_state(self, component_id=None):
+        """ Get all states. Used for api """
+        print(component_id)
+        _state = None
+        if component_id:
+            if self.states.id_exists(component_id):
+                _state = self.states.get(component_id).to_dict()
+        return _state
+
+    def get_actions(self):
+        """ Get all actions. Used for api """
+        actions = {}
+        for _namespace, _actions in self.actions.all().items():
+            for _id, _action in _actions.items():
+                if _namespace:
+                    actions[f".{_namespace}.{_id}"] = _id
+                else:
+                    actions[f".{_id}"] = _id
+
+        return actions
+
 
 
 class CoreState(enum.Enum):

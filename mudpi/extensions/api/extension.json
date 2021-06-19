@@ -1,0 +1,8 @@
+{
+	"name": "API",
+	"namespace": "api",
+	"details": {
+		"description": "A simple API to interface with core systems."
+	},
+	"requirements": ["bottle"]
+}
