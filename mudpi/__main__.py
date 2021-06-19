@@ -93,7 +93,6 @@ def main(args=None):
 
     Logger.log_formatted(LOG_LEVEL["warning"], "Initializing Core ", "Complete", 'success')
 
-    Logger.log(LOG_LEVEL["debug"], f'{" Detecting Configurations ":_^{FONT_PADDING+8}}')
     # Load the Extension System
     loaded_extensions = manager.load_all_extensions()
 
@@ -104,6 +103,7 @@ def main(args=None):
     Logger.log_formatted(LOG_LEVEL["warning"], "MudPi Fully Loaded", 'Complete', 'success')
 
     # Restore Previous States
+    Logger.log(LOG_LEVEL["debug"], f'{" Restore Cachced States ":_^{FONT_PADDING+8}}')
     Logger.log_formatted(LOG_LEVEL["info"], "Checking for Previous Component States", 'Pending', 'warning')
     manager.mudpi.restore_states()
     Logger.log_formatted(LOG_LEVEL["warning"], "Restored Previous Component States", 'Complete', 'success')
