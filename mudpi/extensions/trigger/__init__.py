@@ -94,6 +94,17 @@ class Trigger(Component):
         else:
             self._active.clear()
 
+    @property
+    def json_attributes(self):
+        """ Return a list of attribute keys to export in json """
+        return [
+            'source',
+            'nested_source',
+            'frequency',
+            'thresholds',
+            'active'
+        ]
+
 
     """ Methods """
     def check(self):

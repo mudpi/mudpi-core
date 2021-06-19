@@ -87,6 +87,13 @@ class TimerSensor(Sensor):
         """ Return true if count should count down """
         return self.config.get('invert_count', False)
 
+    @property
+    def json_attributes(self):
+        """ Return a list of attribute keys to export in json """
+        return [
+            'max_duration',
+            'invert_count'
+        ]
 
     """ Methods """
     def init(self):

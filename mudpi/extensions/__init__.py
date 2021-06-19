@@ -425,11 +425,13 @@ class Component:
             'should_update',
             'classifier'
         ]
-        attributes = _core_attributes + self.json_attributes
-        # for attribute in self.json_attributes:
-        #     component_json[attribute] = getattr(self, attribute)
         for attribute, data in self.config.items():
             component_json[attribute] = data
+
+        attributes = list(set(_core_attributes + self.json_attributes))
+        for attribute in attributes:
+            component_json[attribute] = getattr(self, attribute)
+            
         return component_json
 
     def __repr__(self):

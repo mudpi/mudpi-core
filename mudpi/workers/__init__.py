@@ -111,6 +111,18 @@ class Worker:
             time.sleep(0.001)
             time_remaining -= 0.001
 
+    def to_json(self):
+        """ Return data in a json format """
+        components = self.components.keys()
+        return {
+            "key": self.key,
+            "name": self.name,
+            "update_interval": self.update_interval,
+            "components": list(components),
+            "is_available": self.is_available,
+            "duration": self.duration
+        }
+
     """ Should be moved to Timer util """
     @property
     def duration(self):

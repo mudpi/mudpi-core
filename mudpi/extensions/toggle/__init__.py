@@ -86,6 +86,15 @@ class Toggle(Component):
         else:
             self._active.clear()
 
+    @property
+    def json_attributes(self):
+        """ Return a list of attribute keys to export in json """
+        return [
+            'active',
+            'invert_state',
+            'topic'
+        ]
+
 
     """ Methods """
     def update(self):

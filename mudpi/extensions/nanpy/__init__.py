@@ -206,3 +206,13 @@ class Node(Worker):
         self._node_connected.clear()
         self._node_ready.clear()
         return True
+
+    def to_json(self):
+        """ Return data in a json format """
+        return {
+            "key": self.key,
+            "name": self.name,
+            "update_interval": self.update_interval,
+            "is_available": self.is_available,
+            "duration": self.duration
+        }

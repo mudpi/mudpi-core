@@ -141,6 +141,17 @@ class Sequence(Component):
             "step_complete": self._step_complete
         }
 
+    @property
+    def json_attributes(self):
+        """ Return a list of attribute keys to export in json """
+        return [
+            'total_steps',
+            'sequence',
+            'active',
+            'topic'
+        ]
+
+
     """ Methods """
     def init(self):
         """ Init hook to subscribe to events """
