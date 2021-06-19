@@ -50,29 +50,57 @@ class CoreManager:
             Logger.log_to_file(LOG_LEVEL["debug"], f'{index}: {config_item}')
         Logger.log_to_file(LOG_LEVEL["debug"], "End of config file dump!\n")
 
-    def load_all_extensions(self, config=None):
+    def load_all_extensions(self, config=None, extensions=[]):
         """ Import extensions for MudPi based on loaded Config """
         config = config or self.mudpi.config.config
 
         if not self.import_config_dir():
             raise ConfigError("Could not import the config_path and load extensions")
 
-
+        Logger.log(LOG_LEVEL["debug"], f'{" Preparing Core Extensions ":_^{FONT_PADDING+8}}')
         Logger.log_formatted(
             LOG_LEVEL["warning"], "Detecting Configurations", "Pending", 'notice'
         )
 
         core_configs = ['mudpi', 'logging', 'debug']
-        # Get all the non-core extensions to load
-        extensions_to_load = [ 
+        core_extensions = ['api']
+
+        core_extensions_to_load = [ 
             key 
             for key in config.keys() 
-            if key not in core_configs
+            if key not in core_configs and key in core_extensions
         ]
+
+        Logger.log_formatted(
+            LOG_LEVEL["warning"], f"Detected {len(core_extensions_to_load)} Core Configurations", "Complete", 'success'
+        )
+
+        self.prepare_and_load_extensions(core_extensions_to_load, config)
+
+        self.mudpi.core_loaded()
+
+        Logger.log(LOG_LEVEL["debug"], f'{" Preparing Configured Extensions ":_^{FONT_PADDING+8}}')
+        # Get all the non-core extensions to load
+        extensions_to_load = extensions or [ 
+            key 
+            for key in config.keys() 
+            if key not in core_configs and key not in core_extensions
+        ]
+
         Logger.log_formatted(
             LOG_LEVEL["warning"], f"Detected {len(extensions_to_load)} Non-Core Configurations", "Complete", 'success'
         )
         
+        self.prepare_and_load_extensions(extensions_to_load, config)
+
+        # Cache important data like requirements installed
+        self.mudpi.states.cache()
+
+        return self.mudpi.extensions.all()
+
+    def prepare_and_load_extensions(self, extensions=[], config={}):
+        """ Prepare and load extensions provided """
+        extensions_to_load = extensions
         Logger.log_formatted(
             LOG_LEVEL["warning"], f"Preparing {len(extensions_to_load)} Configurations to be Loaded ", "Pending", 'notice'
         )
@@ -135,7 +163,7 @@ class CoreManager:
                 LOG_LEVEL["warning"], f"{len(extensions_to_load)} Configurations Ready to Load ", "Complete", 'success'
             )
 
-            Logger.log(LOG_LEVEL["debug"], f'{" Load Extensions ":_^{FONT_PADDING+8}}')
+            Logger.log(LOG_LEVEL["debug"], f'{" Initializing Extensions ":_^{FONT_PADDING+8}}')
             Logger.log_formatted(
                 LOG_LEVEL["warning"], f"Loading {len(extensions_to_load)} Configurations into Extensions ", "Pending", 'notice'
             )
@@ -146,11 +174,6 @@ class CoreManager:
 
         #  Import and setup the extensions
         self.load_extensions(extensions_to_load, config)
-
-        # Cache important data like requirements installed
-        self.mudpi.states.cache()
-
-        return self.mudpi.extensions.all()
 
     def load_extensions(self, extensions, config):
         """ Initialize a list of extensions with provided config """
