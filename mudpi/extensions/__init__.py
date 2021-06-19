@@ -431,7 +431,7 @@ class Component:
         attributes = list(set(_core_attributes + self.json_attributes))
         for attribute in attributes:
             component_json[attribute] = getattr(self, attribute)
-            
+
         return component_json
 
     def __repr__(self):
