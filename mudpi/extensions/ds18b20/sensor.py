@@ -74,13 +74,17 @@ class ds18b20(Sensor):
 
     """ Methods """
     def init(self):
-        """To support multiple 1-wire devices check to see if the ID is set in the config. 
+        """To support multiple 1-wire devices check to see if the ID is set in the config.
         If the ID is not set, there should only be a single 28-xxxxxxxxx directory in the base directory, so we use that. """
 
         base_dir = '/sys/bus/w1/devices'
 
         if self.config.get('onewireID') and os.path.isdir(base_dir + '/' + self.config.get('onewireID')):
-            device_file = base_dir + '/' + self.config.get('onewireID') + '/w1_slave'
+            self.device_file = base_dir + '/' + self.config.get('onewireID') + '/w1_slave'
+            Logger.log(
+                LOG_LEVEL["debug"],
+                'Setting device file to ' + self.device_file
+            )
         else:
             Logger.log(
                 LOG_LEVEL["debug"],
