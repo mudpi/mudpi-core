@@ -35,10 +35,10 @@ class Interface(BaseInterface):
 
         for conf in config:
             """ See if 1-wire ID was passed by the user in the config file """
-            if not conf.get('onewireID'):
+            if not conf.get('one_wire_ID'):
                 Logger.log(
                     LOG_LEVEL["debug"],
-                    'DS18B20 onewireID not set. Will search for device.'
+                    'DS18B20 one_wire_ID not set. Will search for device.'
                 )         
                
         return config
@@ -68,8 +68,8 @@ class ds18b20(Sensor):
         return 'temperature'
 
     @property
-    def onewireID(self):
-        return self.config['onewireID']
+    def one_wire_ID(self):
+        return self.config['one_wire_ID']
 
 
     """ Methods """
@@ -79,8 +79,8 @@ class ds18b20(Sensor):
 
         base_dir = '/sys/bus/w1/devices'
 
-        if self.config.get('onewireID') and os.path.isdir(base_dir + '/' + self.config.get('onewireID')):
-            self.device_file = base_dir + '/' + self.config.get('onewireID') + '/w1_slave'
+        if self.config.get('one_wire_ID') and os.path.isdir(base_dir + '/' + self.config.get('one_wire_ID')):
+            self.device_file = base_dir + '/' + self.config.get('one_wire_ID') + '/w1_slave'
             Logger.log(
                 LOG_LEVEL["debug"],
                 'Setting device file to ' + self.device_file
@@ -88,7 +88,7 @@ class ds18b20(Sensor):
         else:
             Logger.log(
                 LOG_LEVEL["debug"],
-                'DS18B20 onewireID not set or not found.'
+                'DS18B20 one_wire_ID not set or not found.'
             )
             """ Make sure 1-wire device directory exists """
             try:
@@ -96,7 +96,7 @@ class ds18b20(Sensor):
             except:
                 Logger.log(
                     LOG_LEVEL["error"],
-                    'Failed to find 1-wire device directory. Ensure device is connected and onewireID corret..'
+                    'Failed to find 1-wire device directory. Ensure device is connected and one_wire_ID corret..'
                     )
             else:
                 self.device_file = device_folder + '/w1_slave'        
