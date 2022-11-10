@@ -17,7 +17,7 @@ os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
 
-#device_folder = '/sys/bus/w1/devices/28-01206308503c'
+#device_folder = '/sys/bus/w1/devices/28-XXXXXXXXXXXXX'
 #device_folder = glob.glob(base_dir + '/28*')[0]
 #device_file = device_folder + '/w1_slave'
 
