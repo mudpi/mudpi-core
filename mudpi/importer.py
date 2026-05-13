@@ -108,7 +108,7 @@ class ExtensionImporter:
                 continue
 
             try:
-                with open(config_path) as f:
+                with open(config_path, encoding="utf-8") as f:
                     config = json.loads(f.read())
             except FileNotFoundError:
                 Logger.log(
@@ -119,7 +119,7 @@ class ExtensionImporter:
             except Exception as e:
                 Logger.log(
                     LOG_LEVEL["error"],
-                    f'{FONT_RED}Error loading extension.json at {config_path} {error}.{FONT_RESET}'
+                    f'{FONT_RED}Error loading extension.json at {config_path} {e}.{FONT_RESET}'
                 )
                 continue
 
@@ -652,7 +652,7 @@ def _get_custom_extensions(mudpi):
     for extension in extension_dirs:
         extension_importer = ExtensionImporter.create(mudpi, extension, custom_extensions)
         if extension_importer is not None:
-            extension_list[extension_importer.name]: extension_importer
+            extension_list[extension_importer.name] = extension_importer
 
     mudpi.cache['custom_extension_importers'] = extension_list
 

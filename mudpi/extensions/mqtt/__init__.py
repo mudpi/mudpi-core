@@ -36,7 +36,7 @@ class Extension(BaseExtension):
                     if rc == 0:
                         self.connections[conf['key']]['connected'] = True
 
-                self.connections[conf['key']]['client'] = mqtt.Client(f'mudpi-{conf["key"]}')
+                self.connections[conf['key']]['client'] = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, f'mudpi-{conf["key"]}')
                 self.connections[conf['key']]['client'].on_connect = on_conn
                 username = conf.get('username')
                 password = conf.get('password')

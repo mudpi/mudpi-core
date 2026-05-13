@@ -1,8 +1,9 @@
 {
 	"name": "Digital Humidity Temperature (DHT) [Legacy]",
 	"namespace": "dht_legacy",
+	"deprecated": true,
 	"details": {
-		"description": "Provides interface for DHT sensors to take climate readings (using depricated library).",
+		"description": "DEPRECATED: Adafruit_DHT is abandoned and incompatible with Python 3.9+. Use the 'dht' extension instead.",
 		"documentation": "https://mudpi.app/docs/extensions/dht"
 	},
 	"requirements": ["Adafruit_DHT"]

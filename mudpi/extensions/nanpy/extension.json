@@ -1,9 +1,10 @@
 {
 	"name": "Nanpy",
 	"namespace": "nanpy",
+	"deprecated": true,
 	"details": {
-		"description": "Control arduino and ESP boards through serial/wifi.",
+		"description": "DEPRECATED: Nanpy is abandoned (last updated 2020) and may not work on Python 3.9+. Control arduino and ESP boards through serial/wifi.",
 		"documentation": "https://mudpi.app/docs/nodes"
 	},
-	"requirements": ["https://github.com/olixr/nanpy/archive/master.zip"]
+	"requirements": ["nanpy"]
 }

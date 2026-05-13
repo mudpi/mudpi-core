@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=77.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mudpi"
+version = "0.11.0"
+description = "Privacy Focused Automation for the Garden & Home"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+    { name = "Eric Davisson", email = "eric@mudpi.app" },
+]
+urls = { Homepage = "https://mudpi.app", Repository = "https://github.com/mudpi/mudpi-core" }
+dependencies = [
+    "redis>=5.0,<7.0",
+    "pyyaml>=6.0",
+    "paho-mqtt>=2.1,<3.0",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Home Automation",
+    "Topic :: System :: Hardware",
+]
+
+[project.scripts]
+mudpi = "mudpi.__main__:main"
+
+[tool.setuptools.packages.find]
+exclude = ["tools", "tests", "scripts", "debug"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.yml", "*.config", "*.config.example", "*.sh"]

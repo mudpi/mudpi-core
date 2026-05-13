@@ -1,17 +1,30 @@
 """ 
-    Nanpy Extension
+    Nanpy Extension [Deprecated]
     Allows arduino boards and ESP based devices 
     to be controlled via serial or wifi.
+
+    DEPRECATED: The nanpy library is abandoned (last updated 2020) and
+    may not function correctly on Python 3.9+.
 """
 import time
 import random
 import socket
+import warnings
 import threading
 from mudpi.workers import Worker
 from mudpi.extensions import BaseExtension
 from mudpi.exceptions import MudPiError, ConfigError
-from nanpy import (ArduinoApi, SerialManager)
 from mudpi.logger.Logger import Logger, LOG_LEVEL
+
+warnings.warn(
+    "The 'nanpy' extension is deprecated and will be removed in a future "
+    "release. The nanpy library is abandoned (last updated 2020) and may "
+    "not function correctly on Python 3.9+.",
+    DeprecationWarning,
+    stacklevel=2
+)
+
+from nanpy import (ArduinoApi, SerialManager)
 from nanpy.serialmanager import SerialManagerError
 from nanpy.sockconnection import (SocketManager, SocketManagerError)
 

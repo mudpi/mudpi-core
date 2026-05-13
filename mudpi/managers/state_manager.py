@@ -136,14 +136,14 @@ class State():
     def __init__(
         self,
         component_id,
-        state = {},
-        metadata = {},
-        updated_at = datetime.datetime.now(),
-        source_id = None
+        state=None,
+        metadata=None,
+        updated_at=None,
+        source_id=None
         ):
         self.component_id = component_id
-        self.state = state
-        self.metadata = metadata # Used for UI like icons, measure units, and display names.
+        self.state = state if state is not None else {}
+        self.metadata = metadata if metadata is not None else {}
         self.updated_at = updated_at if updated_at is not None else datetime.datetime.now().replace(microsecond=0)
         self.source_id = source_id
 

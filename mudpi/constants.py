@@ -2,7 +2,7 @@ import os
 
 """ Constants used by MudPi """
 MAJOR_VERSION = 0
-MINOR_VERSION = 10
+MINOR_VERSION = 11
 PATCH_VERSION = "0"
 __version__ = f'{MAJOR_VERSION}.{MINOR_VERSION}.{PATCH_VERSION}'
 

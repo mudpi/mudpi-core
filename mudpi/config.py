@@ -104,7 +104,7 @@ class Config(object):
             format = self.config_format(file)
 
         try:
-            with open(file) as f:
+            with open(file, encoding="utf-8") as f:
                 config = f.read()
                 f.close()
                 if format is not None:
@@ -169,7 +169,7 @@ class Config(object):
             config = yaml.dump(config)
         else:
             config = str(config)
-        with open(file, 'w') as f:
+        with open(file, 'w', encoding="utf-8") as f:
             f.write(config)
         return True
 
