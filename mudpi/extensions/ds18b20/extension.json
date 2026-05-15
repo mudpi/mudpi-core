@@ -1,0 +1,9 @@
+{
+	"name": "DS18B20 1-Wire Temperature Sensor",
+	"namespace": "ds18b20",
+	"details": {
+		"description": "Provides interface for ds18b20 sensors to take tempurature readings.",
+		"documentation": "https://mudpi.app/docs/sensors/ds18b20"
+	},
+	"requirements": ["glob2", "python-time"]
+}

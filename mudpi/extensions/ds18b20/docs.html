@@ -1,0 +1,41 @@
+# DS18B20
+The `ds18b20` extension connects to a DS18B20 device to gather temperature readings. The sensor will return `temperature`.
+
+This extension does not take an extension level configs and is focused on [interfaces.]({{url('docs/developers-interfaces')}})
+
+---
+<div class="mb-2"></div>
+
+## Sensor Interface
+Provides a [sensor]({{url('docs/sensors')}}) that returns a DS18B20 readings. 
+
+<table class="mt-2 mb-4">
+<thead><tr><td width="15%">Option</td><td width="15%">Type</td><td width="15%">Required</td><td width="55%">Description</td></tr></thead>
+<tbody>
+    <tr><td class="font-600">key</td><td class="text-italic text-sm">[String]</td><td>Yes</td><td class="text-xs">Unique slug id for the component</td></tr>
+    <tr><td class="font-600">name</td><td class="text-italic text-sm">[String]</td><td>No</td><td class="text-xs">Friendly display name of component. Useful for UI.</td></tr>
+    <tr><td class="font-600">one_wire_ID</td><td class="text-italic text-sm">[String]</td><td>No</td><td class="text-xs">The address of the DS18B20 sensor. This should be set if using mulitple DS18B20 sensors and can be found as a directory in `/sys/bus/w1/devices/`  in the format of `28-XXXXXXXXXXXXX` . <strong>Default 10</strong></td></tr>
+</tbody>
+</table>
+
+### Config Examples
+Here is a config of a complete example sensor.
+
+```json
+"sensor": [{
+    "key": "ds18b20_outside",
+    "interface": "ds18b20",
+    "name": "Outside temperature",
+    "one_wire_ID": "28-0000000000001"
+}]
+```
+
+### Data
+Here is an example of the data returned by the DS18B20:
+
+```json
+{
+    "temperature": 50
+}
+```
+---
